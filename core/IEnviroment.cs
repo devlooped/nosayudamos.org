@@ -11,8 +11,9 @@ namespace NosAyudamos
     {
         public string GetVariable(string name)
         {
-            return Environment.GetEnvironmentVariable(
-                Ensure.NotEmpty(name, nameof(name)));
+            return Ensure.NotEmpty(
+                    Environment.GetEnvironmentVariable(
+                        Ensure.NotEmpty(name, nameof(name))), name);
         }
     }
 }
