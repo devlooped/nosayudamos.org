@@ -5,7 +5,7 @@ namespace NosAyudamos
     public static class Ensure
     {
         [System.Diagnostics.DebuggerStepThrough]
-        public static string NotEmpty(this string value, string varName)
+        public static string NotEmpty(this string? value, string varName)
         {
             if (string.IsNullOrEmpty(value))
             {
