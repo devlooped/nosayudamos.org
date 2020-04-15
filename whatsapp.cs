@@ -11,13 +11,16 @@ namespace NosAyudamos
 {
     public class Whatsapp
     {
-        private readonly IMessaging _messaging;
-        private readonly ILanguageUnderstanding _languageUnderstanding;
+        private readonly IMessaging messaging;
+        private readonly ILanguageUnderstanding languageUnderstanding;
 
-        public Whatsapp(IMessaging messaging, ILanguageUnderstanding languageUnderstanding)
+        private readonly ITextAnalysis textAnalysis;
+
+        public Whatsapp(IMessaging messaging, ILanguageUnderstanding languageUnderstanding, ITextAnalysis textAnalysis)
         {
-            _messaging = messaging;
-            _languageUnderstanding = languageUnderstanding;
+            this.messaging = messaging;
+            this.languageUnderstanding = languageUnderstanding;
+            this.textAnalysis = textAnalysis;
         }
 
         [FunctionName("whatsapp")]
@@ -29,10 +32,15 @@ namespace NosAyudamos
 
             var msg = Message.Create(body);
 
-            var intents = await _languageUnderstanding.GetIntentsAsync(msg.Body);
+            var intents = await languageUnderstanding.GetIntentsAsync(msg.Body);
             log.LogInformation(JsonSerializer.Serialize(intents, new JsonSerializerOptions { WriteIndented = true }));
+            var entities = await textAnalysis.GetentitiesAsync(msg.Body);
+            log.LogInformation(JsonSerializer.Serialize(entities, new JsonSerializerOptions { WriteIndented = true }));
+            var keyPhrases = await textAnalysis.GetKeyPhrasesAsync(msg.Body);
+            log.LogInformation(JsonSerializer.Serialize(keyPhrases, new JsonSerializerOptions { WriteIndented = true }));
+            
 
             return new OkObjectResult("");
-       }
+        }
     }
 }
