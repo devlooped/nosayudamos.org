@@ -5,11 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Web;
 using System.Text.Json;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
 
 namespace NosAyudamos
 {
@@ -31,10 +27,10 @@ namespace NosAyudamos
         {
             var body = await new StreamReader(req.Body).ReadToEndAsync();
 
-            var msg = IncomingMessage.Create(body);
+            var msg = Message.Create(body);
 
             var intents = await _languageUnderstanding.GetIntentsAsync(msg.Body);
-            log.LogInformation(JsonConvert.SerializeObject(intents, Formatting.Indented));
+            log.LogInformation(JsonSerializer.Serialize(intents, new JsonSerializerOptions { WriteIndented = true }));
 
             return new OkObjectResult("");
        }

@@ -11,22 +11,18 @@ namespace NosAyudamos
 
     public class Messaging : IMessaging
     {
-        private readonly IEnviroment _enviroment;
-        public Messaging(IEnviroment enviroment)
+        private readonly IEnviroment enviroment;
+        public Messaging(IEnviroment env)
         {
-            _enviroment = enviroment;
+            enviroment = env;
 
             TwilioClient.Init(
-                _enviroment.GetVariable("TwilioAccountSid"),
-                _enviroment.GetVariable("TwilioAuthToken"));
+                enviroment.GetVariable("TwilioAccountSid"),
+                enviroment.GetVariable("TwilioAuthToken"));
         }
 
         public async Task<string> SendText(string from, string body, string to)
         {
-            Exceptions.ThrowIfNullOrEmpty(from, nameof(from));
-            Exceptions.ThrowIfNullOrEmpty(body, nameof(body));
-            Exceptions.ThrowIfNullOrEmpty(to, nameof(to));
-
              var message = await MessageResource.CreateAsync(
                 new Twilio.Types.PhoneNumber(from),
                 body,

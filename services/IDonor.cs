@@ -10,24 +10,24 @@ namespace NosAyudamos
 
     public class Donor : IDonor
     {
-        private readonly StateMachine<State, Trigger> _machine;
+        private readonly StateMachine<State, Trigger> machine;
 
         public State State { get; set; }
 
         public Donor()
         {
-            _machine = new StateMachine<State, Trigger>(() => State, s => State = s);
+            machine = new StateMachine<State, Trigger>(() => State, s => State = s);
             InitializeStateMachine();
         }
 
         public void Register()
         {
-            _machine.Fire(Trigger.Register);
+            machine.Fire(Trigger.Register);
         }
 
         private void InitializeStateMachine()
         {
-            _machine.Configure(State.New)
+            machine.Configure(State.New)
                 .Permit(Trigger.Register, State.Registered);
         }
     }

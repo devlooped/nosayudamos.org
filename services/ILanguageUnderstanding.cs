@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
@@ -14,11 +13,11 @@ namespace NosAyudamos
 
     public class LanguageUnderstanding : ILanguageUnderstanding
     {
-        private readonly IEnviroment _enviroment;
+        private readonly IEnviroment enviroment;
 
-        public LanguageUnderstanding(IEnviroment enviroment)
+        public LanguageUnderstanding(IEnviroment env)
         {
-            _enviroment = enviroment;
+            enviroment = env;
         }
 
         public async Task<IEnumerable<string>> GetIntentsAsync(string text)
@@ -37,8 +36,8 @@ namespace NosAyudamos
             };
 
             var predictionResponse = await luisClient.Prediction.GetSlotPredictionAsync(
-                Guid.Parse(Environment.GetEnvironmentVariable("LuisAppId")),
-                slotName: Environment.GetEnvironmentVariable("LuisAppSlot"), 
+                Guid.Parse(enviroment.GetVariable("LuisAppId")),
+                slotName: enviroment.GetVariable("LuisAppSlot"), 
                 predictionRequest,
                 verbose: true,
                 showAllIntents: false,
@@ -50,11 +49,11 @@ namespace NosAyudamos
         private ILUISRuntimeClient CreateLuisClient()
         {
             var credentials = new ApiKeyServiceClientCredentials(
-                Environment.GetEnvironmentVariable("LuisSubscriptionKey"));
+                enviroment.GetVariable("LuisSubscriptionKey"));
 
             return new LUISRuntimeClient(credentials, new System.Net.Http.DelegatingHandler[] { })
                 {
-                    Endpoint = Environment.GetEnvironmentVariable("LuisEndpoint")
+                    Endpoint = enviroment.GetVariable("LuisEndpoint")
                 };
         }
     }
