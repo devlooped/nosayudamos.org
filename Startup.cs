@@ -12,6 +12,7 @@ namespace NosAyudamos
             builder.Services.AddSingleton<IEnviroment, Enviroment>();
             builder.Services.AddSingleton<IMessaging, Messaging>();
             builder.Services.AddSingleton<ILanguageUnderstanding, LanguageUnderstanding>();
+            builder.Services.AddSingleton<ITextAnalysis, TextAnalysis>();
         }
     }
 }
