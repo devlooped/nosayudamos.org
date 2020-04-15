@@ -8,17 +8,10 @@ namespace NosAyudamos
         public string Body { get; set; }
         public string To { get; set; }
 
-        public Message(string from, string body, string to) =>
-            (From, Body, To) = (from, body, to);
+        public Message(string from, string body, string to) => (From, Body, To) = (from, body, to);
         
-        public static Message Create(string requestBody)
-        {
-            var json = JsonDocument.Parse(requestBody);
+        internal Message() { }
 
-            return new Message
-                (json.RootElement.GetProperty("From").GetString(),
-                json.RootElement.GetProperty("Body").GetString(),
-                json.RootElement.GetProperty("To").GetString());
-        }
+        public static Message Create(string json) => JsonSerializer.Deserialize<Message>(json, new JsonSerializerOptions { AllowTrailingCommas = true, PropertyNameCaseInsensitive = true });
     }
 }
