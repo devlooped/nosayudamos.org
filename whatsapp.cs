@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -8,24 +8,35 @@ using Microsoft.Extensions.Logging;
 using System.Web;
 using System.Text.Json;
 using System.Linq;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace NosAyudamos
 {
-    public static class whatsapp
+    public class Whatsapp
     {
+        private readonly IMessaging _messaging;
+        private readonly ILanguageUnderstanding _languageUnderstanding;
+
+        public Whatsapp(IMessaging messaging, ILanguageUnderstanding languageUnderstanding)
+        {
+            _messaging = messaging;
+            _languageUnderstanding = languageUnderstanding;
+        }
+
         [FunctionName("whatsapp")]
-        public static async Task<IActionResult> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            var request = await new StreamReader(req.Body).ReadToEndAsync();
-            var query = HttpUtility.ParseQueryString(request);
-            var dict = query.OfType<string>().ToDictionary(x => x, x => query.Get(x));
+            var body = await new StreamReader(req.Body).ReadToEndAsync();
 
-            var body = JsonSerializer.Serialize(dict, new JsonSerializerOptions { WriteIndented = true });
-            log.LogInformation(body);
+            var msg = IncomingMessage.Create(body);
 
-            return new OkObjectResult("");     
+            var intents = await _languageUnderstanding.GetIntentsAsync(msg.Body);
+            log.LogInformation(JsonConvert.SerializeObject(intents, Formatting.Indented));
+
+            return new OkObjectResult("");
        }
     }
 }
