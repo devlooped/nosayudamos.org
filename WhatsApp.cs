@@ -29,8 +29,9 @@ namespace NosAyudamos
             ILogger log)
         {
             var body = await new StreamReader(req.Body).ReadToEndAsync();
-
             var msg = Message.Create(body);
+
+            log.LogInformation(JsonSerializer.Serialize(msg, new JsonSerializerOptions { WriteIndented = true }));
 
             var intents = await languageUnderstanding.GetIntentsAsync(msg.Body);
             log.LogInformation(JsonSerializer.Serialize(intents, new JsonSerializerOptions { WriteIndented = true }));
@@ -39,8 +40,12 @@ namespace NosAyudamos
             var keyPhrases = await textAnalysis.GetKeyPhrasesAsync(msg.Body);
             log.LogInformation(JsonSerializer.Serialize(keyPhrases, new JsonSerializerOptions { WriteIndented = true }));
             
-
-            return new OkObjectResult("");
+            return new OkObjectResult(new 
+            {
+                intents = intents,
+                entities = entities,
+                keyPhrases = keyPhrases,
+            });
         }
     }
 }
