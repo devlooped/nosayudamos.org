@@ -48,7 +48,12 @@ namespace NosAyudamos
 
                 if (elements.Length > 0)
                 {
-                    return new Person { LastName = elements[1], FirstName = elements[2], NationalId = elements[4] };
+                    return new Person { 
+                        LastName = elements[1], 
+                        FirstName = elements[2], 
+                        Gender = elements[3], 
+                        NationalId = elements[4], 
+                        DateOfBirth = elements[6] };
                 }
             }
 
