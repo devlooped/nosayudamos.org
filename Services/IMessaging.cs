@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
@@ -6,22 +8,21 @@ namespace NosAyudamos
 {
     public interface IMessaging
     {
-        Task<string> SendText(string from, string body, string to);
+        Task<string> SendTextAsync(string from, string body, string to);
     }
 
     public class Messaging : IMessaging
     {
-        private readonly IEnviroment enviroment;
-        public Messaging(IEnviroment env)
+        public Messaging(IEnviroment enviroment)
         {
-            enviroment = env;
+            Contract.Assert(enviroment != null);
 
             TwilioClient.Init(
                 enviroment.GetVariable("TwilioAccountSid"),
                 enviroment.GetVariable("TwilioAuthToken"));
         }
 
-        public async Task<string> SendText(string from, string body, string to)
+        public async Task<string> SendTextAsync(string from, string body, string to)
         {
              var message = await MessageResource.CreateAsync(
                 new Twilio.Types.PhoneNumber(from),

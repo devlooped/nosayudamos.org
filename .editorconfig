@@ -151,3 +151,16 @@ csharp_space_between_method_declaration_name_and_open_parenthesis = false
 csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = none
+
+# CA1054: Uri parameters should not be strings
+dotnet_diagnostic.CA1054.severity = none
+
+# CA1724: The type name Message conflicts in whole or in part with the namespace name 'System.Runtime.Remoting.Messaging'
+dotnet_diagnostic.CA1724.severity = none
+
+
+# CA1716: Identifiers should not match keywords
+dotnet_diagnostic.CA1716.severity = none
