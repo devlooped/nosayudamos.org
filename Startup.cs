@@ -13,6 +13,7 @@ namespace NosAyudamos
             builder.Services.AddSingleton<IMessaging, Messaging>();
             builder.Services.AddSingleton<ILanguageUnderstanding, LanguageUnderstanding>();
             builder.Services.AddSingleton<ITextAnalysis, TextAnalysis>();
+            builder.Services.AddSingleton<IPersonRecognizer, PersonRecognizer>();
         }
     }
 }
