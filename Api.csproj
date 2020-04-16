@@ -13,6 +13,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.*" />
     <PackageReference Include="stateless" Version="5.1.1" />
     <PackageReference Include="Twilio" Version="5.*" />
+    <PackageReference Include="ZXing.Net" Version="0.16.5" />
+    <PackageReference Include="ZXing.Net.Bindings.CoreCompat.System.Drawing" Version="0.16.5-beta" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
