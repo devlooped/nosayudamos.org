@@ -164,3 +164,6 @@ dotnet_diagnostic.CA1724.severity = none
 
 # CA1716: Identifiers should not match keywords
 dotnet_diagnostic.CA1716.severity = none
+
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = none
