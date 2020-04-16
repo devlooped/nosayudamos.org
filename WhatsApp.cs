@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System;
+using System.Collections.Generic;
 
 namespace NosAyudamos
 {
@@ -36,25 +37,25 @@ namespace NosAyudamos
                 var body = await new StreamReader(req.Body).ReadToEndAsync();
                 var msg = Message.Create(body);
 
-                // log.LogInformation(JsonSerializer.Serialize(msg, new JsonSerializerOptions { WriteIndented = true }));
-                // var intents = await languageUnderstanding.GetIntentsAsync(msg.Body);
-                // log.LogInformation(JsonSerializer.Serialize(intents, new JsonSerializerOptions { WriteIndented = true }));
-                // var entities = await textAnalysis.GetentitiesAsync(msg.Body);
-                // log.LogInformation(JsonSerializer.Serialize(entities, new JsonSerializerOptions { WriteIndented = true }));
-                // var keyPhrases = await textAnalysis.GetKeyPhrasesAsync(msg.Body);
-                // log.LogInformation(JsonSerializer.Serialize(keyPhrases, new JsonSerializerOptions { WriteIndented = true }));
-                
-                // return new OkObjectResult(new
-                // {
-                //     intents = intents,
-                //     entities = entities,
-                //     keyPhrases = keyPhrases,
-                // });
+                if (Uri.TryCreate(msg.Body, UriKind.RelativeOrAbsolute, out var uri))
+                {
+                    var person = await personRecognizer.Recognize(msg.Body);
 
-                var person = await personRecognizer.Recognize(msg.Body);
-
-                return new OkObjectResult(person);
-
+                    return new OkObjectResult(person);
+                } 
+                else
+                {
+                    var intents = await languageUnderstanding.GetIntentsAsync(msg.Body);
+                    var entities = await textAnalysis.GetentitiesAsync(msg.Body);
+                    var keyPhrases = await textAnalysis.GetKeyPhrasesAsync(msg.Body);
+                    
+                    return new OkObjectResult(new
+                    {
+                        intents = intents,
+                        entities = entities,
+                        keyPhrases = keyPhrases,
+                    });
+                }
             }
             catch (Exception ex)
             {
