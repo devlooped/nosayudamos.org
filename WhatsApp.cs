@@ -5,9 +5,8 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace NosAyudamos
 {
@@ -28,39 +27,41 @@ namespace NosAyudamos
         }
 
         [FunctionName("whatsapp")]
-        public async Task<IActionResult> Run(
+        public async Task<IActionResult> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
+            Contract.Assert(req != null);
+
             try
             {
-                var body = await new StreamReader(req.Body).ReadToEndAsync();
+                using var reader = new StreamReader(req.Body);
+                var body = await reader.ReadToEndAsync();
                 var msg = Message.Create(body);
 
                 if (Uri.TryCreate(msg.Body, UriKind.RelativeOrAbsolute, out var uri))
                 {
-                    var person = await personRecognizer.Recognize(msg.Body);
+                    var person = await personRecognizer.RecognizeAsync(msg.Body);
 
                     return new OkObjectResult(person);
-                } 
+                }
                 else
                 {
                     var intents = await languageUnderstanding.GetIntentsAsync(msg.Body);
-                    var entities = await textAnalysis.GetentitiesAsync(msg.Body);
+                    var entities = await textAnalysis.GetEntitiesAsync(msg.Body);
                     var keyPhrases = await textAnalysis.GetKeyPhrasesAsync(msg.Body);
-                    
+
                     return new OkObjectResult(new
                     {
-                        intents = intents,
-                        entities = entities,
-                        keyPhrases = keyPhrases,
+                        intents,
+                        entities,
+                        keyPhrases,
                     });
                 }
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "An Exception ocurred.");
-
+                log.LogError(ex.ToString());
                 throw;
             }
         }

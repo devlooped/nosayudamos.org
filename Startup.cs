@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,6 +10,8 @@ namespace NosAyudamos
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            Contract.Assert(builder != null);
+
             builder.Services.AddSingleton<IEnviroment, Enviroment>();
             builder.Services.AddSingleton<IMessaging, Messaging>();
             builder.Services.AddSingleton<ILanguageUnderstanding, LanguageUnderstanding>();

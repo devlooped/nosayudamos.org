@@ -8,8 +8,8 @@ namespace NosAyudamos
 {
     public interface ITextAnalysis
     {
-        Task<IEnumerable<string>> GetKeyPhrasesAsync(string text);
-        Task<IEnumerable<CategorizedEntity>> GetentitiesAsync(string text);
+        Task<IEnumerable<string>> GetKeyPhrasesAsync(string? text);
+        Task<IEnumerable<CategorizedEntity>> GetEntitiesAsync(string? text);
     }
 
     public class TextAnalysis : ITextAnalysis
@@ -21,8 +21,11 @@ namespace NosAyudamos
             enviroment = env;
         }
 
-        public async Task<IEnumerable<string>> GetKeyPhrasesAsync(string text)
+        public async Task<IEnumerable<string>> GetKeyPhrasesAsync(string? text)
         {
+            if (string.IsNullOrEmpty(text))
+                return Array.Empty<string>();
+
             var analyticsClient = CreateAnalyticsClient();
 
             var response = await Task.Run(() => analyticsClient.ExtractKeyPhrases(text)).ConfigureAwait(false);
@@ -30,8 +33,11 @@ namespace NosAyudamos
             return response.Value;
         }
 
-        public async Task<IEnumerable<CategorizedEntity>> GetentitiesAsync(string text)
+        public async Task<IEnumerable<CategorizedEntity>> GetEntitiesAsync(string? text)
         {
+            if (string.IsNullOrEmpty(text))
+                return Array.Empty<CategorizedEntity>();
+
             var analyticsClient = CreateAnalyticsClient();
 
             var response = await Task.Run(() => analyticsClient.RecognizeEntities(text)).ConfigureAwait(false);

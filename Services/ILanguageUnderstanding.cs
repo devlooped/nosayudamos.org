@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
@@ -8,7 +9,7 @@ namespace NosAyudamos
 {
     public interface ILanguageUnderstanding
     {
-        Task<IEnumerable<string>> GetIntentsAsync(string text);
+        Task<IEnumerable<string>> GetIntentsAsync(string? text);
     }
 
     public class LanguageUnderstanding : ILanguageUnderstanding
@@ -20,8 +21,11 @@ namespace NosAyudamos
             enviroment = env;
         }
 
-        public async Task<IEnumerable<string>> GetIntentsAsync(string text)
+        public async Task<IEnumerable<string>> GetIntentsAsync(string? text)
         {
+            if (string.IsNullOrEmpty(text))
+                return Array.Empty<string>();
+
             using var luisClient = CreateLuisClient();
 
             var requestOptions = new PredictionRequestOptions
@@ -37,7 +41,7 @@ namespace NosAyudamos
 
             var predictionResponse = await luisClient.Prediction.GetSlotPredictionAsync(
                 Guid.Parse(enviroment.GetVariable("LuisAppId")),
-                slotName: enviroment.GetVariable("LuisAppSlot"), 
+                slotName: enviroment.GetVariable("LuisAppSlot"),
                 predictionRequest,
                 verbose: true,
                 showAllIntents: false,
@@ -51,10 +55,10 @@ namespace NosAyudamos
             var credentials = new ApiKeyServiceClientCredentials(
                 enviroment.GetVariable("LuisSubscriptionKey"));
 
-            return new LUISRuntimeClient(credentials, new System.Net.Http.DelegatingHandler[] { })
-                {
-                    Endpoint = enviroment.GetVariable("LuisEndpoint")
-                };
+            return new LUISRuntimeClient(credentials, Array.Empty<DelegatingHandler>())
+            {
+                Endpoint = enviroment.GetVariable("LuisEndpoint")
+            };
         }
     }
 }

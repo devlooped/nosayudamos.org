@@ -4,6 +4,7 @@
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
     <Nullable>Enable</Nullable>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.AI.TextAnalytics" Version="1.0.0-preview.4" />
@@ -15,6 +16,9 @@
     <PackageReference Include="Twilio" Version="5.*" />
     <PackageReference Include="ZXing.Net" Version="0.16.5" />
     <PackageReference Include="ZXing.Net.Bindings.CoreCompat.System.Drawing" Version="0.16.5-beta" />
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="3.0.0-beta*" />
+    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="3.0.0-beta*" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.*" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
