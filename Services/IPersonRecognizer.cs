@@ -34,7 +34,7 @@ namespace NosAyudamos
 
         public async Task<Person?> Recognize(string imageUrl)
         {
-            var bytes = await DownloadImage(imageUrl);
+            var bytes = await DownloadImageAsync(imageUrl);
 
             using var image = (System.Drawing.Bitmap)Bitmap.FromStream(
                 new MemoryStream(bytes));
@@ -55,7 +55,7 @@ namespace NosAyudamos
             return null;
         }
 
-        private async static Task<byte[]> DownloadImage(string imageUrl)
+        private async static Task<byte[]> DownloadImageAsync(string imageUrl)
         {
             using var client = new HttpClient();
             return await client.GetByteArrayAsync(imageUrl);
