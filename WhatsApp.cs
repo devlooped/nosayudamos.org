@@ -44,13 +44,13 @@ namespace NosAyudamos
                     var person = await personRecognizer.RecognizeAsync(msg.Body);
 
                     return new OkObjectResult(person);
-                } 
+                }
                 else
                 {
                     var intents = await languageUnderstanding.GetIntentsAsync(msg.Body);
                     var entities = await textAnalysis.GetEntitiesAsync(msg.Body);
                     var keyPhrases = await textAnalysis.GetKeyPhrasesAsync(msg.Body);
-                    
+
                     return new OkObjectResult(new
                     {
                         intents,

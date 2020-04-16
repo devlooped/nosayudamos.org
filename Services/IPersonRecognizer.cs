@@ -18,7 +18,7 @@ namespace NosAyudamos
         public static Task<Person?> RecognizeAsync(this IPersonRecognizer recognizer, string? imageUrl)
         {
             if (imageUrl == null ||
-                Uri.TryCreate(imageUrl, UriKind.RelativeOrAbsolute, out var imageUri) || 
+                Uri.TryCreate(imageUrl, UriKind.RelativeOrAbsolute, out var imageUri) ||
                 imageUri == null)
             {
                 return Task.FromResult<Person?>(default);
@@ -36,15 +36,15 @@ namespace NosAyudamos
         {
             reader = new Lazy<BarcodeReader>(
                 () => new BarcodeReader()
+                {
+                    AutoRotate = true,
+                    TryInverted = true,
+                    Options = new ZXing.Common.DecodingOptions()
                     {
-                        AutoRotate = true,
-                        TryInverted = true,
-                        Options = new ZXing.Common.DecodingOptions()
-                        {
-                            TryHarder = true,
-                            PossibleFormats = new List<BarcodeFormat> { BarcodeFormat.PDF_417 }
-                        },
-                    });
+                        TryHarder = true,
+                        PossibleFormats = new List<BarcodeFormat> { BarcodeFormat.PDF_417 }
+                    },
+                });
         }
 
         public async Task<Person?> RecognizeAsync(Uri imageUri)
@@ -62,12 +62,14 @@ namespace NosAyudamos
 
                 if (elements.Length > 0)
                 {
-                    return new Person { 
-                        LastName = elements[1], 
-                        FirstName = elements[2], 
-                        Sex = elements[3], 
-                        NationalId = elements[4], 
-                        DateOfBirth = elements[6] };
+                    return new Person
+                    {
+                        LastName = elements[1],
+                        FirstName = elements[2],
+                        Sex = elements[3],
+                        NationalId = elements[4],
+                        DateOfBirth = elements[6]
+                    };
                 }
             }
 

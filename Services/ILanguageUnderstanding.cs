@@ -41,7 +41,7 @@ namespace NosAyudamos
 
             var predictionResponse = await luisClient.Prediction.GetSlotPredictionAsync(
                 Guid.Parse(enviroment.GetVariable("LuisAppId")),
-                slotName: enviroment.GetVariable("LuisAppSlot"), 
+                slotName: enviroment.GetVariable("LuisAppSlot"),
                 predictionRequest,
                 verbose: true,
                 showAllIntents: false,

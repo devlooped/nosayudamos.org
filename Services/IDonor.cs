@@ -32,6 +32,6 @@ namespace NosAyudamos
         }
     }
 
-    public enum State { New, Registered};
+    public enum State { New, Registered };
     public enum Trigger { Register, Registered, };
 }
