@@ -39,7 +39,7 @@ namespace NosAyudamos
             using var image = (System.Drawing.Bitmap)Bitmap.FromStream(
                 new MemoryStream(bytes));
                 
-            var result = await Task.Run(() => reader.Value.Decode(image));
+            var result = reader.Value.Decode(image);
 
             if (result != null)
             {
