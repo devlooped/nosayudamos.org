@@ -34,13 +34,11 @@ namespace NosAyudamos
 
         public async Task<Person?> Recognize(string imageUrl)
         {
-            using var httpClient = new HttpClient();
-
-            var bytes = await httpClient.GetByteArrayAsync(imageUrl);
+            var bytes = await DownloadImage(imageUrl);
 
             using var image = (System.Drawing.Bitmap)Bitmap.FromStream(
                 new MemoryStream(bytes));
-
+                
             var result = await Task.Run(() => reader.Value.Decode(image));
 
             if (result != null)
