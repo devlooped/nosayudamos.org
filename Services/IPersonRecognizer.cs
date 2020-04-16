@@ -51,7 +51,7 @@ namespace NosAyudamos
                     return new Person { 
                         LastName = elements[1], 
                         FirstName = elements[2], 
-                        Gender = elements[3], 
+                        Sex = elements[3], 
                         NationalId = elements[4], 
                         DateOfBirth = elements[6] };
                 }

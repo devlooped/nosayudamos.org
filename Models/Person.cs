@@ -6,6 +6,6 @@ namespace NosAyudamos
         public string? LastName { get; set; }
         public string? NationalId { get; set; }
         public string? DateOfBirth { get; set; }
-        public string? Gender { get; set; }
+        public string? Sex { get; set; }
     }
 }
