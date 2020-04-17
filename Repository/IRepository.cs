@@ -6,7 +6,7 @@ namespace NosAyudamos
     public interface IRepository<T>
         where T : class, ITableEntity
     {
-        Task<T> AddOrUpdateAsync(T entity);
+        Task<T> PutAsync(T entity);
 
         Task DeleteAsync(T entity);
 
@@ -16,9 +16,9 @@ namespace NosAyudamos
     public class Repository<T> : IRepository<T>
         where T : class, ITableEntity, new()
     {
-        private readonly string connectionString;
-        private readonly string tableName;
-        private CloudTable? table;
+        readonly string connectionString;
+        readonly string tableName;
+        CloudTable? table;
 
         public Repository(string connectionString, string tableName)
         {
@@ -26,7 +26,7 @@ namespace NosAyudamos
             this.tableName = tableName;
         }
 
-        public async Task<T> AddOrUpdateAsync(T entity)
+        public async Task<T> PutAsync(T entity)
         {
             var insertOrMergeOperation = TableOperation.InsertOrReplace(entity);
 
@@ -48,15 +48,15 @@ namespace NosAyudamos
         {
             var retrieveOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
 
-            var table = await GetTableAsync();
+            var table = await GetTableAsync().ConfigureAwait(false);
             var result = await table.ExecuteAsync(retrieveOperation).ConfigureAwait(false);
 
             return (T)result.Result;
         }
 
-        private static CloudStorageAccount CreateCloudStorageAccount(string connectionString) => CloudStorageAccount.Parse(connectionString);
+        static CloudStorageAccount CreateCloudStorageAccount(string connectionString) => CloudStorageAccount.Parse(connectionString);
 
-        private async Task<CloudTable> GetTableAsync()
+        async Task<CloudTable> GetTableAsync()
         {
             if (this.table == null)
             {
