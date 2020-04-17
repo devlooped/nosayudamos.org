@@ -35,6 +35,12 @@ namespace NosAyudamos
         {
             Contract.Assert(req != null);
 
+            if (req.IsTwilioRequest() && !req.IsTwilioSigned())
+            {
+                logger.LogWarning("Received callback came from Twilio but is not properly signed.");
+                return new BadRequestResult();
+            }
+
             try
             {
                 using var reader = new StreamReader(req.Body);
