@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
@@ -7,7 +8,10 @@ namespace NosAyudamos
     {
         public static void Log<T>(this ILogger<T> logger, LogLevel level, object? value)
         {
-            logger.Log(level, "```" + JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true }) + "```");
+            logger.Log(level, 
+                "```" + 
+                JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true }) + 
+                "```", Array.Empty<object>());
         }
     }
 }
