@@ -49,7 +49,7 @@ namespace NosAyudamos
 
         public async Task<Person?> RecognizeAsync(Uri imageUri)
         {
-            var bytes = await DownloadImageAsync(imageUri);
+            var bytes = await Utility.DownloadBlobAsync(imageUri);
 
             using var mem = new MemoryStream(bytes);
             using var image = (Bitmap)Image.FromStream(mem);
@@ -74,12 +74,6 @@ namespace NosAyudamos
             }
 
             return null;
-        }
-
-        private async static Task<byte[]> DownloadImageAsync(Uri imageUri)
-        {
-            using var client = new HttpClient();
-            return await client.GetByteArrayAsync(imageUri);
         }
     }
 }

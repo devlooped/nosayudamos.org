@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Twilio;
@@ -11,9 +10,9 @@ namespace NosAyudamos
         Task<string> SendTextAsync(string from, string body, string to);
     }
 
-    public class Messaging : IMessaging
+    public class TwilioMessaging : IMessaging
     {
-        public Messaging(IEnviroment enviroment)
+        public TwilioMessaging(IEnviroment enviroment)
         {
             Contract.Assert(enviroment != null);
 
