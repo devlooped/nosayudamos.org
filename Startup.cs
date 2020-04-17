@@ -17,6 +17,7 @@ namespace NosAyudamos
             builder.Services.AddSingleton<ILanguageUnderstanding, LanguageUnderstanding>();
             builder.Services.AddSingleton<ITextAnalysis, TextAnalysis>();
             builder.Services.AddSingleton<IPersonRecognizer, PersonRecognizer>();
+            builder.Services.AddSingleton<IBlobStorage, BlobStorage>();
         }
     }
 }
