@@ -18,7 +18,7 @@ namespace NosAyudamos
         public static Task<Person?> RecognizeAsync(this IPersonRecognizer recognizer, string? imageUrl)
         {
             if (imageUrl == null ||
-                Uri.TryCreate(imageUrl, UriKind.RelativeOrAbsolute, out var imageUri) ||
+                !Uri.TryCreate(imageUrl, UriKind.Absolute, out var imageUri) ||
                 imageUri == null)
             {
                 return Task.FromResult<Person?>(default);

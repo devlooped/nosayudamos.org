@@ -7,23 +7,25 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.Contracts;
+using System.Text.Json;
 
 namespace NosAyudamos
 {
     public class Whatsapp
     {
-        private readonly IMessaging messaging;
-        private readonly ILanguageUnderstanding languageUnderstanding;
+        readonly IMessaging messaging;
+        readonly ILanguageUnderstanding languageUnderstanding;
+        readonly ITextAnalysis textAnalysis;
+        readonly IPersonRecognizer personRecognizer;
+        readonly ILogger<Whatsapp> logger;
 
-        private readonly ITextAnalysis textAnalysis;
-        private readonly IPersonRecognizer personRecognizer;
-
-        public Whatsapp(IMessaging messaging, ILanguageUnderstanding languageUnderstanding, ITextAnalysis textAnalysis, IPersonRecognizer personRecognizer)
+        public Whatsapp(IMessaging messaging, ILanguageUnderstanding languageUnderstanding, ITextAnalysis textAnalysis, IPersonRecognizer personRecognizer, ILogger<Whatsapp> logger)
         {
             this.messaging = messaging;
             this.languageUnderstanding = languageUnderstanding;
             this.textAnalysis = textAnalysis;
             this.personRecognizer = personRecognizer;
+            this.logger = logger;
         }
 
         [FunctionName("whatsapp")]
@@ -41,7 +43,9 @@ namespace NosAyudamos
 
                 if (Uri.TryCreate(msg.Body, UriKind.Absolute, out var uri))
                 {
-                    var person = await personRecognizer.RecognizeAsync(msg.Body);
+                    var person = await personRecognizer.RecognizeAsync(uri);
+
+                    logger.Log(LogLevel.Information, person);
 
                     return new OkObjectResult(person);
                 }
@@ -51,12 +55,16 @@ namespace NosAyudamos
                     var entities = await textAnalysis.GetEntitiesAsync(msg.Body);
                     var keyPhrases = await textAnalysis.GetKeyPhrasesAsync(msg.Body);
 
-                    return new OkObjectResult(new
+                    var result = new
                     {
                         intents,
                         entities,
                         keyPhrases,
-                    });
+                    };
+
+                    logger.Log(LogLevel.Information, result);
+
+                    return new OkObjectResult(result);
                 }
             }
             catch (Exception ex)

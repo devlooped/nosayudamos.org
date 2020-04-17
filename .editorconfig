@@ -161,7 +161,6 @@ dotnet_diagnostic.CA1054.severity = none
 # CA1724: The type name Message conflicts in whole or in part with the namespace name 'System.Runtime.Remoting.Messaging'
 dotnet_diagnostic.CA1724.severity = none
 
-
 # CA1716: Identifiers should not match keywords
 dotnet_diagnostic.CA1716.severity = none
 
