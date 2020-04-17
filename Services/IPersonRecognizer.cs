@@ -5,6 +5,8 @@ using ZXing;
 using System.IO;
 using System;
 using System.Drawing;
+using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NosAyudamos
 {
@@ -47,6 +49,7 @@ namespace NosAyudamos
                 });
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1308")]
         public async Task<Person?> RecognizeAsync(Uri imageUri)
         {
             var bytes = await Utility.DownloadBlobAsync(imageUri);
@@ -62,10 +65,12 @@ namespace NosAyudamos
 
                 if (elements.Length > 0)
                 {
+                    var textInfo = CultureInfo.InvariantCulture.TextInfo;
+
                     return new Person
                     {
-                        LastName = elements[1],
-                        FirstName = elements[2],
+                        LastName = textInfo.ToTitleCase(elements[1].ToLowerInvariant()),
+                        FirstName = textInfo.ToTitleCase(elements[2].ToLowerInvariant()),
                         Sex = elements[3],
                         NationalId = elements[4],
                         DateOfBirth = elements[6]
