@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime;
@@ -18,9 +19,11 @@ namespace NosAyudamos
         readonly IEnviroment enviroment;
         readonly ILogger<LanguageUnderstanding> logger;
 
-        public LanguageUnderstanding(IEnviroment env, ILogger<LanguageUnderstanding> logger)
+        public LanguageUnderstanding(IEnviroment enviroment, ILogger<LanguageUnderstanding> logger)
         {
-            enviroment = env;
+            Contract.Assert(enviroment != null);
+
+            this.enviroment = enviroment;
             this.logger = logger;
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Azure;
 using Azure.AI.TextAnalytics;
@@ -16,9 +17,11 @@ namespace NosAyudamos
     {
         private readonly IEnviroment enviroment;
 
-        public TextAnalysis(IEnviroment env)
+        public TextAnalysis(IEnviroment enviroment)
         {
-            enviroment = env;
+            Contract.Assert(enviroment != null);
+
+            this.enviroment = enviroment;
         }
 
         public async Task<IEnumerable<string>> GetKeyPhrasesAsync(string? text)

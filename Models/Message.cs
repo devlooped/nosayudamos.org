@@ -12,10 +12,10 @@ namespace NosAyudamos
 
         internal Message() { }
 
-        public static Message Create(string json) => JsonSerializer.Deserialize<Message>(json, new JsonSerializerOptions 
+        public static Message Create(string json) => JsonSerializer.Deserialize<Message>(json, new JsonSerializerOptions
         {
-            AllowTrailingCommas = true, 
-            PropertyNameCaseInsensitive = true 
+            AllowTrailingCommas = true,
+            PropertyNameCaseInsensitive = true
         });
     }
 }

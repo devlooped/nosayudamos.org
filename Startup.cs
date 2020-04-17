@@ -4,7 +4,6 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
-using Serilog.Formatting.Compact;
 using Serilog.Sinks.Slack;
 
 [assembly: FunctionsStartup(typeof(NosAyudamos.Startup))]
@@ -42,7 +41,7 @@ namespace NosAyudamos
             builder.Services.AddLogging(lb => lb.AddSerilog(logger));
             builder.Services.AddApplicationInsightsTelemetry();
             builder.Services.AddSingleton<IEnviroment, Enviroment>();
-            builder.Services.AddSingleton<IMessaging, Messaging>();
+            builder.Services.AddSingleton<IMessaging, TwilioMessaging>();
             builder.Services.AddSingleton<ILanguageUnderstanding, LanguageUnderstanding>();
             builder.Services.AddSingleton<ITextAnalysis, TextAnalysis>();
             builder.Services.AddSingleton<IPersonRecognizer, PersonRecognizer>();

@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
@@ -15,6 +16,8 @@ namespace NosAyudamos
 
         public BlobStorage(IEnviroment enviroment)
         {
+            Contract.Assert(enviroment != null);
+
             this.enviroment = enviroment;
         }
 
