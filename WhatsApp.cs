@@ -39,6 +39,9 @@ namespace NosAyudamos
             {
                 using var reader = new StreamReader(req.Body);
                 var body = await reader.ReadToEndAsync();
+
+                logger.Log(LogLevel.Information, "```" + body + "```", Array.Empty<string>());
+
                 var msg = Message.Create(body);
 
                 logger.Log(LogLevel.Information, msg);
