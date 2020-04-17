@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
+using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
 {
@@ -14,11 +15,13 @@ namespace NosAyudamos
 
     public class LanguageUnderstanding : ILanguageUnderstanding
     {
-        private readonly IEnviroment enviroment;
+        readonly IEnviroment enviroment;
+        readonly ILogger<LanguageUnderstanding> logger;
 
-        public LanguageUnderstanding(IEnviroment env)
+        public LanguageUnderstanding(IEnviroment env, ILogger<LanguageUnderstanding> logger)
         {
             enviroment = env;
+            this.logger = logger;
         }
 
         public async Task<IEnumerable<string>> GetIntentsAsync(string? text)
