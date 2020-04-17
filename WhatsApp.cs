@@ -39,7 +39,7 @@ namespace NosAyudamos
                 var body = await reader.ReadToEndAsync();
                 var msg = Message.Create(body);
 
-                if (Uri.TryCreate(msg.Body, UriKind.RelativeOrAbsolute, out var uri))
+                if (Uri.TryCreate(msg.Body, UriKind.Absolute, out var uri))
                 {
                     var person = await personRecognizer.RecognizeAsync(msg.Body);
 
