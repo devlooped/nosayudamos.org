@@ -18,6 +18,7 @@ namespace NosAyudamos
             this.LastName = lastName;
             this.DateOfBirth = dateOfBirth;
             this.State = state;
+            //TODO: fix
         }
     }
 }
