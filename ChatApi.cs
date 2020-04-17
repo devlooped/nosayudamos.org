@@ -35,8 +35,6 @@ namespace NosAyudamos
             var json = JsonSerializer.Deserialize<JsonElement>(payload);
             var responses = new List<string>();
 
-            logger.Log(LogLevel.Information, responses.ToArray());
-
             foreach (var message in json.GetProperty("messages").EnumerateArray())
             {
                 var body = message.GetProperty("body").GetString();

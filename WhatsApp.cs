@@ -41,6 +41,8 @@ namespace NosAyudamos
                 var body = await reader.ReadToEndAsync();
                 var msg = Message.Create(body);
 
+                logger.Log(LogLevel.Information, msg);
+
                 if (Uri.TryCreate(msg.Body, UriKind.Absolute, out var uri))
                 {
                     var person = await personRecognizer.RecognizeAsync(uri);
@@ -63,7 +65,6 @@ namespace NosAyudamos
                     };
 
                     logger.Log(LogLevel.Information, result);
-
                     return new OkObjectResult(result);
                 }
             }
