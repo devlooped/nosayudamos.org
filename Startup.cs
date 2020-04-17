@@ -23,15 +23,17 @@ namespace NosAyudamos
                 .MinimumLevel.Override("Function", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Azure", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.Slack(new SlackSinkOptions
-                {
-                    WebHookUrl = Environment.GetEnvironmentVariable("SlackApiWebHook"),
-                    CustomChannel = "#api",
-                    ShowDefaultAttachments = false,
-                    ShowPropertyAttachments = false,
-                    ShowExceptionAttachments = true,
-                }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}`
-{Message}")
+                .WriteTo.Logger(lc => lc.Filter
+                    .ByIncludingOnly(e => e.Properties.ContainsKey("Category"))
+                    .WriteTo.Slack(new SlackSinkOptions
+                    {
+                        WebHookUrl = Environment.GetEnvironmentVariable("SlackApiWebHook"),
+                        CustomChannel = "#api",
+                        ShowDefaultAttachments = false,
+                        ShowPropertyAttachments = false,
+                        ShowExceptionAttachments = true,
+                    }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}`
+    {Message}"))
                 .WriteTo.Console()
                 .CreateLogger();
 
