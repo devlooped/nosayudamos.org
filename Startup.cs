@@ -12,6 +12,7 @@ namespace NosAyudamos
         {
             Contract.Assert(builder != null);
 
+            builder.Services.AddApplicationInsightsTelemetry();
             builder.Services.AddSingleton<IEnviroment, Enviroment>();
             builder.Services.AddSingleton<IMessaging, Messaging>();
             builder.Services.AddSingleton<ILanguageUnderstanding, LanguageUnderstanding>();
