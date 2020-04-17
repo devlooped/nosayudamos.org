@@ -25,14 +25,14 @@ namespace NosAyudamos
 
             if(!await containerClient.ExistsAsync())
             {
-                containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName);
+                containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName).ConfigureAwait(false);
             }
 
             var blobClient = containerClient.GetBlobClient(blobName);
             
             using var stream = new MemoryStream(bytes);
             
-            await blobClient.UploadAsync(stream, true);
+            await blobClient.UploadAsync(stream, true).ConfigureAwait(false);
         }
 
         private BlobServiceClient CreateBlobServiceClient()
