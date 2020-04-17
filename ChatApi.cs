@@ -43,7 +43,7 @@ namespace NosAyudamos
                 if (at != -1)
                     from = from.Substring(0, at);
 
-                using var response = await http.PostAsync(new Uri(uri, "whatsapp"), new { from, body }, formatter);
+                using var response = await http.PostAsync(new Uri(uri, "whatsapp"), new { from, body, to = "14155238886" }, formatter);
                 responses.Add(await response.Content.ReadAsStringAsync());
             }
 

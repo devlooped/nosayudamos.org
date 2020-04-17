@@ -65,6 +65,9 @@ namespace NosAyudamos
                     };
 
                     logger.Log(LogLevel.Information, result);
+
+                    await messaging.SendTextAsync(msg.To!, "Gracias!", msg.From!);
+
                     return new OkObjectResult(result);
                 }
             }
