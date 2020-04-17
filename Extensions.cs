@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
@@ -10,7 +11,11 @@ namespace NosAyudamos
         {
             logger.Log(level, 
                 "```" + 
-                JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true }) + 
+                JsonSerializer.Serialize(value, new JsonSerializerOptions 
+                { 
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, 
+                    WriteIndented = true 
+                }) + 
                 "```", Array.Empty<object>());
         }
     }

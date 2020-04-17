@@ -12,6 +12,10 @@ namespace NosAyudamos
 
         internal Message() { }
 
-        public static Message Create(string json) => JsonSerializer.Deserialize<Message>(json, new JsonSerializerOptions { AllowTrailingCommas = true, PropertyNameCaseInsensitive = true });
+        public static Message Create(string json) => JsonSerializer.Deserialize<Message>(json, new JsonSerializerOptions 
+        {
+            AllowTrailingCommas = true, 
+            PropertyNameCaseInsensitive = true 
+        });
     }
 }
