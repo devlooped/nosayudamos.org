@@ -23,22 +23,18 @@ namespace NosAyudamos
             var blobServiceClient = CreateBlobServiceClient();
             var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
-            if(!await containerClient.ExistsAsync())
+            if (!await containerClient.ExistsAsync())
             {
                 containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName).ConfigureAwait(false);
             }
 
             var blobClient = containerClient.GetBlobClient(blobName);
-            
+
             using var stream = new MemoryStream(bytes);
-            
+
             await blobClient.UploadAsync(stream, true).ConfigureAwait(false);
         }
 
-        private BlobServiceClient CreateBlobServiceClient()
-        {
-            return new BlobServiceClient(
-                enviroment.GetVariable("StorageConnectionString"));
-        }
+        private BlobServiceClient CreateBlobServiceClient() => new BlobServiceClient(enviroment.GetVariable("StorageConnectionString"));
     }
 }
