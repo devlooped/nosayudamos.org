@@ -22,7 +22,7 @@ namespace NosAyudamos
         public LanguageUnderstanding(IEnviroment enviroment, ILogger<LanguageUnderstanding> logger)
         {
             Contract.Assert(enviroment != null);
-            
+
             this.enviroment = enviroment;
             this.logger = logger;
         }
