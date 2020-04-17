@@ -25,8 +25,8 @@ namespace NosAyudamos
         public async Task<string> SendTextAsync(string from, string body, string to)
         {
             var message = await MessageResource.CreateAsync(
-               from: new Twilio.Types.PhoneNumber(from),
-               to: new Twilio.Types.PhoneNumber(to),
+               from: new Twilio.Types.PhoneNumber("+" + from?.TrimStart('+')),
+               to: new Twilio.Types.PhoneNumber("+" + to?.TrimStart('+')),
                body: body).ConfigureAwait(false);
 
             return message.Sid;
