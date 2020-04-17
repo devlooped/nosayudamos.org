@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace NosAyudamos
@@ -8,10 +9,10 @@ namespace NosAyudamos
         public string LastName { get; set; }
         public string DateOfBirth { get; set; }
 
-        public DonorEntity(string nationalId, string firstName, string lastName, string dateOfBirth)
+        public DonorEntity(int nationalId, string firstName, string lastName, string dateOfBirth)
         {
-            this.PartitionKey = "find_proper_one"; //TODO: fix
-            this.RowKey = nationalId;
+            this.PartitionKey = Base62.Encode(nationalId).Substring(0, 2);
+            this.RowKey = nationalId.ToString(CultureInfo.InvariantCulture);
             this.FirstName = firstName;
             this.LastName = lastName;
             this.DateOfBirth = dateOfBirth;
