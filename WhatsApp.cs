@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.Contracts;
 using System.Xml.Linq;
+using Twilio.TwiML;
+using Twilio.AspNet.Common;
+using Twilio.AspNet.Core;
 
 namespace NosAyudamos
 {
@@ -78,7 +81,7 @@ namespace NosAyudamos
                     await messaging.SendTextAsync(msg.To!, "Gracias!", msg.From!);
 
                     if (req.IsTwilioRequest())
-                        return new OkObjectResult(new XElement("Response"));
+                        return new TwiMLResult(new MessagingResponse());
 
                     return new OkObjectResult(result);
                 }
