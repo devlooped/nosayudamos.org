@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.Contracts;
-using System.Text.Json;
+using System.Xml.Linq;
 
 namespace NosAyudamos
 {
@@ -46,17 +46,17 @@ namespace NosAyudamos
                 using var reader = new StreamReader(req.Body);
                 var body = await reader.ReadToEndAsync();
 
-                logger.Log(LogLevel.Information, "```" + body + "```", Array.Empty<string>());
+                logger.LogInformation("Request: {Body}", body);
 
                 var msg = Message.Create(body);
 
-                logger.Log(LogLevel.Information, msg);
+                logger.LogInformation("Message: {@Message}", msg);
 
                 if (Uri.TryCreate(msg.Body, UriKind.Absolute, out var uri))
                 {
                     var person = await personRecognizer.RecognizeAsync(uri);
 
-                    logger.Log(LogLevel.Information, person);
+                    logger.LogInformation("Person: {@Person}", person);
 
                     return new OkObjectResult(person);
                 }
@@ -73,7 +73,7 @@ namespace NosAyudamos
                         keyPhrases,
                     };
 
-                    logger.Log(LogLevel.Information, result);
+                    logger.LogInformation("Cognitive: {@Result}", result);
 
                     await messaging.SendTextAsync(msg.To!, "Gracias!", msg.From!);
 

@@ -1,29 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Logging;
 using Twilio.Security;
 
 namespace NosAyudamos
 {
     public static class Extensions
     {
-        public static void Log<T>(this ILogger<T> logger, LogLevel level, object? value)
-        {
-            logger.Log(level,
-                "```" +
-                JsonSerializer.Serialize(value, new JsonSerializerOptions
-                {
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    WriteIndented = true
-                }) +
-                "```", Array.Empty<object>());
-        }
-
         /// <summary>
         /// Gets whether the given request came from Twilio.
         /// </summary>
