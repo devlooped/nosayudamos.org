@@ -77,6 +77,9 @@ namespace NosAyudamos
 
                     await messaging.SendTextAsync(msg.To!, "Gracias!", msg.From!);
 
+                    if (req.IsTwilioRequest())
+                        return new OkObjectResult(new XElement("Response"));
+
                     return new OkObjectResult(result);
                 }
             }
