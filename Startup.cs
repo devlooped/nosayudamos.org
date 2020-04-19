@@ -44,6 +44,11 @@ namespace NosAyudamos
             builder.Services.AddSingleton<ITextAnalysis, TextAnalysis>();
             builder.Services.AddSingleton<IPersonRecognizer, PersonRecognizer>();
             builder.Services.AddSingleton<IBlobStorage, BlobStorage>();
+            builder.Services.AddSingleton<IRepositoryFactory, RepositoryFactory>();
+            builder.Services.AddSingleton<IWorkflowFactory, WorkflowFactory>();
+            builder.Services.AddSingleton<IStartupWorkflow, StartupWorkflow>();
+            builder.Services.AddSingleton<IWorkflow, DonorWorkflow>();
+            builder.Services.AddSingleton<IWorkflow, DoneeWorkflow>();
         }
     }
 }

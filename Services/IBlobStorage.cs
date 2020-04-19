@@ -5,7 +5,7 @@ using Azure.Storage.Blobs;
 
 namespace NosAyudamos
 {
-    public interface IBlobStorage
+    interface IBlobStorage
     {
         Task UploadAsync(byte[] bytes, string containerName, string blobName);
     }

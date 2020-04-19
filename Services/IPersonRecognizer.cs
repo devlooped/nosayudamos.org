@@ -10,12 +10,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace NosAyudamos
 {
-    public interface IPersonRecognizer
+    interface IPersonRecognizer
     {
         Task<Person?> RecognizeAsync(Uri imageUri);
     }
 
-    public static class PersonRecognizerExtensions
+    static class PersonRecognizerExtensions
     {
         public static Task<Person?> RecognizeAsync(this IPersonRecognizer recognizer, string? imageUrl)
         {
@@ -30,7 +30,7 @@ namespace NosAyudamos
         }
     }
 
-    public class PersonRecognizer : IPersonRecognizer
+    class PersonRecognizer : IPersonRecognizer
     {
         private readonly Lazy<BarcodeReader> reader;
 
@@ -67,14 +67,12 @@ namespace NosAyudamos
                 {
                     var textInfo = CultureInfo.InvariantCulture.TextInfo;
 
-                    return new Person
-                    {
-                        LastName = textInfo.ToTitleCase(elements[1].ToLowerInvariant()),
-                        FirstName = textInfo.ToTitleCase(elements[2].ToLowerInvariant()),
-                        Sex = elements[3],
-                        NationalId = elements[4],
-                        DateOfBirth = elements[6]
-                    };
+                    return new Person(
+                        textInfo.ToTitleCase(elements[2].ToLowerInvariant()),
+                        textInfo.ToTitleCase(elements[1].ToLowerInvariant()),
+                        elements[4],
+                        elements[6],
+                        elements[3]);
                 }
             }
 

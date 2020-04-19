@@ -2,27 +2,30 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 
 namespace NosAyudamos
 {
-    public interface IMessaging
+    interface IMessaging
     {
         Task SendTextAsync(string from, string body, string to);
     }
 
     class Messaging : IMessaging, IDisposable
     {
-        Lazy<IMessaging> twilio;
-        Lazy<IMessaging> chatApi;
-        string chatApiNumber;
+        readonly Lazy<IMessaging> twilio;
+        readonly Lazy<IMessaging> chatApi;
+        readonly Lazy<IMessaging> log;
+        readonly IEnviroment enviroment;
 
-        public Messaging(IEnviroment enviroment)
+        public Messaging(IEnviroment enviroment, ILogger<Messaging> logger)
         {
-            chatApiNumber = enviroment.GetVariable("ChatApiNumber");
+            this.enviroment = enviroment;
             twilio = new Lazy<IMessaging>(() => new TwilioMessaging(enviroment));
             chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(enviroment));
+            log = new Lazy<IMessaging>(() => new LogMessaging(logger));
         }
 
         public void Dispose()
@@ -34,12 +37,22 @@ namespace NosAyudamos
                 td.Dispose();
         }
 
-        public Task SendTextAsync(string from, string body, string to)
+        public async Task SendTextAsync(string from, string body, string to)
         {
-            if (from == chatApiNumber)
-                return chatApi.Value.SendTextAsync(from, body, to);
-            else
-                return twilio.Value.SendTextAsync(from, body, to);
+            var sendMessage = enviroment.GetVariable("SendMessages", true);
+
+            if (sendMessage)
+            {
+                if (from == enviroment.GetVariable("ChatApiNumber"))
+                    await chatApi.Value.SendTextAsync(from, body, to);
+                else
+                    await twilio.Value.SendTextAsync(from, body, to);
+            }
+
+            if (enviroment.GetVariable("AZURE_FUNCTIONS_ENVIRONMENT") == "Development")
+            {
+                await log.Value.SendTextAsync(from, body, to);
+            }
         }
     }
 
@@ -77,6 +90,19 @@ namespace NosAyudamos
                body: body).ConfigureAwait(false);
 
             //return message.Sid;
+        }
+    }
+
+    class LogMessaging : IMessaging
+    {
+        readonly ILogger<IMessaging> logger;
+        public LogMessaging(ILogger<IMessaging> logger) => this.logger = logger;
+
+        public Task SendTextAsync(string from, string body, string to)
+        {
+            logger.LogInformation($"From:{from}|Body:{body}To:|{to}");
+
+            return Task.CompletedTask;
         }
     }
 }

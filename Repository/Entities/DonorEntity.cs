@@ -3,11 +3,14 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace NosAyudamos
 {
-    public class DonorEntity : TableEntity
+    [Table("donor")]
+    class DonorEntity : TableEntity
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string DateOfBirth { get; set; }
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string DateOfBirth { get; set; } = "";
+
+        public DonorEntity() { }
 
         public DonorEntity(int nationalId, string firstName, string lastName, string dateOfBirth)
         {

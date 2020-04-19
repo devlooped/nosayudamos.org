@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace NosAyudamos
@@ -18,6 +19,19 @@ namespace NosAyudamos
                 .ToDictionary(x => x[0], x => x[1]);
 
             return new Message(values[nameof(From)], values[nameof(Body)], values[nameof(To)]);
+        }
+    }
+
+    static class MessageExtensions
+    {
+        public static string SanitizeTo(this Message message)
+        {
+            return message.To.Replace("whatsapp:+", "", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static string SanitizeFom(this Message message)
+        {
+            return message.To.Replace("whatsapp:+", "", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
