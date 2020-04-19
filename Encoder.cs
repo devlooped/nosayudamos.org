@@ -8,13 +8,11 @@ using System.Threading.Tasks;
 
 namespace NosAyudamos
 {
-    public class Encoder
+    class Encoder
     {
         [FunctionName("encode")]
         public async Task<IActionResult> EncodeAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "base62/encode")] HttpRequest req)
         {
-            Contract.Assert(req != null);
-
             using var reader = new StreamReader(req.Body);
             var body = await reader.ReadToEndAsync();
 
@@ -27,8 +25,6 @@ namespace NosAyudamos
         [FunctionName("decode")]
         public async Task<IActionResult> DecodeAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "base62/decode")] HttpRequest req)
         {
-            Contract.Assert(req != null);
-
             using var reader = new StreamReader(req.Body);
             var body = await reader.ReadToEndAsync();
 

@@ -14,15 +14,13 @@ namespace NosAyudamos
         Task<IEnumerable<string>> GetIntentsAsync(string? text);
     }
 
-    public class LanguageUnderstanding : ILanguageUnderstanding
+    class LanguageUnderstanding : ILanguageUnderstanding
     {
         readonly IEnviroment enviroment;
         readonly ILogger<LanguageUnderstanding> logger;
 
         public LanguageUnderstanding(IEnviroment enviroment, ILogger<LanguageUnderstanding> logger)
         {
-            Contract.Assert(enviroment != null);
-
             this.enviroment = enviroment;
             this.logger = logger;
         }

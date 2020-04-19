@@ -10,12 +10,10 @@ using Serilog.Sinks.Slack;
 
 namespace NosAyudamos
 {
-    public class Startup : FunctionsStartup
+    class Startup : FunctionsStartup
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            Contract.Assert(builder != null);
-
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .MinimumLevel.Override("Host", LogEventLevel.Warning)
@@ -41,7 +39,7 @@ namespace NosAyudamos
             builder.Services.AddLogging(lb => lb.AddSerilog(logger));
             builder.Services.AddApplicationInsightsTelemetry();
             builder.Services.AddSingleton<IEnviroment, Enviroment>();
-            builder.Services.AddSingleton<IMessaging, TwilioMessaging>();
+            builder.Services.AddSingleton<IMessaging, Messaging>();
             builder.Services.AddSingleton<ILanguageUnderstanding, LanguageUnderstanding>();
             builder.Services.AddSingleton<ITextAnalysis, TextAnalysis>();
             builder.Services.AddSingleton<IPersonRecognizer, PersonRecognizer>();

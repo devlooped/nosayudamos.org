@@ -10,16 +10,11 @@ namespace NosAyudamos
         Task UploadAsync(byte[] bytes, string containerName, string blobName);
     }
 
-    public class BlobStorage : IBlobStorage
+    class BlobStorage : IBlobStorage
     {
-        private readonly IEnviroment enviroment;
+        readonly IEnviroment enviroment;
 
-        public BlobStorage(IEnviroment enviroment)
-        {
-            Contract.Assert(enviroment != null);
-
-            this.enviroment = enviroment;
-        }
+        public BlobStorage(IEnviroment enviroment) => this.enviroment = enviroment;
 
         public async Task UploadAsync(byte[] bytes, string containerName, string blobName)
         {
