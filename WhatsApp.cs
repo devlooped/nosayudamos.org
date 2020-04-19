@@ -7,14 +7,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.Contracts;
-using System.Xml.Linq;
 using Twilio.TwiML;
-using Twilio.AspNet.Common;
 using Twilio.AspNet.Core;
+using System.Net;
 
 namespace NosAyudamos
 {
-    public class Whatsapp
+    class Whatsapp
     {
         readonly IMessaging messaging;
         readonly ILanguageUnderstanding languageUnderstanding;
@@ -38,7 +37,11 @@ namespace NosAyudamos
         {
             Contract.Assert(req != null);
 
-            if (req.IsTwilioRequest() && !req.IsTwilioSigned())
+            using var reader = new StreamReader(req.Body);
+            var raw = await reader.ReadToEndAsync();
+            var body = WebUtility.UrlDecode(raw);
+
+            if (req.IsTwilioRequest() && !req.IsTwilioSigned(raw))
             {
                 logger.LogWarning("Received callback came from Twilio but is not properly signed.");
                 return new BadRequestResult();
@@ -46,9 +49,6 @@ namespace NosAyudamos
 
             try
             {
-                using var reader = new StreamReader(req.Body);
-                var body = await reader.ReadToEndAsync();
-
                 logger.LogInformation("Request: {Body}", body);
 
                 var msg = Message.Create(body);

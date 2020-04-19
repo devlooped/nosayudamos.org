@@ -1,29 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Twilio.Security;
 
 namespace NosAyudamos
 {
-    public static class Extensions
+    static class Extensions
     {
         /// <summary>
         /// Gets whether the given request came from Twilio.
         /// </summary>
-        public static bool IsTwilioRequest(this HttpRequest http)
-        {
-            Contract.Assert(http != null);
-            return http.Headers.ContainsKey("X-Twilio-Signature");
-        }
+        public static bool IsTwilioRequest(this HttpRequest http) => http.Headers.ContainsKey("X-Twilio-Signature");
 
         /// <summary>
         /// Validates the Twilio signature of the request.
         /// </summary>
-        public static bool IsTwilioSigned(this HttpRequest http)
+        public static bool IsTwilioSigned(this HttpRequest http, string body)
         {
-            Contract.Assert(http != null);
             if (!http.IsTwilioRequest())
                 throw new ArgumentException("Request did not come from Twilio. Cannot verify its signature.", nameof(http));
 
@@ -43,15 +40,16 @@ namespace NosAyudamos
             var validator = new RequestValidator(token);
             var parameters = new Dictionary<string, string>();
 
-            foreach (var parameter in http.Query)
+            foreach (var parameter in body.Split('&').Select(x => x.Split('=')))
             {
-                parameters[parameter.Key] = parameter.Value;
+                parameters[parameter[0]] = WebUtility.UrlDecode(parameter[1]);
             }
 
             var uri = new Uri(http.GetDisplayUrl());
             var url = uri.GetComponents(UriComponents.SchemeAndServer | UriComponents.Path, UriFormat.Unescaped);
 
-            return validator.Validate(url, parameters, signature);
+            return validator.Validate(url, parameters, signature) ||
+                validator.Validate(url.Replace("http://", "https://", StringComparison.Ordinal), parameters, signature);
         }
     }
 }

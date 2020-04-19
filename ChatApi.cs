@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Text.Json;
@@ -15,11 +16,16 @@ using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
 {
-    public class ChatApi
+    class ChatApi
     {
+        readonly string chatApiNumber;
         readonly ILogger<ChatApi> logger;
 
-        public ChatApi(ILogger<ChatApi> logger) => this.logger = logger;
+        public ChatApi(IEnviroment enviroment, ILogger<ChatApi> logger)
+        {
+            chatApiNumber = enviroment.GetVariable("ChatApiNumber");
+            this.logger = logger;
+        }
 
         [FunctionName("chat")]
         public async Task<IActionResult> EncodeAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
@@ -43,7 +49,15 @@ namespace NosAyudamos
                 if (at != -1)
                     from = from.Substring(0, at);
 
-                using var response = await http.PostAsync(new Uri(uri, "whatsapp"), new { from = "whatsapp:+" + from.TrimStart('+'), body, to = "whatsapp:+14155238886" }, formatter);
+                from = "+" + from.TrimStart('+');
+
+                // Avoid reentrancy from our own messages.
+                if (from == chatApiNumber)
+                    continue;
+
+                using var content = new StringContent(WebUtility.UrlEncode($"From=+{from.TrimStart('+')}&To={chatApiNumber}&Body={body}"));
+                using var response = await http.PostAsync(new Uri(uri, "whatsapp"), content);
+
                 responses.Add(await response.Content.ReadAsStringAsync());
             }
 

@@ -13,16 +13,11 @@ namespace NosAyudamos
         Task<IEnumerable<CategorizedEntity>> GetEntitiesAsync(string? text);
     }
 
-    public class TextAnalysis : ITextAnalysis
+    class TextAnalysis : ITextAnalysis
     {
         private readonly IEnviroment enviroment;
 
-        public TextAnalysis(IEnviroment enviroment)
-        {
-            Contract.Assert(enviroment != null);
-
-            this.enviroment = enviroment;
-        }
+        public TextAnalysis(IEnviroment enviroment) => this.enviroment = enviroment;
 
         public async Task<IEnumerable<string>> GetKeyPhrasesAsync(string? text)
         {
