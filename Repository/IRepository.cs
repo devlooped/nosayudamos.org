@@ -1,9 +1,34 @@
+using System.Reflection;
 using Microsoft.Azure.Cosmos.Table;
 using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
 
 namespace NosAyudamos
 {
-    public interface IRepository<T>
+    interface IRepositoryFactory
+    {
+        IRepository<T> Create<T>() where T : class, ITableEntity;
+    }
+
+    class RepositoryFactory : IRepositoryFactory
+    {
+        readonly IEnviroment enviroment;
+
+        public RepositoryFactory(IEnviroment enviroment) => this.enviroment = enviroment;
+
+        public IRepository<T> Create<T>()
+            where T : class, ITableEntity
+        {
+            var table = typeof(T).GetTypeInfo().GetCustomAttribute<TableAttribute>();
+
+            Contract.Assert(table != null);
+
+            return new Repository<T>(
+                this.enviroment.GetVariable("StorageConnectionString"), table?.Name!);
+        }
+    }
+
+    interface IRepository<T>
         where T : class, ITableEntity
     {
         Task<T> PutAsync(T entity);
@@ -13,8 +38,8 @@ namespace NosAyudamos
         Task<T> GetAsync(string partitionKey, string rowKey);
     }
 
-    public class Repository<T> : IRepository<T>
-        where T : class, ITableEntity, new()
+    class Repository<T> : IRepository<T>
+        where T : class, ITableEntity
     {
         readonly string connectionString;
         readonly string tableName;

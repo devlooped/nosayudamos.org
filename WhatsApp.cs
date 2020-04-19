@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.Contracts;
-using Twilio.TwiML;
-using Twilio.AspNet.Core;
 using System.Net;
 
 namespace NosAyudamos
@@ -16,17 +14,13 @@ namespace NosAyudamos
     class Whatsapp
     {
         readonly IMessaging messaging;
-        readonly ILanguageUnderstanding languageUnderstanding;
-        readonly ITextAnalysis textAnalysis;
-        readonly IPersonRecognizer personRecognizer;
         readonly ILogger<Whatsapp> logger;
+        readonly IStartupWorkflow workflow;
 
-        public Whatsapp(IMessaging messaging, ILanguageUnderstanding languageUnderstanding, ITextAnalysis textAnalysis, IPersonRecognizer personRecognizer, ILogger<Whatsapp> logger)
+        public Whatsapp(IMessaging messaging, IStartupWorkflow workflow, ILogger<Whatsapp> logger)
         {
             this.messaging = messaging;
-            this.languageUnderstanding = languageUnderstanding;
-            this.textAnalysis = textAnalysis;
-            this.personRecognizer = personRecognizer;
+            this.workflow = workflow;
             this.logger = logger;
         }
 
@@ -55,36 +49,9 @@ namespace NosAyudamos
 
                 logger.LogInformation("Message: {@Message}", msg);
 
-                if (Uri.TryCreate(msg.Body, UriKind.Absolute, out var uri))
-                {
-                    var person = await personRecognizer.RecognizeAsync(uri);
+                await workflow.RunAsync(msg);
 
-                    logger.LogInformation("Person: {@Person}", person);
-
-                    return new OkObjectResult(person);
-                }
-                else
-                {
-                    var intents = await languageUnderstanding.GetIntentsAsync(msg.Body);
-                    var entities = await textAnalysis.GetEntitiesAsync(msg.Body);
-                    var keyPhrases = await textAnalysis.GetKeyPhrasesAsync(msg.Body);
-
-                    var result = new
-                    {
-                        intents,
-                        entities,
-                        keyPhrases,
-                    };
-
-                    logger.LogInformation("Cognitive: {@Result}", result);
-
-                    await messaging.SendTextAsync(msg.To!, "Gracias!", msg.From!);
-
-                    if (req.IsTwilioRequest())
-                        return new TwiMLResult(new MessagingResponse());
-
-                    return new OkObjectResult(result);
-                }
+                return new OkResult();
             }
             catch (Exception ex)
             {

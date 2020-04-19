@@ -2,13 +2,13 @@ using Stateless;
 
 namespace NosAyudamos
 {
-    public interface IDonor
+    interface IDonor
     {
         State State { get; set; }
         void Register();
     }
 
-    public class Donor : IDonor
+    class Donor : IDonor
     {
         private readonly StateMachine<State, Trigger> machine;
 
@@ -32,6 +32,6 @@ namespace NosAyudamos
         }
     }
 
-    public enum State { New, Registered };
-    public enum Trigger { Register, Registered, };
+    enum State { New, Registered };
+    enum Trigger { Register, Registered, };
 }

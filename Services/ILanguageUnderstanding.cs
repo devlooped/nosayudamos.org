@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
 {
-    public interface ILanguageUnderstanding
+    interface ILanguageUnderstanding
     {
         Task<IEnumerable<string>> GetIntentsAsync(string? text);
     }
