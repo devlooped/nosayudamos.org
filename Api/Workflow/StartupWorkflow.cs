@@ -49,7 +49,7 @@ namespace NosAyudamos
                 if (intents.Contains("help"))
                 {
                     await messaging.SendTextAsync(
-                        message.To, "Gracias por contactarnos, envie foto de dni para registarse primero.", message.From);
+                        message.To, "Gracias por contactarnos, envianos foto de tu DNI para registarte primero.", message.From);
                 }
                 else if (intents.Contains("donate"))
                 {
@@ -59,7 +59,7 @@ namespace NosAyudamos
                 else
                 {
                     await messaging.SendTextAsync(
-                        message.To, "Gracias por contactarnos, desea ayudar o necesita ayuda?", message.From);
+                        message.To, "Gracias por contactarnos, querés ayudar o necesitás ayuda?", message.From);
                 }
             }
         }
@@ -114,7 +114,8 @@ namespace NosAyudamos
                             await messaging.SendTextAsync(
                                 message.To, "No pudimos procesar su dni. Nos contactaremos en breve.", message.From);
 
-                            logger.LogWarning($"Unable to process national_id.{System.Environment.NewLine}Message:{System.Environment.NewLine}{message}");
+                            logger.LogWarning(@"Unable to process national_id.
+Message: {@message:j}", message);
 
                             return;
                         }
