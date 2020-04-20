@@ -49,7 +49,7 @@ namespace NosAyudamos
                     await twilio.Value.SendTextAsync(from, body, to);
             }
 
-            if (enviroment.GetVariable("AZURE_FUNCTIONS_ENVIRONMENT") == "Development")
+            if (enviroment.GetVariable("AZURE_FUNCTIONS_ENVIRONMENT", "Production") == "Development")
             {
                 await log.Value.SendTextAsync(from, body, to);
             }
