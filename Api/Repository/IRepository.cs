@@ -12,9 +12,9 @@ namespace NosAyudamos
 
     class RepositoryFactory : IRepositoryFactory
     {
-        readonly IEnviroment enviroment;
+        readonly IEnvironment enviroment;
 
-        public RepositoryFactory(IEnviroment enviroment) => this.enviroment = enviroment;
+        public RepositoryFactory(IEnvironment enviroment) => this.enviroment = enviroment;
 
         public IRepository<T> Create<T>()
             where T : class, ITableEntity

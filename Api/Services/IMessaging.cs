@@ -18,9 +18,9 @@ namespace NosAyudamos
         readonly Lazy<IMessaging> twilio;
         readonly Lazy<IMessaging> chatApi;
         readonly Lazy<IMessaging> log;
-        readonly IEnviroment enviroment;
+        readonly IEnvironment enviroment;
 
-        public Messaging(IEnviroment enviroment, ILogger<Messaging> logger)
+        public Messaging(IEnvironment enviroment, ILogger<Messaging> logger)
         {
             this.enviroment = enviroment;
             twilio = new Lazy<IMessaging>(() => new TwilioMessaging(enviroment));
@@ -61,7 +61,7 @@ namespace NosAyudamos
         readonly MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
         string apiUrl;
 
-        public ChatApiMessaging(IEnviroment enviroment) => apiUrl = enviroment.GetVariable("ChatApiUrl");
+        public ChatApiMessaging(IEnvironment enviroment) => apiUrl = enviroment.GetVariable("ChatApiUrl");
 
         public async Task SendTextAsync(string from, string body, string to)
         {
@@ -72,7 +72,7 @@ namespace NosAyudamos
 
     class TwilioMessaging : IMessaging
     {
-        public TwilioMessaging(IEnviroment enviroment)
+        public TwilioMessaging(IEnvironment enviroment)
         {
             TwilioClient.Init(
                 enviroment.GetVariable("TwilioAccountSid"),

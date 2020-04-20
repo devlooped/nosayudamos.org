@@ -6,13 +6,13 @@ namespace NosAyudamos
     [Workflow("Donee")]
     class DoneeWorkflow : IWorkflow
     {
-        readonly IEnviroment enviroment;
+        readonly IEnvironment enviroment;
         readonly ITextAnalysis textAnalysis;
         readonly ILogger<DoneeWorkflow> logger;
         readonly IMessaging messaging;
         readonly IRepositoryFactory repositoryFactory;
 
-        public DoneeWorkflow(IEnviroment enviroment,
+        public DoneeWorkflow(IEnvironment enviroment,
                             ITextAnalysis textAnalysis,
                             IMessaging messaging,
                             IRepositoryFactory repositoryFactory,
