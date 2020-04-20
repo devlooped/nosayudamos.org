@@ -18,13 +18,13 @@ namespace NosAyudamos
         readonly Lazy<IMessaging> twilio;
         readonly Lazy<IMessaging> chatApi;
         readonly Lazy<IMessaging> log;
-        readonly IEnviroment enviroment;
+        readonly IEnvironment environment;
 
-        public Messaging(IEnviroment enviroment, ILogger<Messaging> logger)
+        public Messaging(IEnvironment environment, ILogger<Messaging> logger)
         {
-            this.enviroment = enviroment;
-            twilio = new Lazy<IMessaging>(() => new TwilioMessaging(enviroment));
-            chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(enviroment));
+            this.environment = environment;
+            twilio = new Lazy<IMessaging>(() => new TwilioMessaging(environment));
+            chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(environment));
             log = new Lazy<IMessaging>(() => new LogMessaging(logger));
         }
 
@@ -39,17 +39,17 @@ namespace NosAyudamos
 
         public async Task SendTextAsync(string from, string body, string to)
         {
-            var sendMessage = enviroment.GetVariable("SendMessages", true);
+            var sendMessage = environment.GetVariable("SendMessages", true);
 
             if (sendMessage)
             {
-                if (from == enviroment.GetVariable("ChatApiNumber"))
+                if (from == environment.GetVariable("ChatApiNumber"))
                     await chatApi.Value.SendTextAsync(from, body, to);
                 else
                     await twilio.Value.SendTextAsync(from, body, to);
             }
 
-            if (enviroment.GetVariable("AZURE_FUNCTIONS_ENVIRONMENT") == "Development")
+            if (environment.GetVariable("AZURE_FUNCTIONS_ENVIRONMENT") == "Development")
             {
                 await log.Value.SendTextAsync(from, body, to);
             }
@@ -61,9 +61,9 @@ namespace NosAyudamos
         readonly MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
         string apiUrl;
 
-        public ChatApiMessaging(IEnviroment enviroment)
+        public ChatApiMessaging(IEnvironment environment)
         {
-            apiUrl = enviroment.GetVariable("ChatApiUrl");
+            apiUrl = environment.GetVariable("ChatApiUrl");
         }
 
         public async Task SendTextAsync(string from, string body, string to)
@@ -75,11 +75,11 @@ namespace NosAyudamos
 
     class TwilioMessaging : IMessaging
     {
-        public TwilioMessaging(IEnviroment enviroment)
+        public TwilioMessaging(IEnvironment environment)
         {
             TwilioClient.Init(
-                enviroment.GetVariable("TwilioAccountSid"),
-                enviroment.GetVariable("TwilioAuthToken"));
+                environment.GetVariable("TwilioAccountSid"),
+                environment.GetVariable("TwilioAuthToken"));
         }
 
         public async Task SendTextAsync(string from, string body, string to)

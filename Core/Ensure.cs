@@ -2,7 +2,7 @@
 
 namespace NosAyudamos
 {
-    public static class Ensure
+    static class Ensure
     {
         [System.Diagnostics.DebuggerStepThrough]
         public static string NotEmpty(this string? value, string varName)

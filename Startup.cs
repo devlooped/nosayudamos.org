@@ -24,7 +24,7 @@ namespace NosAyudamos
                     .ByIncludingOnly(e => e.Properties.ContainsKey("Category"))
                     .WriteTo.Slack(new SlackSinkOptions
                     {
-                        WebHookUrl = Environment.GetEnvironmentVariable("SlackApiWebHook"),
+                        WebHookUrl = System.Environment.GetEnvironmentVariable("SlackApiWebHook"),
                         CustomChannel = "#api",
                         ShowDefaultAttachments = false,
                         ShowPropertyAttachments = false,
@@ -38,7 +38,7 @@ namespace NosAyudamos
 
             builder.Services.AddLogging(lb => lb.AddSerilog(logger));
             builder.Services.AddApplicationInsightsTelemetry();
-            builder.Services.AddSingleton<IEnviroment, Enviroment>();
+            builder.Services.AddSingleton<IEnvironment, Environment>();
             builder.Services.AddSingleton<IMessaging, Messaging>();
             builder.Services.AddSingleton<ILanguageUnderstanding, LanguageUnderstanding>();
             builder.Services.AddSingleton<ITextAnalysis, TextAnalysis>();
@@ -46,9 +46,10 @@ namespace NosAyudamos
             builder.Services.AddSingleton<IBlobStorage, BlobStorage>();
             builder.Services.AddSingleton<IRepositoryFactory, RepositoryFactory>();
             builder.Services.AddSingleton<IWorkflowFactory, WorkflowFactory>();
-            builder.Services.AddSingleton<IStartupWorkflow, StartupWorkflow>();
-            builder.Services.AddSingleton<IWorkflow, DonorWorkflow>();
-            builder.Services.AddSingleton<IWorkflow, DoneeWorkflow>();
+            builder.Services.AddSingleton<IQRCode, QRCode>();
+            builder.Services.AddTransient<IStartupWorkflow, StartupWorkflow>();
+            builder.Services.AddTransient<IWorkflow, DonorWorkflow>();
+            builder.Services.AddTransient<IWorkflow, DoneeWorkflow>();
         }
     }
 }

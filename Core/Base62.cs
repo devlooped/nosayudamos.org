@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NosAyudamos
 {
-    public static class Base62
+    static class Base62
     {
         public static string Encode(int value)
         {

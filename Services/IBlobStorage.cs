@@ -12,9 +12,9 @@ namespace NosAyudamos
 
     class BlobStorage : IBlobStorage
     {
-        readonly IEnviroment enviroment;
+        readonly IEnvironment environment;
 
-        public BlobStorage(IEnviroment enviroment) => this.enviroment = enviroment;
+        public BlobStorage(IEnvironment environment) => this.environment = environment;
 
         public async Task UploadAsync(byte[] bytes, string containerName, string blobName)
         {
@@ -33,6 +33,6 @@ namespace NosAyudamos
             await blobClient.UploadAsync(stream, true).ConfigureAwait(false);
         }
 
-        private BlobServiceClient CreateBlobServiceClient() => new BlobServiceClient(enviroment.GetVariable("StorageConnectionString"));
+        private BlobServiceClient CreateBlobServiceClient() => new BlobServiceClient(environment.GetVariable("StorageConnectionString"));
     }
 }

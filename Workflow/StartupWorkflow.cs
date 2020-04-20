@@ -14,7 +14,7 @@ namespace NosAyudamos
     [Workflow("Startup")]
     class StartupWorkflow : IWorkflow, IStartupWorkflow
     {
-        readonly IEnviroment enviroment;
+        readonly IEnvironment environment;
         readonly ILanguageUnderstanding languageUnderstanding;
         readonly IWorkflowFactory workflowFactory;
         readonly IBlobStorage blobStorage;
@@ -23,7 +23,7 @@ namespace NosAyudamos
         readonly IPersonRecognizer personRecognizer;
         readonly IRepositoryFactory repositoryFactory;
 
-        public StartupWorkflow(IEnviroment enviroment,
+        public StartupWorkflow(IEnvironment environment,
                             ILanguageUnderstanding languageUnderstanding,
                             IMessaging messaging,
                             IWorkflowFactory workflowFactory,
@@ -31,8 +31,8 @@ namespace NosAyudamos
                             IPersonRecognizer personRecognizer,
                             IRepositoryFactory repositoryFactory,
                             ILogger<StartupWorkflow> logger) =>
-                            (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowFactory, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.logger) =
-                                (enviroment, languageUnderstanding, messaging, workflowFactory, blobStorage, personRecognizer, repositoryFactory, logger);
+                            (this.environment, this.languageUnderstanding, this.messaging, this.workflowFactory, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.logger) =
+                                (environment, languageUnderstanding, messaging, workflowFactory, blobStorage, personRecognizer, repositoryFactory, logger);
         public async Task RunAsync(Message message)
         {
             //TODO: Find person by phone number and execute person workflow
@@ -75,7 +75,7 @@ namespace NosAyudamos
                     var image = await Utility.DownloadBlobAsync(imageUri);
 
                     await this.blobStorage.UploadAsync(
-                        image, this.enviroment.GetVariable("AttachmentsContainerName"), $"dni_{person.NationalId}.png");
+                        image, this.environment.GetVariable("AttachmentsContainerName"), $"dni_{person.NationalId}.png");
 
                     var doneeRepository = this.repositoryFactory.Create<DoneeEntity>();
 
@@ -113,7 +113,7 @@ namespace NosAyudamos
                             await messaging.SendTextAsync(
                                 message.To, "No pudimos procesar su dni. Nos contactaremos en breve.", message.From);
 
-                            logger.LogWarning($"Unable to process national_id.{Environment.NewLine}Message:{Environment.NewLine}{message}");
+                            logger.LogWarning($"Unable to process national_id.{System.Environment.NewLine}Message:{System.Environment.NewLine}{message}");
 
                             return;
                         }

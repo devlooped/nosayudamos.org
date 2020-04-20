@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace NosAyudamos
 {
-    public static class Utility
+    static class Utility
     {
         public async static Task<byte[]> DownloadBlobAsync(Uri blobUri)
         {

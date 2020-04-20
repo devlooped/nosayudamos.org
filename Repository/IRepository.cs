@@ -12,9 +12,9 @@ namespace NosAyudamos
 
     class RepositoryFactory : IRepositoryFactory
     {
-        readonly IEnviroment enviroment;
+        readonly IEnvironment environment;
 
-        public RepositoryFactory(IEnviroment enviroment) => this.enviroment = enviroment;
+        public RepositoryFactory(IEnvironment enviroment) => this.environment = enviroment;
 
         public IRepository<T> Create<T>()
             where T : class, ITableEntity
@@ -24,7 +24,7 @@ namespace NosAyudamos
             Contract.Assert(table != null);
 
             return new Repository<T>(
-                this.enviroment.GetVariable("StorageConnectionString"), table?.Name!);
+                this.environment.GetVariable("StorageConnectionString"), table?.Name!);
         }
     }
 

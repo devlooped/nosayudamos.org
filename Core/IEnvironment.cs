@@ -3,24 +3,24 @@ using System.ComponentModel;
 
 namespace NosAyudamos
 {
-    public interface IEnviroment
+    interface IEnvironment
     {
         string GetVariable(string name);
         T GetVariable<T>(string name, T defaultValue = default);
     }
 
-    class Enviroment : IEnviroment
+    class Environment : IEnvironment
     {
         public string GetVariable(string name)
         {
             return Ensure.NotEmpty(
-                    Environment.GetEnvironmentVariable(
+                    System.Environment.GetEnvironmentVariable(
                         Ensure.NotEmpty(name, nameof(name))), name);
         }
 
         public T GetVariable<T>(string name, T defaultValue = default)
         {
-            var value = Environment.GetEnvironmentVariable(
+            var value = System.Environment.GetEnvironmentVariable(
                         Ensure.NotEmpty(name, nameof(name)));
 
             if (value != null)
