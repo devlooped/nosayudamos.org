@@ -64,7 +64,7 @@ namespace NosAyudamos
 
                 if (elements.Length > 0)
                 {
-                    var textInfo = CultureInfo.InvariantCulture.TextInfo;
+                    var textInfo = CultureInfo.CurrentCulture.TextInfo;
 
                     return new Person(
                         textInfo.ToTitleCase(elements[2].ToLowerInvariant()),

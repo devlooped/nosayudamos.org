@@ -8,6 +8,7 @@
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>CA1812</NoWarn>
+    <NeutralLanguage>es-AR</NeutralLanguage>
   </PropertyGroup>
   
   <ItemGroup>
@@ -31,6 +32,7 @@
     <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="3.0.0-beta*" />
     <PackageReference Include="Microsoft.NetCore.Analyzers" Version="3.0.0-beta*" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.*" />
+    <PackageReference Include="netfx-System.StringResources" Version="3.2.0-alpha" />
   </ItemGroup>
   
   <ItemGroup>
@@ -43,4 +45,25 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>UnitTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  
 </Project>
