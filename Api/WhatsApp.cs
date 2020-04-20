@@ -43,7 +43,7 @@ namespace NosAyudamos
 
             try
             {
-                logger.LogInformation("Request: {Body}", body);
+                logger.LogInformation("Raw: {Body}", raw);
 
                 var msg = Message.Create(body);
 

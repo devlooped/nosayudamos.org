@@ -5,9 +5,9 @@ namespace NosAyudamos
     [Table("actionretry")]
     class ActionRetryEntity : TableEntity
     {
-        public string Id => base.PartitionKey;
+        public string Id => PartitionKey;
 
-        public string Action => base.RowKey;
+        public string Action => RowKey;
 
         public int RetryCount { get; set; } = 1;
 
@@ -15,9 +15,9 @@ namespace NosAyudamos
 
         public ActionRetryEntity(string id, string action, int retryCount = 1)
         {
-            this.PartitionKey = id;
-            this.RowKey = action;
-            this.RetryCount = retryCount;
+            PartitionKey = id;
+            RowKey = action;
+            RetryCount = retryCount;
         }
     }
 

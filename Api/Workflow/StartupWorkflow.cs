@@ -33,6 +33,7 @@ namespace NosAyudamos
                             ILogger<StartupWorkflow> logger) =>
                             (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowFactory, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.logger) =
                                 (enviroment, languageUnderstanding, messaging, workflowFactory, blobStorage, personRecognizer, repositoryFactory, logger);
+
         public async Task RunAsync(Message message)
         {
             //TODO: Find person by phone number and execute person workflow
@@ -67,17 +68,17 @@ namespace NosAyudamos
         {
             if (Uri.TryCreate(message.Body, UriKind.Absolute, out var imageUri))
             {
-                var person = await this.personRecognizer.RecognizeAsync(imageUri);
+                var person = await personRecognizer.RecognizeAsync(imageUri);
                 var actionRetryRepository = repositoryFactory.Create<ActionRetryEntity>();
 
                 if (person != null)
                 {
                     var image = await Utility.DownloadBlobAsync(imageUri);
 
-                    await this.blobStorage.UploadAsync(
-                        image, this.enviroment.GetVariable("AttachmentsContainerName"), $"dni_{person.NationalId}.png");
+                    await blobStorage.UploadAsync(
+                        image, enviroment.GetVariable("AttachmentsContainerName"), $"dni_{person.NationalId}.png");
 
-                    var doneeRepository = this.repositoryFactory.Create<DoneeEntity>();
+                    var doneeRepository = repositoryFactory.Create<DoneeEntity>();
 
                     await doneeRepository.PutAsync(
                         new DoneeEntity(person.NationalId,
@@ -86,7 +87,7 @@ namespace NosAyudamos
                                         person.DateOfBirth,
                                         person.Sex));
 
-                    var actionRetry = await actionRetryRepository.GetAsync(message.SanitizeTo(), Action.RecognizeId.ToString());
+                    var actionRetry = await actionRetryRepository.GetAsync(message.To, Action.RecognizeId.ToString());
 
                     if (actionRetry != null)
                     {
@@ -95,11 +96,11 @@ namespace NosAyudamos
                 }
                 else
                 {
-                    var actionRetry = await actionRetryRepository.GetAsync(message.SanitizeTo(), Action.RecognizeId.ToString());
+                    var actionRetry = await actionRetryRepository.GetAsync(message.To, Action.RecognizeId.ToString());
 
                     if (actionRetry == null)
                     {
-                        await actionRetryRepository.PutAsync(new ActionRetryEntity(message.SanitizeTo(), Action.RecognizeId.ToString()));
+                        await actionRetryRepository.PutAsync(new ActionRetryEntity(message.To, Action.RecognizeId.ToString()));
                     }
                     else
                     {

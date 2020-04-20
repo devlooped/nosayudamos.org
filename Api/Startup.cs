@@ -1,7 +1,10 @@
 using System;
-using System.Diagnostics.Contracts;
+using System.Globalization;
+using System.Reflection;
+using System.Resources;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using NosAyudamos.Properties;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Slack;
@@ -14,6 +17,9 @@ namespace NosAyudamos
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(Assembly.GetExecutingAssembly().GetCustomAttribute<NeutralResourcesLanguageAttribute>()!.CultureName);
+            CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture;
+
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .MinimumLevel.Override("Host", LogEventLevel.Warning)
@@ -29,12 +35,11 @@ namespace NosAyudamos
                         ShowDefaultAttachments = false,
                         ShowPropertyAttachments = false,
                         ShowExceptionAttachments = true,
-                    }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}`
-    ```{@Message:j}```"))
+                    }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}` ```{@Message:j}```"))
                 .WriteTo.Console()
                 .CreateLogger();
 
-            Log.Information("Starting up");
+            Log.Information(Strings.Startup.Starting);
 
             builder.Services.AddLogging(lb => lb.AddSerilog(logger));
             builder.Services.AddApplicationInsightsTelemetry();

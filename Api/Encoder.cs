@@ -2,7 +2,6 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Threading.Tasks;
 
