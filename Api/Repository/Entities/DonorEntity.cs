@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace NosAyudamos
@@ -6,21 +5,19 @@ namespace NosAyudamos
     [Table("donor")]
     class DonorEntity : TableEntity
     {
-        public string FirstName { get; set; } = "";
-
-        public string LastName { get; set; } = "";
-
-        public string DateOfBirth { get; set; } = "";
-
         public DonorEntity() { }
 
-        public DonorEntity(int nationalId, string firstName, string lastName, string dateOfBirth)
+        public DonorEntity(string nationalId, string firstName, string lastName, string dateOfBirth)
         {
-            PartitionKey = Base62.Encode(nationalId).Substring(0, 2);
-            RowKey = nationalId.ToString(CultureInfo.InvariantCulture);
+            PartitionKey = nationalId;
+            RowKey = typeof(DonorEntity).FullName;
             FirstName = firstName;
             LastName = lastName;
             DateOfBirth = dateOfBirth;
         }
+
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string DateOfBirth { get; set; } = "";
     }
 }
