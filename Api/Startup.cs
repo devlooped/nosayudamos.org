@@ -35,8 +35,7 @@ namespace NosAyudamos
                         ShowDefaultAttachments = false,
                         ShowPropertyAttachments = false,
                         ShowExceptionAttachments = true,
-                    }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}`
-    ```{@Message:j}```"))
+                    }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}` ```{@Message:j}```"))
                 .WriteTo.Console()
                 .CreateLogger();
 

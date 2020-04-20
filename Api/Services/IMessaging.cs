@@ -61,10 +61,7 @@ namespace NosAyudamos
         readonly MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
         string apiUrl;
 
-        public ChatApiMessaging(IEnviroment enviroment)
-        {
-            apiUrl = enviroment.GetVariable("ChatApiUrl");
-        }
+        public ChatApiMessaging(IEnviroment enviroment) => apiUrl = enviroment.GetVariable("ChatApiUrl");
 
         public async Task SendTextAsync(string from, string body, string to)
         {
@@ -100,7 +97,8 @@ namespace NosAyudamos
 
         public Task SendTextAsync(string from, string body, string to)
         {
-            logger.LogInformation($"From:{from}|Body:{body}To:|{to}");
+            logger.LogInformation($@"From:{from}|To:|{to}
+Body:{body}");
 
             return Task.CompletedTask;
         }
