@@ -1,4 +1,3 @@
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;

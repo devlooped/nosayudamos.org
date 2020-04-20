@@ -17,7 +17,7 @@ namespace NosAyudamos
 
         public IWorkflow Create(Workflow workflow)
         {
-            return this.workflows.First(w =>
+            return workflows.First(w =>
                 w.GetType().GetTypeInfo().GetCustomAttribute<WorkflowAttribute>()?.Name == workflow.ToString());
         }
     }

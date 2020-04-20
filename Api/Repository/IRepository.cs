@@ -24,7 +24,7 @@ namespace NosAyudamos
             Contract.Assert(table != null);
 
             return new Repository<T>(
-                this.enviroment.GetVariable("StorageConnectionString"), table?.Name!);
+                enviroment.GetVariable("StorageConnectionString"), table?.Name!);
         }
     }
 
@@ -83,7 +83,7 @@ namespace NosAyudamos
 
         async Task<CloudTable> GetTableAsync()
         {
-            if (this.table == null)
+            if (table == null)
             {
                 var storageAccount = CreateCloudStorageAccount(connectionString);
                 var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
@@ -94,7 +94,7 @@ namespace NosAyudamos
                 this.table = table;
             }
 
-            return this.table;
+            return table;
         }
     }
 }

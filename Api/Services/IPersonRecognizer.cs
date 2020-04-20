@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Net.Http;
 using ZXing;
 using System.IO;
 using System;

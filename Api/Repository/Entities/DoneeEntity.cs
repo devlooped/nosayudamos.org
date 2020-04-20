@@ -17,13 +17,13 @@ namespace NosAyudamos
 
         public DoneeEntity(string nationalId, string firstName, string lastName, string dateOfBirth, string sex, string state = "0")
         {
-            this.PartitionKey = Base62.Encode(Int32.Parse(nationalId, CultureInfo.InvariantCulture)).Substring(0, 2);
-            this.RowKey = nationalId;
-            this.FirstName = firstName;
-            this.LastName = lastName;
-            this.DateOfBirth = dateOfBirth;
-            this.Sex = sex;
-            this.State = state;
+            PartitionKey = Base62.Encode(Int32.Parse(nationalId, CultureInfo.InvariantCulture)).Substring(0, 2);
+            RowKey = nationalId;
+            FirstName = firstName;
+            LastName = lastName;
+            DateOfBirth = dateOfBirth;
+            Sex = sex;
+            State = state;
         }
     }
 }
