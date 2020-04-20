@@ -1,9 +1,11 @@
+using System.Composition;
 using System.Threading.Tasks;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 
 namespace NosAyudamos
 {
+    [Shared]
     class TwilioMessaging : IMessaging
     {
         public TwilioMessaging(IEnvironment enviroment)

@@ -16,7 +16,7 @@ namespace NosAyudamos
     {
         readonly IEnvironment enviroment;
         readonly ILanguageUnderstanding languageUnderstanding;
-        readonly IWorkflowFactory workflowFactory;
+        readonly Lazy<IWorkflowSelector> workflowSelector;
         readonly IBlobStorage blobStorage;
         readonly ILogger<StartupWorkflow> logger;
         readonly IMessaging messaging;
@@ -26,13 +26,13 @@ namespace NosAyudamos
         public StartupWorkflow(IEnvironment enviroment,
                             ILanguageUnderstanding languageUnderstanding,
                             IMessaging messaging,
-                            IWorkflowFactory workflowFactory,
+                            Lazy<IWorkflowSelector> workflowSelector,
                             IBlobStorage blobStorage,
                             IPersonRecognizer personRecognizer,
                             IRepositoryFactory repositoryFactory,
                             ILogger<StartupWorkflow> logger) =>
-                            (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowFactory, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.logger) =
-                                (enviroment, languageUnderstanding, messaging, workflowFactory, blobStorage, personRecognizer, repositoryFactory, logger);
+                            (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowSelector, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.logger) =
+                                (enviroment, languageUnderstanding, messaging, workflowSelector, blobStorage, personRecognizer, repositoryFactory, logger);
 
         public async Task RunAsync(Message message)
         {
@@ -49,17 +49,17 @@ namespace NosAyudamos
                 if (intents.Contains("help"))
                 {
                     await messaging.SendTextAsync(
-                        message.To, "Gracias por contactarnos, envie foto de dni para registarse primero.", message.From);
+                        message.To, "Gracias por contactarnos, envianos foto de tu DNI para registarte primero.", message.From);
                 }
                 else if (intents.Contains("donate"))
                 {
-                    var workflow = workflowFactory.Create(Workflow.Donor);
+                    var workflow = workflowSelector.Value.Select(Workflow.Donor);
                     await workflow.RunAsync(message);
                 }
                 else
                 {
                     await messaging.SendTextAsync(
-                        message.To, "Gracias por contactarnos, desea ayudar o necesita ayuda?", message.From);
+                        message.To, "Gracias por contactarnos, querés ayudar o necesitás ayuda?", message.From);
                 }
             }
         }
@@ -114,7 +114,8 @@ namespace NosAyudamos
                             await messaging.SendTextAsync(
                                 message.To, "No pudimos procesar su dni. Nos contactaremos en breve.", message.From);
 
-                            logger.LogWarning($"Unable to process national_id.{System.Environment.NewLine}Message:{System.Environment.NewLine}{message}");
+                            logger.LogWarning(@"Unable to process national_id.
+Message: {@message:j}", message);
 
                             return;
                         }

@@ -6,6 +6,7 @@ using System;
 using System.Drawing;
 using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
+using System.Composition;
 
 namespace NosAyudamos
 {
@@ -24,6 +25,7 @@ namespace NosAyudamos
         }
     }
 
+    [Shared]
     class PersonRecognizer : IPersonRecognizer
     {
         private readonly Lazy<BarcodeReader> reader;
@@ -43,7 +45,6 @@ namespace NosAyudamos
                 });
         }
 
-        [SuppressMessage("Microsoft.Globalization", "CA1308")]
         public async Task<Person?> RecognizeAsync(Uri imageUri)
         {
             var bytes = await Utility.DownloadBlobAsync(imageUri);
@@ -59,11 +60,9 @@ namespace NosAyudamos
 
                 if (elements.Length > 0)
                 {
-                    var textInfo = CultureInfo.CurrentCulture.TextInfo;
-
                     return new Person(
-                        textInfo.ToTitleCase(elements[2].ToLowerInvariant()),
-                        textInfo.ToTitleCase(elements[1].ToLowerInvariant()),
+                        CultureInfo.CurrentCulture.TextInfo.ToTitleCase(elements[2].ToLower(CultureInfo.CurrentCulture)),
+                        CultureInfo.CurrentCulture.TextInfo.ToTitleCase(elements[1].ToLower(CultureInfo.CurrentCulture)),
                         elements[4],
                         elements[6],
                         elements[3]);

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Threading.Tasks;
 using Azure;
 using Azure.AI.TextAnalytics;
 
 namespace NosAyudamos
 {
+    [Shared]
     class TextAnalysis : ITextAnalysis
     {
         private readonly IEnvironment enviroment;

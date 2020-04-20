@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
 {
+    [Shared]
     class LanguageUnderstanding : ILanguageUnderstanding
     {
         readonly IEnvironment enviroment;
