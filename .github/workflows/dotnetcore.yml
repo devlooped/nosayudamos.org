@@ -13,15 +13,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: Use dotnet
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
-    - name: Setup dotnet-format
+    - name: Use dotnet-format
       run: dotnet tool update -g --version 3.2.* dotnet-format >nul || dotnet tool list -g
+    - name: Env
+      run: 'gci env: | format-table -autosize -wrap'
+      shell: pwsh
     - name: Run dotnet-format
       run: dotnet format -f . --dry-run --check -v:diag
-    - name: Install dependencies
+    - name: Restore
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
