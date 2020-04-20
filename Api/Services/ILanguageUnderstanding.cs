@@ -15,10 +15,10 @@ namespace NosAyudamos
 
     class LanguageUnderstanding : ILanguageUnderstanding
     {
-        readonly IEnviroment enviroment;
+        readonly IEnvironment enviroment;
         readonly ILogger<LanguageUnderstanding> logger;
 
-        public LanguageUnderstanding(IEnviroment enviroment, ILogger<LanguageUnderstanding> logger)
+        public LanguageUnderstanding(IEnvironment enviroment, ILogger<LanguageUnderstanding> logger)
         {
             this.enviroment = enviroment;
             this.logger = logger;

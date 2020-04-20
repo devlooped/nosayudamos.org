@@ -31,7 +31,7 @@ namespace NosAyudamos
             }
 
             var signature = values[0];
-            var token = Ensure.NotEmpty(Environment.GetEnvironmentVariable("TwilioAuthToken"), "TwilioAuthToken");
+            var token = Ensure.NotEmpty(System.Environment.GetEnvironmentVariable("TwilioAuthToken"), "TwilioAuthToken");
 
             if (signature == token)
                 return true;

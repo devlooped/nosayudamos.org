@@ -21,7 +21,7 @@ namespace NosAyudamos
         readonly string chatApiNumber;
         readonly ILogger<ChatApi> logger;
 
-        public ChatApi(IEnviroment enviroment, ILogger<ChatApi> logger)
+        public ChatApi(IEnvironment enviroment, ILogger<ChatApi> logger)
         {
             chatApiNumber = enviroment.GetVariable("ChatApiNumber");
             this.logger = logger;

@@ -11,9 +11,9 @@ namespace NosAyudamos
 
     class BlobStorage : IBlobStorage
     {
-        readonly IEnviroment enviroment;
+        readonly IEnvironment enviroment;
 
-        public BlobStorage(IEnviroment enviroment) => this.enviroment = enviroment;
+        public BlobStorage(IEnvironment enviroment) => this.enviroment = enviroment;
 
         public async Task UploadAsync(byte[] bytes, string containerName, string blobName)
         {

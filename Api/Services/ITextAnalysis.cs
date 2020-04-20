@@ -6,7 +6,7 @@ using Azure.AI.TextAnalytics;
 
 namespace NosAyudamos
 {
-    public interface ITextAnalysis
+    interface ITextAnalysis
     {
         Task<IEnumerable<string>> GetKeyPhrasesAsync(string? text);
         Task<IEnumerable<CategorizedEntity>> GetEntitiesAsync(string? text);
@@ -14,9 +14,9 @@ namespace NosAyudamos
 
     class TextAnalysis : ITextAnalysis
     {
-        private readonly IEnviroment enviroment;
+        private readonly IEnvironment enviroment;
 
-        public TextAnalysis(IEnviroment enviroment) => this.enviroment = enviroment;
+        public TextAnalysis(IEnvironment enviroment) => this.enviroment = enviroment;
 
         public async Task<IEnumerable<string>> GetKeyPhrasesAsync(string? text)
         {

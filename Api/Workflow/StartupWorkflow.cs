@@ -14,7 +14,7 @@ namespace NosAyudamos
     [Workflow("Startup")]
     class StartupWorkflow : IWorkflow, IStartupWorkflow
     {
-        readonly IEnviroment enviroment;
+        readonly IEnvironment enviroment;
         readonly ILanguageUnderstanding languageUnderstanding;
         readonly IWorkflowFactory workflowFactory;
         readonly IBlobStorage blobStorage;
@@ -23,7 +23,7 @@ namespace NosAyudamos
         readonly IPersonRecognizer personRecognizer;
         readonly IRepositoryFactory repositoryFactory;
 
-        public StartupWorkflow(IEnviroment enviroment,
+        public StartupWorkflow(IEnvironment enviroment,
                             ILanguageUnderstanding languageUnderstanding,
                             IMessaging messaging,
                             IWorkflowFactory workflowFactory,
@@ -114,7 +114,7 @@ namespace NosAyudamos
                             await messaging.SendTextAsync(
                                 message.To, "No pudimos procesar su dni. Nos contactaremos en breve.", message.From);
 
-                            logger.LogWarning($"Unable to process national_id.{Environment.NewLine}Message:{Environment.NewLine}{message}");
+                            logger.LogWarning($"Unable to process national_id.{System.Environment.NewLine}Message:{System.Environment.NewLine}{message}");
 
                             return;
                         }
