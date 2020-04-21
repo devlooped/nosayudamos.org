@@ -1,15 +1,9 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Reflection;
 
 namespace NosAyudamos
 {
-    interface IWorkflowFactory
-    {
-        IWorkflow Create(Workflow workflow);
-    }
-
     class WorkflowFactory : IWorkflowFactory
     {
         readonly IEnumerable<IWorkflow> workflows;
@@ -22,14 +16,8 @@ namespace NosAyudamos
         }
     }
 
-    interface IWorkflow
+    interface IWorkflowFactory
     {
-        Task RunAsync(Message message);
-    }
-
-    enum Workflow
-    {
-        Donor,
-        Donee
+        IWorkflow Create(Workflow workflow);
     }
 }
