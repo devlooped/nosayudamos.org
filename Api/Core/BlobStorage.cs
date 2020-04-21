@@ -4,11 +4,6 @@ using Azure.Storage.Blobs;
 
 namespace NosAyudamos
 {
-    interface IBlobStorage
-    {
-        Task UploadAsync(byte[] bytes, string containerName, string blobName);
-    }
-
     class BlobStorage : IBlobStorage
     {
         readonly IEnvironment enviroment;
@@ -33,5 +28,10 @@ namespace NosAyudamos
         }
 
         private BlobServiceClient CreateBlobServiceClient() => new BlobServiceClient(enviroment.GetVariable("StorageConnectionString"));
+    }
+
+    interface IBlobStorage
+    {
+        Task UploadAsync(byte[] bytes, string containerName, string blobName);
     }
 }

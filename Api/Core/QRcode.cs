@@ -7,11 +7,6 @@ using ZXing;
 
 namespace NosAyudamos
 {
-    interface IQRCode
-    {
-        Task<string?> ReadAsync(Uri imageUri);
-    }
-
     class QRCode : IQRCode
     {
         private readonly Lazy<BarcodeReader> reader;
@@ -42,5 +37,10 @@ namespace NosAyudamos
 
             return result?.Text;
         }
+    }
+
+    interface IQRCode
+    {
+        Task<string?> ReadAsync(Uri imageUri);
     }
 }

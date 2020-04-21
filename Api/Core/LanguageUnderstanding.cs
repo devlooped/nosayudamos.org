@@ -8,11 +8,6 @@ using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
 {
-    interface ILanguageUnderstanding
-    {
-        Task<IEnumerable<string>> GetIntentsAsync(string? text);
-    }
-
     class LanguageUnderstanding : ILanguageUnderstanding
     {
         readonly IEnvironment enviroment;
@@ -64,4 +59,10 @@ namespace NosAyudamos
             };
         }
     }
+
+    interface ILanguageUnderstanding
+    {
+        Task<IEnumerable<string>> GetIntentsAsync(string? text);
+    }
+
 }

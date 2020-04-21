@@ -1,14 +1,7 @@
-using System;
 using System.ComponentModel;
 
 namespace NosAyudamos
 {
-    interface IEnvironment
-    {
-        string GetVariable(string name);
-        T GetVariable<T>(string name, T defaultValue = default);
-    }
-
     class Environment : IEnvironment
     {
         public string GetVariable(string name)
@@ -32,5 +25,11 @@ namespace NosAyudamos
 
             return defaultValue;
         }
+    }
+
+    interface IEnvironment
+    {
+        string GetVariable(string name);
+        T GetVariable<T>(string name, T defaultValue = default);
     }
 }

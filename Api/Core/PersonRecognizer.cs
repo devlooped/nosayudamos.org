@@ -9,11 +9,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace NosAyudamos
 {
-    interface IPersonRecognizer
-    {
-        Task<Person?> RecognizeAsync(Uri imageUri);
-    }
-
     static class PersonRecognizerExtensions
     {
         public static Task<Person?> RecognizeAsync(this IPersonRecognizer recognizer, string? imageUrl)
@@ -77,5 +72,10 @@ namespace NosAyudamos
 
             return null;
         }
+    }
+
+    interface IPersonRecognizer
+    {
+        Task<Person?> RecognizeAsync(Uri imageUri);
     }
 }
