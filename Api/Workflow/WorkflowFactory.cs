@@ -1,19 +1,15 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using System;
+using Autofac.Features.Indexed;
 
 namespace NosAyudamos
 {
     class WorkflowFactory : IWorkflowFactory
     {
-        readonly IEnumerable<IWorkflow> workflows;
-        public WorkflowFactory(IEnumerable<IWorkflow> workflows) => this.workflows = workflows;
+        readonly IIndex<Workflow, Func<IWorkflow>> workflows;
 
-        public IWorkflow Create(Workflow workflow)
-        {
-            return workflows.First(w =>
-                w.GetType().GetTypeInfo().GetCustomAttribute<WorkflowAttribute>()?.Name == workflow.ToString());
-        }
+        public WorkflowFactory(IIndex<Workflow, Func<IWorkflow>> workflows) => this.workflows = workflows;
+
+        public IWorkflow Create(Workflow workflow) => workflows[workflow]();
     }
 
     interface IWorkflowFactory

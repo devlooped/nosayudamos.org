@@ -18,17 +18,9 @@ namespace NosAyudamos
 {
     class ChatApi
     {
-        readonly string chatApiNumber;
-        readonly ILogger<ChatApi> logger;
-
-        public ChatApi(IEnvironment enviroment, ILogger<ChatApi> logger)
-        {
-            chatApiNumber = enviroment.GetVariable("ChatApiNumber");
-            this.logger = logger;
-        }
-
         [FunctionName("chat")]
-        public async Task<IActionResult> EncodeAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+        public async Task<IActionResult> EncodeAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+            [Resolve] IEnvironment enviroment)
         {
             Contract.Assert(req != null);
 
@@ -40,6 +32,8 @@ namespace NosAyudamos
             var payload = await reader.ReadToEndAsync();
             var json = JsonSerializer.Deserialize<JsonElement>(payload);
             var responses = new List<string>();
+
+            var chatApiNumber = enviroment.GetVariable("ChatApiNumber");
 
             foreach (var message in json.GetProperty("messages").EnumerateArray())
             {

@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace NosAyudamos
 {
@@ -11,7 +11,7 @@ namespace NosAyudamos
         readonly Lazy<IMessaging> log;
         readonly IEnvironment enviroment;
 
-        public Messaging(IEnvironment enviroment, ILogger<Messaging> logger)
+        public Messaging(IEnvironment enviroment, ILogger logger)
         {
             this.enviroment = enviroment;
             twilio = new Lazy<IMessaging>(() => new TwilioMessaging(enviroment));

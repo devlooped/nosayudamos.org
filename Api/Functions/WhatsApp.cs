@@ -4,30 +4,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.Contracts;
 using System.Net;
+using Serilog;
 
 namespace NosAyudamos
 {
     class Whatsapp
     {
-        readonly IMessaging messaging;
-        readonly ILogger<Whatsapp> logger;
-        readonly IStartupWorkflow workflow;
-
-        public Whatsapp(IMessaging messaging, IStartupWorkflow workflow, ILogger<Whatsapp> logger)
-        {
-            this.messaging = messaging;
-            this.workflow = workflow;
-            this.logger = logger;
-        }
-
         [FunctionName("whatsapp")]
         public async Task<IActionResult> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+            [Resolve] IStartupWorkflow workflow, 
+            [Resolve] ILogger logger)
         {
             Contract.Assert(req != null);
 
@@ -37,17 +27,17 @@ namespace NosAyudamos
 
             if (req.IsTwilioRequest() && !req.IsTwilioSigned(raw))
             {
-                logger.LogWarning("Received callback came from Twilio but is not properly signed.");
+                logger.Warning("Received callback came from Twilio but is not properly signed.");
                 return new BadRequestResult();
             }
 
             try
             {
-                logger.LogInformation("Raw: {Body}", raw);
+                logger.Information("Raw: {Body}", raw);
 
                 var msg = Message.Create(body);
 
-                logger.LogInformation("Message: {@Message}", msg);
+                logger.Information("Message: {@Message}", msg);
 
                 await workflow.RunAsync(msg);
 
@@ -55,7 +45,7 @@ namespace NosAyudamos
             }
             catch (Exception ex)
             {
-                log.LogError(ex.ToString());
+                logger.Error(ex.ToString());
                 throw;
             }
         }

@@ -12,6 +12,8 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="5.1.2" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Azure.AI.TextAnalytics" Version="1.0.0-preview.4" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.4.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.13.1" />

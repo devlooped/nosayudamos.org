@@ -1,26 +1,48 @@
-using System;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Autofac;
+using Autofac.Core;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using NosAyudamos.Infrastructure;
 using NosAyudamos.Properties;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Slack;
 
-[assembly: FunctionsStartup(typeof(NosAyudamos.Startup))]
+[assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
 namespace NosAyudamos
 {
-    class Startup : FunctionsStartup
+
+    class Startup : IWebJobsStartup
     {
-        public override void Configure(IFunctionsHostBuilder builder)
+        void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterType<DonorWorkflow>().Keyed<IWorkflow>(Workflow.Donor);
+            builder.RegisterType<DoneeWorkflow>().Keyed<IWorkflow>(Workflow.Donee);
+
+            builder.RegisterType<WorkflowFactory>().As<IWorkflowFactory>().SingleInstance();
+        }
+
+        public void Configure(IWebJobsBuilder job)
         {
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(Assembly.GetExecutingAssembly().GetCustomAttribute<NeutralResourcesLanguageAttribute>()!.CultureName);
             CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture;
 
-            var logger = new LoggerConfiguration()
+            Log.Information(Strings.Startup.Starting);
+
+            var builder = new ContainerBuilder();
+            ConfigureContainer(builder);
+
+            builder
+                .RegisterAssemblyTypes(Assembly.GetExecutingAssembly())
+                .Where(t => t.GetInterfaces().Length > 0)
+                .AsImplementedInterfaces();
+
+            Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .MinimumLevel.Override("Host", LogEventLevel.Warning)
                 .MinimumLevel.Override("Function", LogEventLevel.Warning)
@@ -39,22 +61,16 @@ namespace NosAyudamos
                 .WriteTo.Console()
                 .CreateLogger();
 
-            Log.Information(Strings.Startup.Starting);
+            builder.RegisterInstance(Log.Logger).AsImplementedInterfaces();
 
-            builder.Services.AddLogging(lb => lb.AddSerilog(logger));
-            builder.Services.AddApplicationInsightsTelemetry();
-            builder.Services.AddSingleton<IEnvironment, Environment>();
-            builder.Services.AddSingleton<IMessaging, Messaging>();
-            builder.Services.AddSingleton<ILanguageUnderstanding, LanguageUnderstanding>();
-            builder.Services.AddSingleton<ITextAnalysis, TextAnalysis>();
-            builder.Services.AddSingleton<IPersonRecognizer, PersonRecognizer>();
-            builder.Services.AddSingleton<IBlobStorage, BlobStorage>();
-            builder.Services.AddSingleton<IRepositoryFactory, RepositoryFactory>();
-            builder.Services.AddSingleton<IWorkflowFactory, WorkflowFactory>();
-            builder.Services.AddSingleton<IQRCode, IQRCode>();
-            builder.Services.AddTransient<IStartupWorkflow, StartupWorkflow>();
-            builder.Services.AddTransient<IWorkflow, DonorWorkflow>();
-            builder.Services.AddTransient<IWorkflow, DoneeWorkflow>();
+            var container = builder.Build();
+
+            job.AddExtension(new AutofacExtension(container));
+
+            job.Services.AddLogging(lb => lb.AddSerilog(Log.Logger));
+            job.Services.AddSingleton(Log.Logger);
+            job.Services.AddSingleton(container);
+            job.Services.AddApplicationInsightsTelemetry();
         }
     }
 }

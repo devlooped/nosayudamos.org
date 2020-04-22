@@ -2,23 +2,17 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace NosAyudamos
 {
-    [SuppressMessage("Microsoft.Design", "CA1040")]
-    interface IStartupWorkflow : IWorkflow
-    {
-    }
-
-    [Workflow("Startup")]
     class StartupWorkflow : IWorkflow, IStartupWorkflow
     {
         readonly IEnvironment enviroment;
         readonly ILanguageUnderstanding languageUnderstanding;
         readonly IWorkflowFactory workflowFactory;
         readonly IBlobStorage blobStorage;
-        readonly ILogger<StartupWorkflow> logger;
+        readonly ILogger logger;
         readonly IMessaging messaging;
         readonly IPersonRecognizer personRecognizer;
         readonly IRepositoryFactory repositoryFactory;
@@ -30,7 +24,7 @@ namespace NosAyudamos
                             IBlobStorage blobStorage,
                             IPersonRecognizer personRecognizer,
                             IRepositoryFactory repositoryFactory,
-                            ILogger<StartupWorkflow> logger) =>
+                            ILogger logger) =>
                             (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowFactory, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.logger) =
                                 (enviroment, languageUnderstanding, messaging, workflowFactory, blobStorage, personRecognizer, repositoryFactory, logger);
 
@@ -114,7 +108,7 @@ namespace NosAyudamos
                             await messaging.SendTextAsync(
                                 message.To, "No pudimos procesar su dni. Nos contactaremos en breve.", message.From);
 
-                            logger.LogWarning(@"Unable to process national_id.
+                            logger.Warning(@"Unable to process national_id.
 Message: {@message:j}", message);
 
                             return;
@@ -126,5 +120,10 @@ Message: {@message:j}", message);
                 }
             }
         }
+    }
+
+    [SuppressMessage("Microsoft.Design", "CA1040")]
+    interface IStartupWorkflow : IWorkflow
+    {
     }
 }

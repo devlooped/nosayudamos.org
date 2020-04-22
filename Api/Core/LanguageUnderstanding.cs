@@ -4,16 +4,16 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace NosAyudamos
 {
     class LanguageUnderstanding : ILanguageUnderstanding
     {
         readonly IEnvironment enviroment;
-        readonly ILogger<LanguageUnderstanding> logger;
+        readonly ILogger logger;
 
-        public LanguageUnderstanding(IEnvironment enviroment, ILogger<LanguageUnderstanding> logger)
+        public LanguageUnderstanding(IEnvironment enviroment, ILogger logger)
         {
             this.enviroment = enviroment;
             this.logger = logger;

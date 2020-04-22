@@ -1,16 +1,17 @@
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace NosAyudamos
 {
     class LogMessaging : IMessaging
     {
-        readonly ILogger<IMessaging> logger;
-        public LogMessaging(ILogger<IMessaging> logger) => this.logger = logger;
+        readonly ILogger logger;
+
+        public LogMessaging(ILogger logger) => this.logger = logger;
 
         public Task SendTextAsync(string from, string body, string to)
         {
-            logger.LogInformation($@"From:{from}|To:|{to}
+            logger.Information($@"From:{from}|To:|{to}
 Body:{body}");
 
             return Task.CompletedTask;

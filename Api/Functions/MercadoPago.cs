@@ -4,16 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using Serilog;
 
 namespace NosAyudamos
 {
     class MercadoPago
     {
-        readonly ILogger<MercadoPago> logger;
+        readonly ILogger logger;
 
-        public MercadoPago(ILogger<MercadoPago> logger) => this.logger = logger;
+        public MercadoPago(ILogger logger) => this.logger = logger;
 
         [FunctionName("mercadopago")]
         public async Task<IActionResult> RunAsync(
@@ -22,7 +22,7 @@ namespace NosAyudamos
             using var reader = new StreamReader(req.Body);
             var body = await reader.ReadToEndAsync();
 
-            logger.LogInformation(JsonSerializer.Serialize(JsonDocument.Parse(body).RootElement, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+            logger.Information(JsonSerializer.Serialize(JsonDocument.Parse(body).RootElement, new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
 
             return new OkObjectResult("");
         }
