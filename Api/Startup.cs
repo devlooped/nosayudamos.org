@@ -51,7 +51,7 @@ namespace NosAyudamos
             builder.Services.AddSingleton<IBlobStorage, BlobStorage>();
             builder.Services.AddSingleton<IRepositoryFactory, RepositoryFactory>();
             builder.Services.AddSingleton<IWorkflowFactory, WorkflowFactory>();
-            builder.Services.AddSingleton<IQRCode, IQRCode>();
+            builder.Services.AddSingleton<IQRCode, QRCode>();
             builder.Services.AddTransient<IStartupWorkflow, StartupWorkflow>();
             builder.Services.AddTransient<IWorkflow, DonorWorkflow>();
             builder.Services.AddTransient<IWorkflow, DoneeWorkflow>();
