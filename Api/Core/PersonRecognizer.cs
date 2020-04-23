@@ -5,8 +5,8 @@ using System.IO;
 using System;
 using System.Drawing;
 using System.Globalization;
-using System.Diagnostics.CodeAnalysis;
 using System.Composition;
+using System.Net.Http;
 
 namespace NosAyudamos
 {
@@ -25,13 +25,15 @@ namespace NosAyudamos
         }
     }
 
-    [Shared]
     class PersonRecognizer : IPersonRecognizer
     {
-        private readonly Lazy<BarcodeReader> reader;
+        readonly Lazy<BarcodeReader> reader;
+        readonly HttpClient httpClient;
 
-        public PersonRecognizer()
+        public PersonRecognizer(HttpClient httpClient)
         {
+            this.httpClient = httpClient;
+
             reader = new Lazy<BarcodeReader>(
                 () => new BarcodeReader()
                 {
@@ -47,7 +49,7 @@ namespace NosAyudamos
 
         public async Task<Person?> RecognizeAsync(Uri imageUri)
         {
-            var bytes = await Utility.DownloadBlobAsync(imageUri);
+            var bytes = await httpClient.GetByteArrayAsync(imageUri);
 
             using var mem = new MemoryStream(bytes);
             using var image = (Bitmap)Image.FromStream(mem);

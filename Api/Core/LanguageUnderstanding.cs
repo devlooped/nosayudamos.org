@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
 using Microsoft.Extensions.Logging;
+using Polly;
+using Polly.Registry;
 
 namespace NosAyudamos
 {
@@ -13,13 +15,11 @@ namespace NosAyudamos
     class LanguageUnderstanding : ILanguageUnderstanding
     {
         readonly IEnvironment enviroment;
+        readonly IReadOnlyPolicyRegistry<string> registry;
         readonly ILogger<LanguageUnderstanding> logger;
 
-        public LanguageUnderstanding(IEnvironment enviroment, ILogger<LanguageUnderstanding> logger)
-        {
-            this.enviroment = enviroment;
-            this.logger = logger;
-        }
+        public LanguageUnderstanding(IEnvironment enviroment, IReadOnlyPolicyRegistry<string> registry, ILogger<LanguageUnderstanding> logger) =>
+            (this.enviroment, this.registry, this.logger) = (enviroment, registry, logger);
 
         public async Task<IEnumerable<string>> GetIntentsAsync(string? text)
         {
@@ -39,13 +39,16 @@ namespace NosAyudamos
                 Options = requestOptions
             };
 
-            var predictionResponse = await luisClient.Prediction.GetSlotPredictionAsync(
-                Guid.Parse(enviroment.GetVariable("LuisAppId")),
-                slotName: enviroment.GetVariable("LuisAppSlot"),
-                predictionRequest,
-                verbose: true,
-                showAllIntents: false,
-                log: true).ConfigureAwait(false);
+            var policy = registry.Get<IAsyncPolicy>("LuisPolicy");
+
+            var predictionResponse = await policy.ExecuteAsync(async () =>
+                await luisClient.Prediction.GetSlotPredictionAsync(
+                    Guid.Parse(enviroment.GetVariable("LuisAppId")),
+                    slotName: enviroment.GetVariable("LuisAppSlot"),
+                    predictionRequest,
+                    verbose: true,
+                    showAllIntents: false,
+                    log: true).ConfigureAwait(false));
 
             return predictionResponse.Prediction.Intents.Keys;
         }

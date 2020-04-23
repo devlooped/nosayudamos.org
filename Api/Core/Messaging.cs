@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -9,13 +10,15 @@ namespace NosAyudamos
         readonly Lazy<IMessaging> twilio;
         readonly Lazy<IMessaging> chatApi;
         readonly Lazy<IMessaging> log;
+        readonly HttpClient httpClient;
         readonly IEnvironment enviroment;
 
-        public Messaging(IEnvironment enviroment, ILogger<Messaging> logger)
+        public Messaging(IEnvironment enviroment, HttpClient httpClient, ILogger<Messaging> logger)
         {
             this.enviroment = enviroment;
+            this.httpClient = httpClient;
             twilio = new Lazy<IMessaging>(() => new TwilioMessaging(enviroment));
-            chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(enviroment));
+            chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(enviroment, httpClient));
             log = new Lazy<IMessaging>(() => new LogMessaging(logger));
         }
 
