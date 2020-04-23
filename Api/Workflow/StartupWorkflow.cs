@@ -23,6 +23,7 @@ namespace NosAyudamos
         readonly IMessaging messaging;
         readonly IPersonRecognizer personRecognizer;
         readonly IRepositoryFactory repositoryFactory;
+        readonly IPersonRepository personRepository;
         readonly HttpClient httpClient;
 
         public StartupWorkflow(IEnvironment enviroment,
@@ -32,10 +33,11 @@ namespace NosAyudamos
                             IBlobStorage blobStorage,
                             IPersonRecognizer personRecognizer,
                             IRepositoryFactory repositoryFactory,
+                            IPersonRepository personRepository,
                             HttpClient httpClient,
                             ILogger<StartupWorkflow> logger) =>
-                            (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowSelector, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.httpClient, this.logger) =
-                                (enviroment, languageUnderstanding, messaging, workflowSelector, blobStorage, personRecognizer, repositoryFactory, httpClient, logger);
+                            (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowSelector, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.personRepository, this.httpClient, this.logger) =
+                                (enviroment, languageUnderstanding, messaging, workflowSelector, blobStorage, personRecognizer, repositoryFactory, personRepository, httpClient, logger);
 
         public async Task RunAsync(Message message)
         {
@@ -81,14 +83,9 @@ namespace NosAyudamos
                     await blobStorage.UploadAsync(
                         image, enviroment.GetVariable("AttachmentsContainerName"), $"dni_{person.NationalId}.png");
 
-                    var doneeRepository = repositoryFactory.Create<DoneeEntity>();
+                    person.PhoneNumber = message.From;
 
-                    await doneeRepository.PutAsync(
-                        new DoneeEntity(person.NationalId,
-                                        person.FirstName,
-                                        person.LastName,
-                                        person.DateOfBirth,
-                                        person.Sex));
+                    await personRepository.PutAsync(person);
 
                     var actionRetry = await actionRetryRepository.GetAsync(message.To, Action.RecognizeId.ToString());
 
