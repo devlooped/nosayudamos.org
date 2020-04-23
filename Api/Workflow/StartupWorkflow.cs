@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -22,6 +23,7 @@ namespace NosAyudamos
         readonly IMessaging messaging;
         readonly IPersonRecognizer personRecognizer;
         readonly IRepositoryFactory repositoryFactory;
+        readonly HttpClient httpClient;
 
         public StartupWorkflow(IEnvironment enviroment,
                             ILanguageUnderstanding languageUnderstanding,
@@ -30,9 +32,10 @@ namespace NosAyudamos
                             IBlobStorage blobStorage,
                             IPersonRecognizer personRecognizer,
                             IRepositoryFactory repositoryFactory,
+                            HttpClient httpClient,
                             ILogger<StartupWorkflow> logger) =>
-                            (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowSelector, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.logger) =
-                                (enviroment, languageUnderstanding, messaging, workflowSelector, blobStorage, personRecognizer, repositoryFactory, logger);
+                            (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowSelector, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.httpClient, this.logger) =
+                                (enviroment, languageUnderstanding, messaging, workflowSelector, blobStorage, personRecognizer, repositoryFactory, httpClient, logger);
 
         public async Task RunAsync(Message message)
         {
@@ -59,7 +62,7 @@ namespace NosAyudamos
                 else
                 {
                     await messaging.SendTextAsync(
-                        message.To, "Gracias por contactarnos, querÈs ayudar o necesit·s ayuda?", message.From);
+                        message.To, "Gracias por contactarnos, quer√©s ayudar o necesit√°s ayuda?", message.From);
                 }
             }
         }
@@ -73,7 +76,7 @@ namespace NosAyudamos
 
                 if (person != null)
                 {
-                    var image = await Utility.DownloadBlobAsync(imageUri);
+                    var image = await httpClient.GetByteArrayAsync(imageUri);
 
                     await blobStorage.UploadAsync(
                         image, enviroment.GetVariable("AttachmentsContainerName"), $"dni_{person.NationalId}.png");

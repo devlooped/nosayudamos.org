@@ -19,11 +19,13 @@ namespace NosAyudamos
     class ChatApi
     {
         readonly string chatApiNumber;
+        readonly HttpClient httpClient;
         readonly ILogger<ChatApi> logger;
 
-        public ChatApi(IEnvironment enviroment, ILogger<ChatApi> logger)
+        public ChatApi(IEnvironment enviroment, HttpClient httpClient, ILogger<ChatApi> logger)
         {
             chatApiNumber = enviroment.GetVariable("ChatApiNumber");
+            this.httpClient = httpClient;
             this.logger = logger;
         }
 
@@ -33,7 +35,6 @@ namespace NosAyudamos
             Contract.Assert(req != null);
 
             var uri = new Uri(req.GetDisplayUrl());
-            using var http = new HttpClient();
             var formatter = new JsonMediaTypeFormatter();
 
             using var reader = new StreamReader(req.Body);
@@ -56,7 +57,7 @@ namespace NosAyudamos
                     continue;
 
                 using var content = new StringContent(WebUtility.UrlEncode($"From=+{from.TrimStart('+')}&To={chatApiNumber}&Body={body}"));
-                using var response = await http.PostAsync(new Uri(uri, "whatsapp"), content);
+                using var response = await httpClient.PostAsync(new Uri(uri, "whatsapp"), content);
 
                 responses.Add(await response.Content.ReadAsStringAsync());
             }

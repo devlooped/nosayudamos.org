@@ -21,6 +21,7 @@ namespace NosAyudamos
             var insertOrMergeOperation = TableOperation.InsertOrReplace(entity);
 
             var table = await GetTableAsync();
+
             var result = await table.ExecuteAsync(insertOrMergeOperation).ConfigureAwait(false);
 
             return (T)result.Result;

@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Drawing;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using ZXing;
 
 namespace NosAyudamos
 {
-    [Shared]
     class QRCode : IQRCode
     {
-        private readonly Lazy<BarcodeReader> reader;
+        readonly HttpClient httpClient;
+        readonly Lazy<BarcodeReader> reader;
 
-        public QRCode()
+        public QRCode(HttpClient httpClient)
         {
+            this.httpClient = httpClient;
+
             reader = new Lazy<BarcodeReader>(
                 () => new BarcodeReader()
                 {
@@ -30,7 +33,7 @@ namespace NosAyudamos
 
         public async Task<string?> ReadAsync(Uri imageUri)
         {
-            var bytes = await Utility.DownloadBlobAsync(imageUri);
+            var bytes = await httpClient.GetByteArrayAsync(imageUri);
 
             using var mem = new MemoryStream(bytes);
             using var image = (Bitmap)Image.FromStream(mem);

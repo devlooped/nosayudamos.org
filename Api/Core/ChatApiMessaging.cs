@@ -7,14 +7,18 @@ namespace NosAyudamos
     class ChatApiMessaging : IMessaging
     {
         readonly MediaTypeFormatter formatter = new JsonMediaTypeFormatter();
+        readonly HttpClient httpClient;
         string apiUrl;
 
-        public ChatApiMessaging(IEnvironment enviroment) => apiUrl = enviroment.GetVariable("ChatApiUrl");
+        public ChatApiMessaging(IEnvironment enviroment, HttpClient httpClient)
+        {
+            this.httpClient = httpClient;
+            apiUrl = enviroment.GetVariable("ChatApiUrl");
+        }
 
         public async Task SendTextAsync(string from, string body, string to)
         {
-            using var http = new HttpClient();
-            await http.PostAsync(apiUrl, new { phone = to.TrimStart('+'), body }, formatter).ConfigureAwait(false);
+            await httpClient.PostAsync(apiUrl, new { phone = to.TrimStart('+'), body }, formatter).ConfigureAwait(false);
         }
     }
 }

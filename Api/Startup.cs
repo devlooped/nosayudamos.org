@@ -10,6 +10,10 @@ using NosAyudamos.Properties;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Slack;
+using Polly;
+using System.Net.Http;
+using System;
+using Polly.Extensions.Http;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -70,6 +74,17 @@ namespace NosAyudamos
                 else
                     builder.Services.AddScoped(implementationType);
             }
+
+            var registry = new Resiliency(new Environment()).GetRegistry();
+            var policy = registry.Get<IAsyncPolicy<HttpResponseMessage>>("HttpClientPolicy");
+
+            builder.Services.AddHttpClient<IMessaging, Messaging>().AddPolicyHandler(policy);
+            builder.Services.AddHttpClient<IPersonRecognizer, PersonRecognizer>().AddPolicyHandler(policy);
+            builder.Services.AddHttpClient<IQRCode, QRCode>().AddPolicyHandler(policy);
+            builder.Services.AddHttpClient<IStartupWorkflow, StartupWorkflow>().AddPolicyHandler(policy);
+            builder.Services.AddHttpClient<ChatApi>().AddPolicyHandler(policy);
+
+            builder.Services.AddPolicyRegistry(registry);
         }
     }
 }
