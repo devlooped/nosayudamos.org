@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using ZXing;
 
 namespace NosAyudamos
 {
+    [Shared]
     class QRCode : IQRCode
     {
         private readonly Lazy<BarcodeReader> reader;

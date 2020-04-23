@@ -1,7 +1,9 @@
 using System.ComponentModel;
+using System.Composition;
 
 namespace NosAyudamos
 {
+    [Shared]
     class Environment : IEnvironment
     {
         public string GetVariable(string name)

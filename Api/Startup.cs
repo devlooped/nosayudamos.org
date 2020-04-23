@@ -1,21 +1,23 @@
-using System;
+using System.Composition;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Resources;
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using NosAyudamos.Properties;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Slack;
 
-[assembly: FunctionsStartup(typeof(NosAyudamos.Startup))]
+[assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
 namespace NosAyudamos
 {
-    class Startup : FunctionsStartup
+    class Startup : IWebJobsStartup
     {
-        public override void Configure(IFunctionsHostBuilder builder)
+        public void Configure(IWebJobsBuilder builder)
         {
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(Assembly.GetExecutingAssembly().GetCustomAttribute<NeutralResourcesLanguageAttribute>()!.CultureName);
             CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture;
@@ -43,18 +45,31 @@ namespace NosAyudamos
 
             builder.Services.AddLogging(lb => lb.AddSerilog(logger));
             builder.Services.AddApplicationInsightsTelemetry();
-            builder.Services.AddSingleton<IEnvironment, Environment>();
-            builder.Services.AddSingleton<IMessaging, Messaging>();
-            builder.Services.AddSingleton<ILanguageUnderstanding, LanguageUnderstanding>();
-            builder.Services.AddSingleton<ITextAnalysis, TextAnalysis>();
-            builder.Services.AddSingleton<IPersonRecognizer, PersonRecognizer>();
-            builder.Services.AddSingleton<IBlobStorage, BlobStorage>();
-            builder.Services.AddSingleton<IRepositoryFactory, RepositoryFactory>();
-            builder.Services.AddSingleton<IWorkflowFactory, WorkflowFactory>();
-            builder.Services.AddSingleton<IQRCode, QRCode>();
-            builder.Services.AddTransient<IStartupWorkflow, StartupWorkflow>();
-            builder.Services.AddTransient<IWorkflow, DonorWorkflow>();
-            builder.Services.AddTransient<IWorkflow, DoneeWorkflow>();
+
+            // DI conventions are:
+            // 1. Candidates: types that implement at least one interface
+            // 2. Looking at its attributes: if they don't have [Shared], they are registered as transient
+            // 3. Optionally can have [Export] to force registration of a type without interfaces
+            var candidateTypes = Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => !t.IsAbstract && !t.IsGenericTypeDefinition)
+                .Where(t => t.GetInterfaces().Length > 0 || t.GetCustomAttribute<ExportAttribute>() != null);
+
+            foreach (var implementationType in candidateTypes)
+            {
+                var singleton = implementationType.GetCustomAttribute<SharedAttribute>() != null;
+                foreach (var serviceType in implementationType.GetInterfaces())
+                {
+                    if (singleton)
+                        builder.Services.AddSingleton(serviceType, implementationType);
+                    else
+                        builder.Services.AddScoped(serviceType, implementationType);
+                }
+
+                if (singleton)
+                    builder.Services.AddSingleton(implementationType);
+                else
+                    builder.Services.AddScoped(implementationType);
+            }
         }
     }
 }

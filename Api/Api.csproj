@@ -19,12 +19,13 @@
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime" Version="3.0.0" />
     <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="2.0.0-preview" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.*" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.*" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.Slack" Version="1.2.63" />
     <PackageReference Include="stateless" Version="5.1.1" />
+    <PackageReference Include="System.Composition" Version="1.4.0" />
     <PackageReference Include="Twilio" Version="5.*" />
     <PackageReference Include="Twilio.AspNet.Core" Version="5.*" />
     <PackageReference Include="ZXing.Net" Version="0.16.5" />

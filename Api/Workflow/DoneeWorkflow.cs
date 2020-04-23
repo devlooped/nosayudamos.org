@@ -1,8 +1,10 @@
+using System.Composition;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
 {
+    [Export]
     [Workflow("Donee")]
     class DoneeWorkflow : IWorkflow
     {
