@@ -12,8 +12,7 @@ using Serilog.Events;
 using Serilog.Sinks.Slack;
 using Polly;
 using System.Net.Http;
-using System;
-using Polly.Extensions.Http;
+using AutoMapper;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -85,6 +84,7 @@ namespace NosAyudamos
             builder.Services.AddHttpClient<ChatApi>().AddPolicyHandler(policy);
 
             builder.Services.AddPolicyRegistry(registry);
+            builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
     }
 }
