@@ -41,6 +41,7 @@
     <PackageReference Include="Microsoft.NetCore.Analyzers" Version="3.0.0-beta*" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.*" />
     <PackageReference Include="netfx-System.StringResources" Version="3.2.0-alpha" />
+    <PackageReference Include="Microsoft.Azure.EventGrid" Version="3.2.0" />
   </ItemGroup>
   
   <ItemGroup>
