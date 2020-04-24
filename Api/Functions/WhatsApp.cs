@@ -8,18 +8,19 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics.Contracts;
 using System.Net;
+using Merq;
 
 namespace NosAyudamos
 {
     class Whatsapp
     {
-        readonly IMessaging messaging;
+        readonly IEventStream events;
         readonly ILogger<Whatsapp> logger;
         readonly IStartupWorkflow workflow;
 
-        public Whatsapp(IMessaging messaging, IStartupWorkflow workflow, ILogger<Whatsapp> logger)
+        public Whatsapp(IEventStream events, IStartupWorkflow workflow, ILogger<Whatsapp> logger)
         {
-            this.messaging = messaging;
+            this.events = events;
             this.workflow = workflow;
             this.logger = logger;
         }
@@ -46,6 +47,8 @@ namespace NosAyudamos
                 logger.LogInformation("Raw: {Body}", raw);
 
                 var msg = Message.Create(body);
+
+                events.Push(msg);
 
                 logger.LogInformation("Message: {@Message}", msg);
 
