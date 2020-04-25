@@ -4,14 +4,12 @@ using Newtonsoft.Json.Linq;
 
 namespace NosAyudamos
 {
-    class TestEnvironment : IEnvironment
+    class FeatureEnvironment : IEnvironment
     {
         Environment env = new Environment();
         JObject values;
 
-        public static bool CanRunFeatures { get; } = File.Exists("local.settings.json");
-
-        public TestEnvironment()
+        public FeatureEnvironment()
         {
             if (File.Exists("local.settings.json"))
             {

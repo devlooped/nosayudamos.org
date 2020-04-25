@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Razor.Internal;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace NosAyudamos
 {
-    class TestRepository<T> : IRepository<T>
+    class FeatureRepository<T> : IRepository<T>
         where T : class, ITableEntity
     {
         Dictionary<(string, string), T> values = new Dictionary<(string, string), T>();

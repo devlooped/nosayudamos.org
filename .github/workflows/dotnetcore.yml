@@ -19,9 +19,6 @@ jobs:
         dotnet-version: 3.1.101
     - name: Use dotnet-format
       run: dotnet tool update -g --version 3.2.* dotnet-format >nul || dotnet tool list -g
-    - name: Env
-      run: 'gci env: | format-table -autosize -wrap'
-      shell: pwsh
     - name: Run dotnet-format
       run: dotnet format -f . --dry-run --check -v:diag
     - name: Restore
@@ -30,3 +27,10 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+      env:
+        LuisAppId: ${{ secrets.LuisAppId }},
+        LuisAppSlot: staging,
+        LuisEndpoint: https://nosayudamos-lu.cognitiveservices.azure.com/,
+        LuisSubscriptionKey: ${{ secrets.LuisSubscriptionKey }},
+        TextAnalysisEndpoint: https://nosayudamos-ta.cognitiveservices.azure.com/,
+        TextAnalysisSubscriptionKey: ${{ secrets.TextAnalysisSubscriptionKey }},

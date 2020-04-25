@@ -2,11 +2,11 @@
 
 namespace NosAyudamos
 {
-    class TestRepositoryFactory : IRepositoryFactory
+    class FeatureRepositoryFactory : IRepositoryFactory
     {
         readonly IContainer container;
 
-        public TestRepositoryFactory(IContainer container) => this.container = container;
+        public FeatureRepositoryFactory(IContainer container) => this.container = container;
 
         IRepository<T> IRepositoryFactory.Create<T>() => container.Resolve<IRepository<T>>();
     }

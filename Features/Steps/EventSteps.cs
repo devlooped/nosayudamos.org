@@ -13,10 +13,8 @@ namespace NosAyudamos.Steps
         IEventStream events;
         MessageSent sent;
 
-        public EventSteps(TestContainer container)
+        public EventSteps(FeatureContainer container)
         {
-            Skip.IfNot(TestEnvironment.CanRunFeatures);
-
             events = container.Resolve<IEventStream>();
             events
                 .Of<MessageSent>()
@@ -25,9 +23,7 @@ namespace NosAyudamos.Steps
 
         [When(@"Envia mensaje")]
         public void WhenMessageReceived(string message)
-        {
-            events.Push(new MessageReceived(Constants.DoneeNumber, Constants.SystemNumber, message.ToSingleLine()));
-        }
+            => events.Push(new MessageReceived(Constants.DoneeNumber, Constants.SystemNumber, message.ToSingleLine()));
 
         [Then(@"Recibe mensaje")]
         public void ThenMessageSent(string message)

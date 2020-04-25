@@ -10,7 +10,6 @@ using Autofac.Core.Lifetime;
 using Autofac.Core.Resolving;
 using Merq;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Http;
 
 namespace NosAyudamos
 {
@@ -18,18 +17,14 @@ namespace NosAyudamos
     /// Scenarios can use a container by directly declaring it as a ctor 
     /// parameter.
     /// </summary>
-    public sealed class TestContainer : IContainer
+    public sealed class FeatureContainer : IContainer
     {
         /// <summary>
         /// The static constructor is the only one that validates the entire 
         /// container and all registrations, since that's somewhat expensive.
         /// </summary>
-        static TestContainer()
+        static FeatureContainer()
         {
-            // Only validate when we'll be doing feature testing, which uses the container.
-            if (!TestEnvironment.CanRunFeatures)
-                return;
-
             var builder = CreateBuilder();
             IContainer container = null;
 
@@ -42,7 +37,7 @@ namespace NosAyudamos
 
         IContainer container;
 
-        public TestContainer()
+        public FeatureContainer()
         {
             var builder = CreateBuilder();
 
@@ -65,7 +60,7 @@ namespace NosAyudamos
                 typeof(HttpClient),
             };
 
-            new Startup().Configure(services, new TestEnvironment());
+            new Startup().Configure(services, new FeatureEnvironment());
 
             var candidate = services.Where(desc => !testServices.Contains(desc.ServiceType)).ToList();
 
@@ -114,10 +109,10 @@ namespace NosAyudamos
                 }
             }
 
-            builder.RegisterType<TestEventStream>().As<IEventStream>().SingleInstance();
-            builder.RegisterType<TestEnvironment>().As<IEnvironment>().SingleInstance();
-            builder.RegisterType<TestRepositoryFactory>().As<IRepositoryFactory>().SingleInstance();
-            builder.RegisterGeneric(typeof(TestRepository<>)).As(typeof(IRepository<>)).SingleInstance();
+            builder.RegisterType<FeatureEventStream>().As<IEventStream>().SingleInstance();
+            builder.RegisterType<FeatureEnvironment>().As<IEnvironment>().SingleInstance();
+            builder.RegisterType<FeatureRepositoryFactory>().As<IRepositoryFactory>().SingleInstance();
+            builder.RegisterGeneric(typeof(FeatureRepository<>)).As(typeof(IRepository<>)).SingleInstance();
 
             // For some reason, the built-in registrations we were providing via Startup for HttpClient weren't working.
             builder.RegisterType<HttpClient>().InstancePerDependency();

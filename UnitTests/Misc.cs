@@ -12,13 +12,5 @@ namespace NosAyudamos
             var culture = typeof(IMessaging).Assembly.GetCustomAttribute<NeutralResourcesLanguageAttribute>().CultureName;
             Assert.Equal("es-AR", culture);
         }
-
-        [Fact]
-        public void CanGetContainer()
-        {
-            var container = new TestContainer();
-
-            Assert.NotNull(container);
-        }
     }
 }

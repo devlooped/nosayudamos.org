@@ -6,7 +6,6 @@ using System.Resources;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using NosAyudamos.Properties;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Slack;
@@ -15,6 +14,7 @@ using System.Net.Http;
 using AutoMapper;
 using System.Runtime.CompilerServices;
 using NosAyudamos.Functions;
+using NosAyudamos.Properties;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -36,7 +36,9 @@ namespace NosAyudamos
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(Assembly.GetExecutingAssembly().GetCustomAttribute<NeutralResourcesLanguageAttribute>()!.CultureName);
             CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture;
 
-            var logger = new LoggerConfiguration()
+            var testEnv = environment.GetVariable("TEST", false);
+
+            var config = new LoggerConfiguration()
 #if DEBUG
                 .MinimumLevel.Verbose()
 #else
@@ -46,7 +48,11 @@ namespace NosAyudamos
                 .MinimumLevel.Override("Function", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Azure", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.Logger(lc => lc.Filter
+                .WriteTo.Console();
+
+            if (!testEnv)
+            {
+                config.WriteTo.Logger(lc => lc.Filter
                     .ByIncludingOnly(e =>
                         e.Properties.ContainsKey("Category") &&
                         !string.IsNullOrEmpty(environment.GetVariable("SlackApiWebHook", "")))
@@ -57,9 +63,10 @@ namespace NosAyudamos
                         ShowDefaultAttachments = false,
                         ShowPropertyAttachments = false,
                         ShowExceptionAttachments = true,
-                    }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}` ```{@Message:j}```"))
-                .WriteTo.Console()
-                .CreateLogger();
+                    }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}` ```{@Message:j}```"));
+            }
+
+            var logger = config.CreateLogger();
 
             Log.Information(Strings.Startup.Starting);
 
@@ -101,7 +108,7 @@ namespace NosAyudamos
             var registry = new Resiliency(environment).GetRegistry();
             var policy = registry.Get<IAsyncPolicy<HttpResponseMessage>>("HttpClientPolicy");
 
-            if (!environment.GetVariable("TEST", false))
+            if (!testEnv)
             {
                 services.AddHttpClient<IMessaging, Messaging>().AddPolicyHandler(policy);
                 services.AddHttpClient<IPersonRecognizer, PersonRecognizer>().AddPolicyHandler(policy);
