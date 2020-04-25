@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Microsoft.Azure.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
-using Microsoft.AspNetCore.Testing;
+using Xunit;
 
 namespace NosAyudamos
 {
@@ -24,10 +24,11 @@ namespace NosAyudamos
             }
         }
 
-        [SkipOnCI]
-        [ConditionalFact]
+        [SkippableFact]
         public async Task SendCustomEvent()
         {
+            Skip.IfNot(File.Exists("local.settings.json"));
+
             var domain = gridUri.Host;
             var credentials = new TopicCredentials(gridKey);
             using var client = new EventGridClient(credentials);
