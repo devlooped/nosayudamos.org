@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace NosAyudamos.Features
+namespace NosAyudamos
 {
     using TechTalk.SpecFlow;
     using System;

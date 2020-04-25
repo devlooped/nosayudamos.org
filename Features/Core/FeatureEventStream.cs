@@ -6,11 +6,11 @@ using Merq;
 
 namespace NosAyudamos
 {
-    class TestEventStream : EventStream
+    class FeatureEventStream : EventStream
     {
         readonly IContainer container;
 
-        public TestEventStream(IContainer container) => this.container = container;
+        public FeatureEventStream(IContainer container) => this.container = container;
 
         public override void Push<TEvent>(TEvent @event)
         {

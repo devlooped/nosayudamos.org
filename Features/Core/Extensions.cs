@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace NosAyudamos.Steps
+namespace NosAyudamos
 {
     static class Extensions
     {
