@@ -5,14 +5,9 @@ namespace NosAyudamos
 {
     abstract class DomainModelRepository
     {
-        public DomainModelRepository(string connectionString) => StorageAccount = CreateCloudStorageAccount(connectionString);
+        public DomainModelRepository(string connectionString) => StorageAccount = CloudStorageAccount.Parse(connectionString);
 
         protected CloudStorageAccount StorageAccount { get; }
-
-        private static CloudStorageAccount CreateCloudStorageAccount(string connectionString)
-        {
-            return CloudStorageAccount.Parse(connectionString);
-        }
 
         protected async Task<CloudTable> GetTableAsync(string tableName)
         {
