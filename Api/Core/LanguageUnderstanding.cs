@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Composition;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime;
@@ -14,6 +15,8 @@ namespace NosAyudamos
     [Shared]
     class LanguageUnderstanding : ILanguageUnderstanding
     {
+        static readonly HashSet<string> emptySet = new HashSet<string>();
+
         readonly IEnvironment enviroment;
         readonly IReadOnlyPolicyRegistry<string> registry;
         readonly ILogger<LanguageUnderstanding> logger;
@@ -21,10 +24,10 @@ namespace NosAyudamos
         public LanguageUnderstanding(IEnvironment enviroment, IReadOnlyPolicyRegistry<string> registry, ILogger<LanguageUnderstanding> logger) =>
             (this.enviroment, this.registry, this.logger) = (enviroment, registry, logger);
 
-        public async Task<IEnumerable<string>> GetIntentsAsync(string? text)
+        public async Task<ISet<string>> GetIntentsAsync(string? text)
         {
             if (string.IsNullOrEmpty(text))
-                return Array.Empty<string>();
+                return emptySet;
 
             using var luisClient = CreateLuisClient();
 
@@ -50,7 +53,7 @@ namespace NosAyudamos
                     showAllIntents: false,
                     log: true).ConfigureAwait(false));
 
-            return predictionResponse.Prediction.Intents.Keys;
+            return new HashSet<string>(predictionResponse.Prediction.Intents.Keys, StringComparer.OrdinalIgnoreCase);
         }
 
         private ILUISRuntimeClient CreateLuisClient()
@@ -67,7 +70,7 @@ namespace NosAyudamos
 
     interface ILanguageUnderstanding
     {
-        Task<IEnumerable<string>> GetIntentsAsync(string? text);
+        Task<ISet<string>> GetIntentsAsync(string? text);
     }
 
 }
