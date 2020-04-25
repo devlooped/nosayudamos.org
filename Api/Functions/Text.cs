@@ -36,7 +36,7 @@ namespace NosAyudamos.Functions
 
         public async Task HandleAsync(TextMessageReceived message)
         {
-            log.Verbose("@{Message}", message);
+            log.Verbose("@{Message:j}", message);
 
             // Person is still not registered, need to discover intent
             if (message.PersonId == null)
@@ -45,6 +45,7 @@ namespace NosAyudamos.Functions
                 if (intents.Count == 0)
                 {
                     // Can't figure out intent, ask specifically
+                    throw new NotImplementedException("TODO: no intent could be determined.");
                 }
                 else if (intents.Contains("help"))
                 {
@@ -54,12 +55,14 @@ namespace NosAyudamos.Functions
                 else if (intents.Contains("donate"))
                 {
                     // TODO: ask how much, send link, etc.
+                    throw new NotImplementedException("TODO: donate intent detected.");
                 }
             }
             else
             {
                 var person = await repository.GetAsync(message.PersonId);
                 // TODO load worklow for person, run it.
+                throw new NotImplementedException("TODO: run workflow for registered person.");
             }
         }
     }

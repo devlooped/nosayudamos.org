@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Merq;
 using Microsoft.Azure.EventGrid.Models;
@@ -38,7 +37,7 @@ namespace NosAyudamos.Functions
 
         public async Task HandleAsync(MessageReceived message)
         {
-            log.Verbose("@{Message}", message);
+            log.Verbose("@{Message:j}", message);
 
             // Performs minimal discovery of existing person id (if any)
             // and whether it's a text or image message.

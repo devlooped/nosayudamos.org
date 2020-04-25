@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
 
@@ -5,9 +6,12 @@ namespace NosAyudamos
 {
     abstract class DomainModelRepository
     {
-        public DomainModelRepository(string connectionString) => StorageAccount = CloudStorageAccount.Parse(connectionString);
+        Lazy<CloudStorageAccount> storageAccount;
 
-        protected CloudStorageAccount StorageAccount { get; }
+        public DomainModelRepository(string connectionString)
+            => storageAccount = new Lazy<CloudStorageAccount>(() => CloudStorageAccount.Parse(connectionString));
+
+        protected CloudStorageAccount StorageAccount => storageAccount.Value;
 
         protected async Task<CloudTable> GetTableAsync(string tableName)
         {

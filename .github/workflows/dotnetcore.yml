@@ -24,13 +24,14 @@ jobs:
     - name: Restore
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore -v:m
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test --no-restore -v:m
       env:
-        LuisAppId: ${{ secrets.LuisAppId }},
-        LuisAppSlot: staging,
-        LuisEndpoint: https://nosayudamos-lu.cognitiveservices.azure.com/,
-        LuisSubscriptionKey: ${{ secrets.LuisSubscriptionKey }},
-        TextAnalysisEndpoint: https://nosayudamos-ta.cognitiveservices.azure.com/,
-        TextAnalysisSubscriptionKey: ${{ secrets.TextAnalysisSubscriptionKey }},
+        LuisAppId: ${{ secrets.LuisAppId }}
+        LuisAppSlot: staging
+        LuisEndpoint: https://nosayudamos-lu.cognitiveservices.azure.com/
+        LuisSubscriptionKey: ${{ secrets.LuisSubscriptionKey }}
+        TextAnalysisEndpoint: https://nosayudamos-ta.cognitiveservices.azure.com/
+        TextAnalysisSubscriptionKey: ${{ secrets.TextAnalysisSubscriptionKey }}
+        StorageConnectionString: ${{ secrets.StorageConnectionString }}
