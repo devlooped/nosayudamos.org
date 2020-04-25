@@ -8,15 +8,22 @@ namespace NosAyudamos
     [Shared]
     class TwilioMessaging : IMessaging
     {
-        public TwilioMessaging(IEnvironment enviroment)
-        {
-            TwilioClient.Init(
-                enviroment.GetVariable("TwilioAccountSid"),
-                enviroment.GetVariable("TwilioAuthToken"));
-        }
+        static bool initialized;
+        IEnvironment environment;
+
+        public TwilioMessaging(IEnvironment environment) => this.environment = environment;
 
         public async Task SendTextAsync(string from, string body, string to)
         {
+            if (!initialized)
+            {
+                TwilioClient.Init(
+                    environment.GetVariable("TwilioAccountSid"),
+                    environment.GetVariable("TwilioAuthToken"));
+
+                initialized = true;
+            }
+
             var message = await MessageResource.CreateAsync(
                from: new Twilio.Types.PhoneNumber("whatsapp:+" + from),
                to: new Twilio.Types.PhoneNumber("whatsapp:+" + to),

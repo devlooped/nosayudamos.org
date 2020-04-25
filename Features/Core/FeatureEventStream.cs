@@ -18,7 +18,7 @@ namespace NosAyudamos
 
             if (container.TryResolve<IEnumerable<IEventHandler<TEvent>>>(out var handlers))
             {
-                Task.WaitAll(handlers.Select(x => x.HandleAsync(@event)).ToArray());
+                Task.WaitAll(handlers.Select(x => x.HandleAsync(@event)).ToArray(), 10000);
             }
         }
     }
