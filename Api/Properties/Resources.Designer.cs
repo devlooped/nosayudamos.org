@@ -61,11 +61,29 @@ namespace NosAyudamos.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Person with ID &apos;{0}&apos; was not found..
+        /// </summary>
+        internal static string PersonRepository_NationalIdNotFound {
+            get {
+                return ResourceManager.GetString("PersonRepository_NationalIdNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Iniciando.
         /// </summary>
         internal static string Startup_Starting {
             get {
                 return ResourceManager.GetString("Startup_Starting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gracias por tu mensaje! Por favor envianos una foto de tu DNI para registrarte para recibir ayuda..
+        /// </summary>
+        internal static string UI_Donee_SendIdentifier {
+            get {
+                return ResourceManager.GetString("UI_Donee_SendIdentifier", resourceCulture);
             }
         }
     }

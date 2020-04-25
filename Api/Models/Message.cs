@@ -1,28 +1,35 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 
 namespace NosAyudamos
 {
     class Message
     {
-        public string From { get; set; }
+        public string From { get; set; } = "";
 
-        public string Body { get; set; }
+        public string Body { get; set; } = "";
 
-        public string To { get; set; }
+        public string To { get; set; } = "";
 
         public Message(string from, string body, string to) => (From, Body, To) = (from, body, to);
 
-        public static Message Create(string payload)
-        {
-            var values = payload.Split('&', StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Split('='))
-                .ToDictionary(x => x[0], x => x[1]);
+        private Message() { }
 
-            return new Message(
-                values[nameof(From)].Replace("whatsapp:", "", StringComparison.Ordinal).TrimStart('+').Trim(),
-                values[nameof(Body)],
-                values[nameof(To)].Replace("whatsapp:", "", StringComparison.Ordinal).TrimStart('+').Trim());
+        public static Message Create(IDictionary<string, string> values)
+        {
+            var message = new Message();
+
+            if (values.TryGetValue(nameof(From), out var from))
+                message.From = from.Replace("whatsapp:", "", StringComparison.Ordinal).TrimStart('+').Trim();
+            if (values.TryGetValue(nameof(To), out var to))
+                message.To = to.Replace("whatsapp:", "", StringComparison.Ordinal).TrimStart('+').Trim();
+            if (values.TryGetValue(nameof(Body), out var body))
+                message.Body = body;
+
+            return message;
         }
     }
 }

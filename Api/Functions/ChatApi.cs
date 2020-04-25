@@ -14,19 +14,17 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
-namespace NosAyudamos
+namespace NosAyudamos.Functions
 {
     class ChatApi
     {
         readonly string chatApiNumber;
         readonly HttpClient httpClient;
-        readonly ILogger<ChatApi> logger;
 
-        public ChatApi(IEnvironment enviroment, HttpClient httpClient, ILogger<ChatApi> logger)
+        public ChatApi(IEnvironment enviroment, HttpClient httpClient)
         {
             chatApiNumber = enviroment.GetVariable("ChatApiNumber");
             this.httpClient = httpClient;
-            this.logger = logger;
         }
 
         [FunctionName("chat")]
@@ -35,7 +33,6 @@ namespace NosAyudamos
             Contract.Assert(req != null);
 
             var uri = new Uri(req.GetDisplayUrl());
-            var formatter = new JsonMediaTypeFormatter();
 
             using var reader = new StreamReader(req.Body);
             var payload = await reader.ReadToEndAsync();

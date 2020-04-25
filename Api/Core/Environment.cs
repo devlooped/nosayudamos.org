@@ -20,6 +20,9 @@ namespace NosAyudamos
 
             if (value != null)
             {
+                if (value is T typed)
+                    return typed;
+
                 var converter = TypeDescriptor.GetConverter(typeof(T));
 
                 return (T)converter.ConvertFromString(value);

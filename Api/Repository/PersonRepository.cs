@@ -1,9 +1,30 @@
+using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Azure.Cosmos.Table;
+using NosAyudamos.Properties;
 
 namespace NosAyudamos
 {
+    /// <summary>
+    /// Repository of registered people.
+    /// </summary>
+    interface IPersonRepository
+    {
+        /// <summary>
+        /// Inserts or updates the given person information.
+        /// </summary>
+        Task<Person> PutAsync(Person person);
+        /// <summary>
+        /// Retrieves an existing person from its <paramref name="nationalId"/>.
+        /// </summary>
+        /// <param name="nationalId">The national identifier for the person.</param>
+        /// <returns>The stored person information.</returns>
+        /// <exception cref="ArgumentException">An existing person with the given <paramref name="nationalId"/> was not found.</exception>
+        Task<Person> GetAsync(string nationalId);
+        Task<Person?> FindAsync(string phoneNumber);
+    }
+
     class PersonRepository : DomainModelRepository, IPersonRepository
     {
         readonly IEnvironment environment;
@@ -48,7 +69,15 @@ namespace NosAyudamos
             return person;
         }
 
-        public async Task<Person?> GetAsync(string phoneNumber)
+        public async Task<Person> GetAsync(string nationalId)
+        {
+            var entity = await GetAsync<PersonEntity>(nationalId).ConfigureAwait(false);
+
+            return mapper.Map<PersonEntity, Person>(entity ??
+                throw new ArgumentException(Strings.PersonRepository.NationalIdNotFound(nationalId)));
+        }
+
+        public async Task<Person?> FindAsync(string phoneNumber)
         {
             var mapEntity = await GetAsync<PhoneIdMapEntity>(phoneNumber).ConfigureAwait(false);
 
@@ -66,6 +95,7 @@ namespace NosAyudamos
             return null;
         }
 
+
         private async Task<T> GetAsync<T>(string partitionKey) where T : class, ITableEntity, new()
         {
             var table = await GetTableAsync();
@@ -77,15 +107,6 @@ namespace NosAyudamos
         }
 
         private async Task<CloudTable> GetTableAsync()
-        {
-            return cloudTable ?? await GetTableAsync("person");
-        }
-    }
-
-    interface IPersonRepository
-    {
-        Task<Person> PutAsync(Person person);
-
-        Task<Person?> GetAsync(string phoneNumber);
+            => cloudTable ?? await GetTableAsync("person");
     }
 }
