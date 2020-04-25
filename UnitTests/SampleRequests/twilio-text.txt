@@ -1,0 +1,41 @@
+HEADERS
+X-Request-Start: 1587795432468
+X-Request-Id: 806fe3eb-8370-4eb6-b0d2-01a573d9a543
+Cf-Visitor: {"scheme":"http"}
+Via: 1.1 vegur
+Cf-Ipcountry: US
+Connection: close
+Cdn-Loop: cloudflare
+X-Forwarded-Proto: http
+Content-Type: application/x-www-form-urlencoded
+Host: requestbin.net
+X-Forwarded-For: 34.201.219.37, 162.158.78.61
+X-Forwarded-Port: 80
+User-Agent: TwilioProxy/1.1
+Cf-Ray: 5895f08c8b7a033b-IAD
+Total-Route-Time: 0
+I-Twilio-Idempotency-Token: 1325c268-c558-4265-91a8-3ea5216e92b2
+Cache-Control: max-age=259200
+Cf-Connecting-Ip: 34.201.219.37
+Content-Length: 321
+Accept: */*
+Accept-Encoding: gzip
+Cf-Request-Id: 025194abd90000033bf6998200000001
+Connect-Time: 1
+X-Twilio-Signature: 2TlBpgkA3BLcja4Dg6EB1P80DwI=
+
+FORM/POST PARAMETERS
+SmsMessageSid: SMd7479268e28020ba4a8aa642d1845f64
+NumMedia: 0
+SmsSid: SMd7479268e28020ba4a8aa642d1845f64
+To: whatsapp:+14155238886
+NumSegments: 1
+From: whatsapp:+5491159278282
+ApiVersion: 2010-04-01
+Body: Ayuda
+AccountSid: AC21c54e43d5a9f29bdc0d64cfaac60985
+SmsStatus: received
+MessageSid: SMd7479268e28020ba4a8aa642d1845f64
+
+RAW BODY
+SmsMessageSid=SMd7479268e28020ba4a8aa642d1845f64&NumMedia=0&SmsSid=SMd7479268e28020ba4a8aa642d1845f64&SmsStatus=received&Body=Ayuda&To=whatsapp%3A%2B14155238886&NumSegments=1&MessageSid=SMd7479268e28020ba4a8aa642d1845f64&AccountSid=AC21c54e43d5a9f29bdc0d64cfaac60985&From=whatsapp%3A%2B5491159278282&ApiVersion=2010-04-01
