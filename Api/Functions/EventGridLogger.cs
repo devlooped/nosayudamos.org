@@ -10,14 +10,17 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Serilog;
 
-namespace NosAyudamos
+namespace NosAyudamos.Functions
 {
     class EventGridLogger
     {
+        readonly ILogger logger;
+
+        public EventGridLogger(ILogger logger) => this.logger = logger;
+
         [FunctionName("eventlogger")]
         public async Task<IActionResult> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "options", "post", Route = null)] HttpRequest req,
-            ILogger logger)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "options", "post", Route = null)] HttpRequest req)
         {
             if (req.Method.Equals("options", StringComparison.OrdinalIgnoreCase) &&
                 req.Headers.TryGetValue("WebHook-Request-Callback", out var values) &&

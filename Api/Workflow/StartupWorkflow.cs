@@ -23,7 +23,7 @@ namespace NosAyudamos
         readonly IMessaging messaging;
         readonly IPersonRecognizer personRecognizer;
         readonly IRepositoryFactory repositoryFactory;
-        readonly IPersonRepository personRepository;
+        readonly PersonRepository personRepository;
         readonly HttpClient httpClient;
 
         public StartupWorkflow(IEnvironment enviroment,
@@ -33,7 +33,7 @@ namespace NosAyudamos
                             IBlobStorage blobStorage,
                             IPersonRecognizer personRecognizer,
                             IRepositoryFactory repositoryFactory,
-                            IPersonRepository personRepository,
+                            PersonRepository personRepository,
                             HttpClient httpClient,
                             ILogger<StartupWorkflow> logger) =>
                             (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowSelector, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.personRepository, this.httpClient, this.logger) =

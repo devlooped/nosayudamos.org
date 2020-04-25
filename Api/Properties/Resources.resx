@@ -117,7 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="PersonRepository_NationalIdNotFound" xml:space="preserve">
+    <value>Person with ID '{0}' was not found.</value>
+  </data>
   <data name="Startup_Starting" xml:space="preserve">
     <value>Iniciando</value>
+  </data>
+  <data name="UI_Donee_SendIdentifier" xml:space="preserve">
+    <value>Gracias por tu mensaje! Por favor envianos una foto de tu DNI para registrarte para recibir ayuda.</value>
   </data>
 </root>

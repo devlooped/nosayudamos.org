@@ -13,6 +13,8 @@ using Serilog.Sinks.Slack;
 using Polly;
 using System.Net.Http;
 using AutoMapper;
+using System.Runtime.CompilerServices;
+using NosAyudamos.Functions;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -22,20 +24,35 @@ namespace NosAyudamos
     {
         public void Configure(IWebJobsBuilder builder)
         {
+            // non-testable services are registered here.
+            builder.Services.AddApplicationInsightsTelemetry();
+
+            // testable service registrations in the test-invoked method.
+            Configure(builder.Services, new Environment());
+        }
+
+        internal void Configure(IServiceCollection services, IEnvironment environment)
+        {
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(Assembly.GetExecutingAssembly().GetCustomAttribute<NeutralResourcesLanguageAttribute>()!.CultureName);
             CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture;
 
             var logger = new LoggerConfiguration()
+#if DEBUG
+                .MinimumLevel.Verbose()
+#else
                 .MinimumLevel.Information()
+#endif
                 .MinimumLevel.Override("Host", LogEventLevel.Warning)
                 .MinimumLevel.Override("Function", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Azure", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Logger(lc => lc.Filter
-                    .ByIncludingOnly(e => e.Properties.ContainsKey("Category"))
+                    .ByIncludingOnly(e =>
+                        e.Properties.ContainsKey("Category") &&
+                        !string.IsNullOrEmpty(environment.GetVariable("SlackApiWebHook", "")))
                     .WriteTo.Slack(new SlackSinkOptions
                     {
-                        WebHookUrl = System.Environment.GetEnvironmentVariable("SlackApiWebHook"),
+                        WebHookUrl = environment.GetVariable("SlackApiWebHook", "https://slack.com"),
                         CustomChannel = "#api",
                         ShowDefaultAttachments = false,
                         ShowPropertyAttachments = false,
@@ -46,15 +63,22 @@ namespace NosAyudamos
 
             Log.Information(Strings.Startup.Starting);
 
-            builder.Services.AddLogging(lb => lb.AddSerilog(logger));
-            builder.Services.AddApplicationInsightsTelemetry();
+            services.AddSingleton<ILogger>(logger);
+            services.AddLogging(lb => lb.AddSerilog(logger));
 
             // DI conventions are:
             // 1. Candidates: types that implement at least one interface
             // 2. Looking at its attributes: if they don't have [Shared], they are registered as transient
             // 3. Optionally can have [Export] to force registration of a type without interfaces
             var candidateTypes = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => !t.IsAbstract && !t.IsGenericTypeDefinition)
+                .Where(t =>
+                    !t.IsAbstract &&
+                    !t.IsGenericTypeDefinition &&
+                    !t.IsValueType &&
+                    // Omit generated types like local state capturing
+                    t.GetCustomAttribute<CompilerGeneratedAttribute>() == null &&
+                    // Omit generated types for async state machines
+                    !t.GetInterfaces().Any(i => i == typeof(IAsyncStateMachine)))
                 .Where(t => t.GetInterfaces().Length > 0 || t.GetCustomAttribute<ExportAttribute>() != null);
 
             foreach (var implementationType in candidateTypes)
@@ -63,28 +87,31 @@ namespace NosAyudamos
                 foreach (var serviceType in implementationType.GetInterfaces())
                 {
                     if (singleton)
-                        builder.Services.AddSingleton(serviceType, implementationType);
+                        services.AddSingleton(serviceType, implementationType);
                     else
-                        builder.Services.AddScoped(serviceType, implementationType);
+                        services.AddScoped(serviceType, implementationType);
                 }
 
                 if (singleton)
-                    builder.Services.AddSingleton(implementationType);
+                    services.AddSingleton(implementationType);
                 else
-                    builder.Services.AddScoped(implementationType);
+                    services.AddScoped(implementationType);
             }
 
-            var registry = new Resiliency(new Environment()).GetRegistry();
+            var registry = new Resiliency(environment).GetRegistry();
             var policy = registry.Get<IAsyncPolicy<HttpResponseMessage>>("HttpClientPolicy");
 
-            builder.Services.AddHttpClient<IMessaging, Messaging>().AddPolicyHandler(policy);
-            builder.Services.AddHttpClient<IPersonRecognizer, PersonRecognizer>().AddPolicyHandler(policy);
-            builder.Services.AddHttpClient<IQRCode, QRCode>().AddPolicyHandler(policy);
-            builder.Services.AddHttpClient<IStartupWorkflow, StartupWorkflow>().AddPolicyHandler(policy);
-            builder.Services.AddHttpClient<ChatApi>().AddPolicyHandler(policy);
+            if (!environment.GetVariable("TEST", false))
+            {
+                services.AddHttpClient<IMessaging, Messaging>().AddPolicyHandler(policy);
+                services.AddHttpClient<IPersonRecognizer, PersonRecognizer>().AddPolicyHandler(policy);
+                services.AddHttpClient<IQRCode, QRCode>().AddPolicyHandler(policy);
+                services.AddHttpClient<IStartupWorkflow, StartupWorkflow>().AddPolicyHandler(policy);
+                services.AddHttpClient<ChatApi>().AddPolicyHandler(policy);
+            }
 
-            builder.Services.AddPolicyRegistry(registry);
-            builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddPolicyRegistry(registry);
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
     }
 }

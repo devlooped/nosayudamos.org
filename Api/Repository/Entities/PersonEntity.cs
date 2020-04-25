@@ -4,10 +4,7 @@ namespace NosAyudamos
 {
     class PersonEntity : TableEntity
     {
-        public PersonEntity()
-        {
-            RowKey = typeof(PersonEntity).FullName;
-        }
+        public PersonEntity() => RowKey = typeof(PersonEntity).FullName;
 
         public PersonEntity(string nationalId, string firstName, string lastName, string dateOfBirth, string sex, string phoneNumber, string state = "0")
         {

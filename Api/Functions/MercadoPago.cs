@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace NosAyudamos
+namespace NosAyudamos.Functions
 {
     class MercadoPago
     {
