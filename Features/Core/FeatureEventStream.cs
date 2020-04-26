@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Merq;
@@ -21,11 +22,7 @@ namespace NosAyudamos
 
             if (container.TryResolve<IEnumerable<IEventHandler<TEvent>>>(out var handlers))
             {
-                foreach (var handler in handlers)
-                {
-                    logger.Verbose(@"Invoking {@handler:j} with {@event:j}", handler, @event);
-                    handler.HandleAsync(@event).Wait();
-                }
+                Task.WaitAll(handlers.Select(x => x.HandleAsync(@event)).ToArray());
             }
         }
     }
