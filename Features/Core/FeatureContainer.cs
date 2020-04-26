@@ -57,6 +57,7 @@ namespace NosAyudamos
                 typeof(IEventStream),
                 typeof(IEnvironment),
                 typeof(IRepositoryFactory),
+                typeof(IPersonRepository),
                 typeof(HttpClient),
             };
 
@@ -112,6 +113,7 @@ namespace NosAyudamos
             builder.RegisterType<FeatureEventStream>().As<IEventStream>().SingleInstance();
             builder.RegisterType<FeatureEnvironment>().As<IEnvironment>().SingleInstance();
             builder.RegisterType<FeatureRepositoryFactory>().As<IRepositoryFactory>().SingleInstance();
+            builder.RegisterType<FeaturePersonRepository>().As<IPersonRepository>().SingleInstance();
             builder.RegisterGeneric(typeof(FeatureRepository<>)).As(typeof(IRepository<>)).SingleInstance();
 
             // For some reason, the built-in registrations we were providing via Startup for HttpClient weren't working.
