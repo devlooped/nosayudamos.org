@@ -15,6 +15,7 @@ using AutoMapper;
 using System.Runtime.CompilerServices;
 using NosAyudamos.Functions;
 using NosAyudamos.Properties;
+using System.IO;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -49,6 +50,15 @@ namespace NosAyudamos
                 .MinimumLevel.Override("Microsoft.Azure", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console();
+
+            if (testEnv)
+            {
+                if (File.Exists("log.txt"))
+                    File.Delete("log.txt");
+
+                config.MinimumLevel.Verbose()
+                    .WriteTo.File("log.txt");
+            }
 
             if (!testEnv)
             {

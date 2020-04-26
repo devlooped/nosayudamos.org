@@ -37,7 +37,7 @@ namespace NosAyudamos.Functions
 
         public async Task HandleAsync(MessageReceived message)
         {
-            log.Verbose("@{Message:j}", message);
+            log.Verbose("{@Message:j}", message);
 
             // Performs minimal discovery of existing person id (if any)
             // and whether it's a text or image message.
