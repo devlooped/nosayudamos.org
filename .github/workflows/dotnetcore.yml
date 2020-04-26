@@ -36,3 +36,6 @@ jobs:
         TextAnalysisEndpoint: https://nosayudamos-ta.cognitiveservices.azure.com/
         TextAnalysisSubscriptionKey: ${{ secrets.TextAnalysisSubscriptionKey }}
         StorageConnectionString: ${{ secrets.StorageConnectionString }}
+    - name: Log
+      run: dir log.txt -s | gc
+      shell: pwsh

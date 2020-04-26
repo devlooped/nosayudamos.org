@@ -3,14 +3,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Merq;
+using Serilog;
 
 namespace NosAyudamos
 {
     class FeatureEventStream : EventStream
     {
         readonly IContainer container;
+        readonly ILogger logger;
 
-        public FeatureEventStream(IContainer container) => this.container = container;
+        public FeatureEventStream(IContainer container, ILogger logger)
+            => (this.container, this.logger) = (container, logger);
 
         public override void Push<TEvent>(TEvent @event)
         {
@@ -18,7 +21,11 @@ namespace NosAyudamos
 
             if (container.TryResolve<IEnumerable<IEventHandler<TEvent>>>(out var handlers))
             {
-                Task.WaitAll(handlers.Select(x => x.HandleAsync(@event)).ToArray(), 10000);
+                foreach (var handler in handlers)
+                {
+                    logger.Verbose(@"Invoking {@handler:j} with {@event:j}", handler, @event);
+                    handler.HandleAsync(@event).Wait();
+                }
             }
         }
     }

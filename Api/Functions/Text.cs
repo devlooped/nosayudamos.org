@@ -36,7 +36,7 @@ namespace NosAyudamos.Functions
 
         public async Task HandleAsync(TextMessageReceived message)
         {
-            log.Verbose("@{Message:j}", message);
+            log.Verbose("{@Message:j}", message);
 
             // Person is still not registered, need to discover intent
             if (message.PersonId == null)
