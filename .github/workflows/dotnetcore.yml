@@ -10,7 +10,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    env:
+      MSBUILDSINGLELOADCONTEXT: 1
     steps:
     - uses: actions/checkout@v2
     - name: Use dotnet
@@ -24,9 +25,9 @@ jobs:
     - name: Restore
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore -v:m
+      run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-restore -v:m
+      run: dotnet test --no-restore
       env:
         LuisAppId: ${{ secrets.LuisAppId }}
         LuisAppSlot: staging
