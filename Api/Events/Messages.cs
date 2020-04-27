@@ -31,9 +31,9 @@ namespace NosAyudamos.Events
     /// A message that couldn't be understood or processed in a 
     /// meaningful way by the system. Might need manual intervention.
     /// </summary>
-    public class DeadMessageReceived : MessageReceived
+    public class UnknownMessageReceived : MessageReceived
     {
-        public DeadMessageReceived(string from, string to, string body) : base(from, to, body) { }
+        public UnknownMessageReceived(string from, string to, string body) : base(from, to, body) { }
 
         public string? PersonId { get; set; }
     }

@@ -43,14 +43,23 @@ namespace NosAyudamos.Functions
 
             try
             {
-                logger.LogInformation("Raw: {Body}", raw);
-
                 var values = body.Split('&', StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Split('=', StringSplitOptions.RemoveEmptyEntries))
                     .Where(x => x.Length == 2)
                     .ToDictionary(x => x[0], x => x[1], StringComparer.OrdinalIgnoreCase);
 
-                var message = Message.Create(values);
+                if (values.TryGetValue("from", out var from))
+                    from = from.Replace("whatsapp:", "", StringComparison.Ordinal).TrimStart('+').Trim();
+                else
+                    throw new ArgumentException("'from' is required");
+
+                if (values.TryGetValue("to", out var to))
+                    to = to.Replace("whatsapp:", "", StringComparison.Ordinal).TrimStart('+').Trim();
+                else
+                    throw new ArgumentException("'to' is required");
+
+                if (!values.TryGetValue("body", out var message))
+                    throw new ArgumentException("'body' is required");
 
                 // Detect media attachment from payload.
                 // NOTE: chat-api already sends the Url as the body, so no need to detect 
@@ -59,14 +68,10 @@ namespace NosAyudamos.Functions
                     values.TryGetValue("MediaUrl" + numMedia, out var mediaUrl) &&
                     Uri.TryCreate(mediaUrl, UriKind.Absolute, out var mediaUri))
                 {
-                    message.Body = mediaUrl;
+                    message = mediaUrl;
                 }
 
-                events.Push(new MessageReceived(message.From, message.To, message.Body));
-
-                logger.LogInformation("Message: {@Message}", message);
-
-                await workflow.RunAsync(message);
+                events.Push(new MessageReceived(from, to, message));
 
                 return new OkResult();
             }

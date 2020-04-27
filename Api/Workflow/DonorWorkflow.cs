@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using NosAyudamos.Events;
 
 namespace NosAyudamos
 {
@@ -19,11 +20,7 @@ namespace NosAyudamos
                             ILogger<DonorWorkflow> logger) =>
                             (this.enviroment, this.textAnalysis, this.messaging, this.repositoryFactory, this.logger) =
                                 (enviroment, textAnalysis, messaging, repositoryFactory, logger);
-        public async Task RunAsync(Message message)
-        {
-            //TODO: implement state machine
-            await messaging.SendTextAsync(
-                message.To, "Gracias por contactarnos, cuanto dinero desea donar?", message.From);
-        }
+
+        public Task RunAsync(MessageEvent message) => Task.CompletedTask;
     }
 }
