@@ -4,15 +4,18 @@ using System.Composition;
 using System.Threading.Tasks;
 using Azure;
 using Azure.AI.TextAnalytics;
+using Polly;
+using Polly.Registry;
 
 namespace NosAyudamos
 {
     [Shared]
     class TextAnalysis : ITextAnalysis
     {
-        private readonly IEnvironment enviroment;
+        private readonly IEnvironment environment;
+        readonly IReadOnlyPolicyRegistry<string> registry;
 
-        public TextAnalysis(IEnvironment enviroment) => this.enviroment = enviroment;
+        public TextAnalysis(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment) => (this.registry, this.environment) = (registry, environment);
 
         public async Task<IEnumerable<string>> GetKeyPhrasesAsync(string? text)
         {
@@ -33,7 +36,10 @@ namespace NosAyudamos
 
             var analyticsClient = CreateAnalyticsClient();
 
-            var response = await Task.Run(() => analyticsClient.RecognizeEntities(text)).ConfigureAwait(false);
+            var policy = registry.Get<IAsyncPolicy>("TextAnalysisPolicy");
+
+            var response = await policy.ExecuteAsync(async () =>
+                await Task.Run(() => analyticsClient.RecognizeEntities(text)).ConfigureAwait(false));
 
             return response.Value;
         }
@@ -41,10 +47,10 @@ namespace NosAyudamos
         private TextAnalyticsClient CreateAnalyticsClient()
         {
             var credentials = new AzureKeyCredential(
-                enviroment.GetVariable("TextAnalysisSubscriptionKey"));
+                environment.GetVariable("TextAnalysisSubscriptionKey"));
 
             return new TextAnalyticsClient(
-                new Uri(enviroment.GetVariable("TextAnalysisEndpoint")), credentials);
+                new Uri(environment.GetVariable("TextAnalysisEndpoint")), credentials);
         }
     }
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Merq;
 using Microsoft.Azure.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
+using NosAyudamos.Events;
 
 namespace NosAyudamos
 {
