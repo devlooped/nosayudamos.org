@@ -20,7 +20,7 @@ namespace NosAyudamos.Functions
             => (this.messaging, this.serializer) = (messaging, serializer);
 
         [FunctionName("sender")]
-        public Task RunAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(serializer.Deserialize<MessageSent>(e.Data));
+        public Task RunAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<MessageSent>(serializer));
 
         public Task HandleAsync(MessageSent e) => messaging.SendTextAsync(e.From, e.Body, e.To);
     }

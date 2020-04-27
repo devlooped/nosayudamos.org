@@ -11,7 +11,7 @@ using SlackMessage = SlackBotMessages.Models.Message;
 
 namespace NosAyudamos.Functions
 {
-    class SlackForwarder : IEventHandler<DeadMessageReceived>
+    class SlackForwarder : IEventHandler<UnknownMessageReceived>
     {
         readonly ISerializer serializer;
         readonly IEnvironment environment;
@@ -22,11 +22,9 @@ namespace NosAyudamos.Functions
             (this.serializer, this.environment, this.repository, this.logger) = (serializer, environment, repository, logger);
 
         [FunctionName("slack_forward")]
-        public async Task ForwardAsync([EventGridTrigger] EventGridEvent e) =>
-            // TODO: validate Topic, Subject, EventType
-            await HandleAsync(serializer.Deserialize<DeadMessageReceived>(e.Data));
+        public Task ForwardAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
 
-        public async Task HandleAsync(DeadMessageReceived e)
+        public async Task HandleAsync(UnknownMessageReceived e)
         {
             if (environment.IsDevelopment())
                 return;
