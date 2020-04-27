@@ -23,14 +23,7 @@ namespace NosAyudamos.Functions
             => (this.log, this.serializer, this.repository, this.language, this.events) = (log, serializer, repository, language, events);
 
         [FunctionName("text")]
-        public async Task RunAsync([EventGridTrigger] EventGridEvent e)
-        {
-            log.Information(e.Data.ToString());
-
-            // TODO: validate Topic, Subject, EventType
-
-            await HandleAsync(serializer.Deserialize<TextMessageReceived>(e.Data));
-        }
+        public Task RunAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TextMessageReceived>(serializer));
 
         public async Task HandleAsync(TextMessageReceived message)
         {
@@ -43,7 +36,7 @@ namespace NosAyudamos.Functions
                 if (intents.ContainsKey("None"))
                 {
                     // Can't figure out intent, ask specifically
-                    events.Push(new DeadMessageReceived(message.From, message.To, message.Text) { When = message.When });
+                    events.Push(new UnknownMessageReceived(message.From, message.To, message.Text) { When = message.When });
                     events.Push(new MessageSent(message.To, message.From, Strings.UI.UnknownIntent));
                 }
                 else if (intents.TryGetValue("help", out var helpIntent) &&

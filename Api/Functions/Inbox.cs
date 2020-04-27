@@ -25,14 +25,7 @@ namespace NosAyudamos.Functions
             => (this.log, this.serializer, this.repository, this.events) = (log, serializer, repository, events);
 
         [FunctionName("inbox")]
-        public async Task RunAsync([EventGridTrigger] EventGridEvent e)
-        {
-            log.Information(e.Data.ToString());
-
-            // TODO: validate Topic, Subject, EventType
-
-            await HandleAsync(serializer.Deserialize<MessageReceived>(e.Data));
-        }
+        public Task RunAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<MessageReceived>(serializer));
 
         public async Task HandleAsync(MessageReceived e)
         {
