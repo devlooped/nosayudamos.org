@@ -1,6 +1,6 @@
 ﻿namespace NosAyudamos
 {
-    public enum Role
+    enum Role
     {
         Donee,
         Donor

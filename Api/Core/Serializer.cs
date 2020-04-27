@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Composition;
 using Newtonsoft.Json;
 
 namespace NosAyudamos
 {
+    [Shared]
     class Serializer : ISerializer
     {
         JsonSerializerSettings settings = new JsonSerializerSettings
