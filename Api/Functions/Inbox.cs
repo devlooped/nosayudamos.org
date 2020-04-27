@@ -4,7 +4,6 @@ using Merq;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
-using NosAyudamos.Core;
 using NosAyudamos.Events;
 using Serilog;
 
@@ -35,23 +34,23 @@ namespace NosAyudamos.Functions
             await HandleAsync(serializer.Deserialize<MessageReceived>(e.Data));
         }
 
-        public async Task HandleAsync(MessageReceived message)
+        public async Task HandleAsync(MessageReceived e)
         {
-            log.Verbose("{@Message:j}", message);
+            log.Verbose("{@Message:j}", e);
 
             // Performs minimal discovery of existing person id (if any)
             // and whether it's a text or image message.
 
-            var person = await repository.FindAsync(message.From);
+            var person = await repository.FindAsync(e.From);
             var id = person?.NationalId;
 
-            if (Uri.TryCreate(message.Body, UriKind.Absolute, out var uri))
+            if (Uri.TryCreate(e.Body, UriKind.Absolute, out var uri))
             {
-                events.Push(new ImageMessageReceived(message.From, message.To, uri) { PersonId = id });
+                events.Push(new ImageMessageReceived(e.From, e.To, uri) { PersonId = id, When = e.When });
             }
             else
             {
-                events.Push(new TextMessageReceived(message.From, message.To, message.Body) { PersonId = id });
+                events.Push(new TextMessageReceived(e.From, e.To, e.Body) { PersonId = id, When = e.When });
             }
         }
     }

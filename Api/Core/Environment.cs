@@ -3,6 +3,25 @@ using System.Composition;
 
 namespace NosAyudamos
 {
+    static class EnvironmentExtensions
+    {
+        /// <summary>
+        /// Whether azure functions are running in development mode, locally.
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
+        public static bool IsDevelopment(this IEnvironment environment)
+            => IsTesting(environment) || environment.GetVariable("AZURE_FUNCTIONS_ENVIRONMENT", "Production") == "Development";
+
+        /// <summary>
+        /// Whether the code is being run from a test.
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
+        public static bool IsTesting(this IEnvironment environment)
+            => environment.GetVariable("TESTING", false);
+    }
+
     [Shared]
     class Environment : IEnvironment
     {

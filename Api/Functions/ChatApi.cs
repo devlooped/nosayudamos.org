@@ -1,43 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Merq;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Extensions.Logging;
+using NosAyudamos.Events;
 
 namespace NosAyudamos.Functions
 {
     class ChatApi
     {
-        readonly string chatApiNumber;
-        readonly HttpClient httpClient;
+        readonly Lazy<string> chatApiNumber;
+        readonly IEventStream events;
 
-        public ChatApi(IEnvironment enviroment, HttpClient httpClient)
+        public ChatApi(IEnvironment enviroment, IEventStream events)
         {
-            chatApiNumber = enviroment.GetVariable("ChatApiNumber");
-            this.httpClient = httpClient;
+            chatApiNumber = new Lazy<string>(() => enviroment.GetVariable("ChatApiNumber").TrimStart('+'));
+            this.events = events;
         }
 
         [FunctionName("chat")]
         public async Task<IActionResult> EncodeAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
         {
-            Contract.Assert(req != null);
-
-            var uri = new Uri(req.GetDisplayUrl());
-
             using var reader = new StreamReader(req.Body);
             var payload = await reader.ReadToEndAsync();
             var json = JsonSerializer.Deserialize<JsonElement>(payload);
-            var responses = new List<string>();
 
             foreach (var message in json.GetProperty("messages").EnumerateArray())
             {
@@ -47,19 +37,16 @@ namespace NosAyudamos.Functions
                 if (at != -1)
                     from = from.Substring(0, at);
 
-                from = "+" + from.TrimStart('+');
+                from = from.TrimStart('+');
 
                 // Avoid reentrancy from our own messages.
-                if (from == chatApiNumber)
+                if (from == chatApiNumber.Value)
                     continue;
 
-                using var content = new StringContent(WebUtility.UrlEncode($"From=+{from.TrimStart('+')}&To={chatApiNumber}&Body={body}"));
-                using var response = await httpClient.PostAsync(new Uri(uri, "whatsapp"), content);
-
-                responses.Add(await response.Content.ReadAsStringAsync());
+                events.Push(new MessageReceived(from, chatApiNumber.Value, body));
             }
 
-            return new OkObjectResult(responses.ToArray());
+            return new OkResult();
         }
     }
 }

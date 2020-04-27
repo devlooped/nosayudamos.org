@@ -79,11 +79,38 @@ namespace NosAyudamos.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Necesitás ayuda? Por favor decinos cuánto necesitas..
+        /// </summary>
+        internal static string UI_Donee_SendAmount {
+            get {
+                return ResourceManager.GetString("UI_Donee_SendAmount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Gracias por tu mensaje! Por favor envianos una foto de tu DNI para registrarte para recibir ayuda..
         /// </summary>
         internal static string UI_Donee_SendIdentifier {
             get {
                 return ResourceManager.GetString("UI_Donee_SendIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gracias por tu mensaje! Cuánto querés donar?.
+        /// </summary>
+        internal static string UI_Donor_SendAmount {
+            get {
+                return ResourceManager.GetString("UI_Donor_SendAmount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gracias por tu mensaje! Comentanos si necesitas ayuda o estás interesando en ayudar a otros..
+        /// </summary>
+        internal static string UI_UnknownIntent {
+            get {
+                return ResourceManager.GetString("UI_UnknownIntent", resourceCulture);
             }
         }
     }

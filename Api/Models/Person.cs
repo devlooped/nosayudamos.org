@@ -9,6 +9,7 @@ namespace NosAyudamos
         public string Sex { get; set; } = "";
         public string State { get; set; } = "";
         public string PhoneNumber { get; set; } = "";
+        public Role Role { get; set; } = Role.Donee;
 
         public Person() { }
 

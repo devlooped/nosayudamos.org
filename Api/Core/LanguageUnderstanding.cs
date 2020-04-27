@@ -15,7 +15,7 @@ namespace NosAyudamos
     [Shared]
     class LanguageUnderstanding : ILanguageUnderstanding
     {
-        static readonly HashSet<string> emptySet = new HashSet<string>();
+        static readonly Dictionary<string, Intent> emptyIntents = new Dictionary<string, Intent>();
 
         readonly IEnvironment enviroment;
         readonly IReadOnlyPolicyRegistry<string> registry;
@@ -24,10 +24,10 @@ namespace NosAyudamos
         public LanguageUnderstanding(IEnvironment enviroment, IReadOnlyPolicyRegistry<string> registry, ILogger<LanguageUnderstanding> logger) =>
             (this.enviroment, this.registry, this.logger) = (enviroment, registry, logger);
 
-        public async Task<ISet<string>> GetIntentsAsync(string? text)
+        public async Task<IDictionary<string, Intent>> GetIntentsAsync(string? text)
         {
             if (string.IsNullOrEmpty(text))
-                return emptySet;
+                return emptyIntents;
 
             using var luisClient = CreateLuisClient();
 
@@ -53,7 +53,7 @@ namespace NosAyudamos
                     showAllIntents: false,
                     log: true).ConfigureAwait(false));
 
-            return new HashSet<string>(predictionResponse.Prediction.Intents.Keys, StringComparer.OrdinalIgnoreCase);
+            return predictionResponse.Prediction.Intents;
         }
 
         private ILUISRuntimeClient CreateLuisClient()
@@ -70,7 +70,7 @@ namespace NosAyudamos
 
     interface ILanguageUnderstanding
     {
-        Task<ISet<string>> GetIntentsAsync(string? text);
+        Task<IDictionary<string, Intent>> GetIntentsAsync(string? text);
     }
 
 }

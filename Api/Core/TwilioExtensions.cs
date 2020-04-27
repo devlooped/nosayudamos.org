@@ -8,7 +8,7 @@ using Twilio.Security;
 
 namespace NosAyudamos
 {
-    static class Extensions
+    static class TwilioExtensions
     {
         /// <summary>
         /// Gets whether the given request came from Twilio.

@@ -37,8 +37,6 @@ namespace NosAyudamos
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(Assembly.GetExecutingAssembly().GetCustomAttribute<NeutralResourcesLanguageAttribute>()!.CultureName);
             CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture;
 
-            var testEnv = environment.GetVariable("TEST", false);
-
             var config = new LoggerConfiguration()
 #if DEBUG
                 .MinimumLevel.Verbose()
@@ -51,24 +49,26 @@ namespace NosAyudamos
                 .Enrich.FromLogContext()
                 .WriteTo.Console();
 
-            if (testEnv)
+            if (environment.IsTesting())
             {
                 if (File.Exists("log.txt"))
-                    File.Delete("log.txt");
+                {
+                    try
+                    { File.Delete("log.txt"); }
+                    catch (IOException) { }
+                }
 
                 config.MinimumLevel.Verbose()
                     .WriteTo.File("log.txt");
             }
 
-            if (!testEnv)
+            if (!environment.IsTesting())
             {
                 config.WriteTo.Logger(lc => lc.Filter
-                    .ByIncludingOnly(e =>
-                        e.Properties.ContainsKey("Category") &&
-                        !string.IsNullOrEmpty(environment.GetVariable("SlackApiWebHook", "")))
+                    .ByIncludingOnly(e => e.Properties.ContainsKey("Category"))
                     .WriteTo.Slack(new SlackSinkOptions
                     {
-                        WebHookUrl = environment.GetVariable("SlackApiWebHook", "https://slack.com"),
+                        WebHookUrl = environment.GetVariable("SlackLogWebHook"),
                         CustomChannel = "#api",
                         ShowDefaultAttachments = false,
                         ShowPropertyAttachments = false,
@@ -118,7 +118,7 @@ namespace NosAyudamos
             var registry = new Resiliency(environment).GetRegistry();
             var policy = registry.Get<IAsyncPolicy<HttpResponseMessage>>("HttpClientPolicy");
 
-            if (!testEnv)
+            if (!environment.IsTesting())
             {
                 services.AddHttpClient<IMessaging, Messaging>().AddPolicyHandler(policy);
                 services.AddHttpClient<IPersonRecognizer, PersonRecognizer>().AddPolicyHandler(policy);

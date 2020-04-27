@@ -6,7 +6,10 @@ namespace NosAyudamos
     {
         public PersonEntity() => RowKey = typeof(PersonEntity).FullName;
 
-        public PersonEntity(string nationalId, string firstName, string lastName, string dateOfBirth, string sex, string phoneNumber, string state = "0")
+        public PersonEntity(
+            string nationalId, string firstName, string lastName,
+            string dateOfBirth, string sex, string phoneNumber,
+            string state = "0", string role = nameof(NosAyudamos.Role.Donee))
         {
             PartitionKey = nationalId;
             RowKey = typeof(PersonEntity).FullName;
@@ -16,6 +19,7 @@ namespace NosAyudamos
             Sex = sex;
             PhoneNumber = phoneNumber;
             State = state;
+            Role = role;
         }
 
         public string FirstName { get; set; } = "";
@@ -24,6 +28,7 @@ namespace NosAyudamos
         public string Sex { get; set; } = "";
         public string PhoneNumber { get; set; } = "";
         public string State { get; set; } = "";
+        public string Role { get; set; } = "";
     }
 
     class PhoneIdMapEntity : TableEntity

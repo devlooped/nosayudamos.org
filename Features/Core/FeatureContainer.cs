@@ -8,8 +8,9 @@ using Autofac;
 using Autofac.Core;
 using Autofac.Core.Lifetime;
 using Autofac.Core.Resolving;
-using Merq;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using NosAyudamos.Functions;
 
 namespace NosAyudamos
 {
@@ -54,8 +55,10 @@ namespace NosAyudamos
 
             var testServices = new HashSet<Type>
             {
-                typeof(IEventStream),
                 typeof(IEnvironment),
+                typeof(Messaging),
+                typeof(SlackForwarder),
+                typeof(Sender),
                 typeof(IRepositoryFactory),
                 typeof(IPersonRepository),
                 typeof(HttpClient),
@@ -63,7 +66,9 @@ namespace NosAyudamos
 
             new Startup().Configure(services, new FeatureEnvironment());
 
-            var candidate = services.Where(desc => !testServices.Contains(desc.ServiceType)).ToList();
+            var candidate = services.Where(desc =>
+                !testServices.Contains(desc.ServiceType) &&
+                !testServices.Contains(desc.ImplementationType)).ToList();
 
             // Register in container all the services except for the test replacements, 
             // and make them singletons since each test run will get its own container (for now?)
@@ -74,9 +79,9 @@ namespace NosAyudamos
                     foreach (var service in group)
                     {
                         if (service.ImplementationInstance != null)
-                            builder.RegisterInstance(service.ImplementationInstance).As(service.ServiceType);
+                            builder.RegisterInstance(service.ImplementationInstance).As(service.ServiceType).SingleInstance();
                         else if (service.ImplementationFactory != null)
-                            builder.Register(c => service.ImplementationFactory(c.Resolve<IServiceProvider>())).As(service.ServiceType);
+                            builder.Register(c => service.ImplementationFactory(c.Resolve<IServiceProvider>())).As(service.ServiceType).SingleInstance();
                         else if (service.ServiceType.IsGenericTypeDefinition)
                             builder.RegisterGeneric(service.ImplementationType).As(service.ServiceType).SingleInstance();
                         else if (service.ServiceType.IsAssignableFrom(service.ImplementationType))
@@ -90,13 +95,13 @@ namespace NosAyudamos
 
                     foreach (var instances in group.GroupBy(desc => desc.ImplementationInstance).Where(ig => ig.Key != null))
                     {
-                        builder.RegisterInstance(instances.Key).As(asTypes);
+                        builder.RegisterInstance(instances.Key).As(asTypes).SingleInstance();
                         registered = true;
                     }
 
                     foreach (var factories in group.GroupBy(desc => desc.ImplementationFactory).Where(fg => fg.Key != null))
                     {
-                        builder.Register(c => factories.Key(c.Resolve<IServiceProvider>())).As(asTypes);
+                        builder.Register(c => factories.Key(c.Resolve<IServiceProvider>())).As(asTypes).SingleInstance();
                         registered = true;
                     }
 
@@ -105,16 +110,16 @@ namespace NosAyudamos
                         if (group.Key.IsGenericTypeDefinition)
                             builder.RegisterGeneric(group.Key).As(asTypes).SingleInstance();
                         else
-                            builder.RegisterType(group.Key).As(asTypes);
+                            builder.RegisterType(group.Key).As(asTypes).SingleInstance();
                     }
                 }
             }
 
-            builder.RegisterType<FeatureEventStream>().As<IEventStream>().SingleInstance();
             builder.RegisterType<FeatureEnvironment>().As<IEnvironment>().SingleInstance();
             builder.RegisterType<FeatureRepositoryFactory>().As<IRepositoryFactory>().SingleInstance();
             builder.RegisterType<FeaturePersonRepository>().As<IPersonRepository>().SingleInstance();
             builder.RegisterGeneric(typeof(FeatureRepository<>)).As(typeof(IRepository<>)).SingleInstance();
+            builder.RegisterInstance(Mock.Of<IMessaging>());
 
             // For some reason, the built-in registrations we were providing via Startup for HttpClient weren't working.
             builder.RegisterType<HttpClient>().InstancePerDependency();

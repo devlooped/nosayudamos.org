@@ -1,11 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Merq;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
-using NosAyudamos.Core;
 using NosAyudamos.Events;
 using NosAyudamos.Properties;
 using Serilog;
@@ -42,27 +40,38 @@ namespace NosAyudamos.Functions
             if (message.PersonId == null)
             {
                 var intents = await language.GetIntentsAsync(message.Text);
-                if (intents.Count == 0)
+                if (intents.ContainsKey("None"))
                 {
                     // Can't figure out intent, ask specifically
-                    throw new NotImplementedException("TODO: no intent could be determined.");
+                    events.Push(new DeadMessageReceived(message.From, message.To, message.Text) { When = message.When });
+                    events.Push(new MessageSent(message.To, message.From, Strings.UI.UnknownIntent));
                 }
-                else if (intents.Contains("help"))
+                else if (intents.TryGetValue("help", out var helpIntent) &&
+                    helpIntent.Score >= 0.85)
                 {
                     // User wants to be a donee, we need the ID
                     events.Push(new MessageSent(message.To, message.From, Strings.UI.Donee.SendIdentifier));
                 }
-                else if (intents.Contains("donate"))
+                else if (intents.TryGetValue("donate", out var donateIntent) &&
+                    donateIntent.Score >= 0.85)
                 {
-                    // TODO: ask how much, send link, etc.
-                    throw new NotImplementedException("TODO: donate intent detected.");
+                    events.Push(new MessageSent(message.To, message.From, Strings.UI.Donor.SendAmount));
                 }
             }
             else
             {
                 var person = await repository.GetAsync(message.PersonId);
+                var intents = await language.GetIntentsAsync(message.Text);
+
+                if (intents.ContainsKey("None"))
+                {
+                    if (person.Role == Role.Donee)
+                        events.Push(new MessageSent(message.To, message.From, Strings.UI.UnknownIntent));
+                    else
+                        events.Push(new MessageSent(message.To, message.From, Strings.UI.Donor.SendAmount));
+                }
+
                 // TODO load worklow for person, run it.
-                throw new NotImplementedException("TODO: run workflow for registered person.");
             }
         }
     }

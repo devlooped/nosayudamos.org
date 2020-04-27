@@ -123,7 +123,16 @@
   <data name="Startup_Starting" xml:space="preserve">
     <value>Iniciando</value>
   </data>
+  <data name="UI_Donee_SendAmount" xml:space="preserve">
+    <value>Necesitás ayuda? Por favor decinos cuánto necesitas.</value>
+  </data>
   <data name="UI_Donee_SendIdentifier" xml:space="preserve">
     <value>Gracias por tu mensaje! Por favor envianos una foto de tu DNI para registrarte para recibir ayuda.</value>
+  </data>
+  <data name="UI_Donor_SendAmount" xml:space="preserve">
+    <value>Gracias por tu mensaje! Cuánto querés donar?</value>
+  </data>
+  <data name="UI_UnknownIntent" xml:space="preserve">
+    <value>Gracias por tu mensaje! Comentanos si necesitas ayuda o estás interesando en ayudar a otros.</value>
   </data>
 </root>
