@@ -10,7 +10,6 @@ using System.Diagnostics.Contracts;
 using System.Net;
 using Merq;
 using NosAyudamos.Events;
-using Microsoft.VisualBasic;
 using System.Linq;
 
 namespace NosAyudamos.Functions
@@ -32,8 +31,6 @@ namespace NosAyudamos.Functions
         public async Task<IActionResult> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
         {
-            Contract.Assert(req != null);
-
             using var reader = new StreamReader(req.Body);
             var raw = await reader.ReadToEndAsync();
             var body = WebUtility.UrlDecode(raw);

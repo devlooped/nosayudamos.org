@@ -90,13 +90,17 @@ namespace NosAyudamos
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Contacto inicial de un donatario")]
+        [Xunit.SkippableTheoryAttribute(DisplayName="Contacto inicial de un donatario")]
         [Xunit.TraitAttribute("FeatureTitle", "Bandeja de entrada")]
         [Xunit.TraitAttribute("Description", "Contacto inicial de un donatario")]
-        public virtual void ContactoInicialDeUnDonatario()
+        [Xunit.InlineDataAttribute("Necesito ayuda", new string[0])]
+        [Xunit.InlineDataAttribute("Ayuda", new string[0])]
+        [Xunit.InlineDataAttribute("Dame plata", new string[0])]
+        [Xunit.InlineDataAttribute("Prestame dinero", new string[0])]
+        public virtual void ContactoInicialDeUnDonatario(string mensaje, string[] exampleTags)
         {
-            string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Contacto inicial de un donatario", null, ((string[])(null)));
+            string[] tagsOfScenario = exampleTags;
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Contacto inicial de un donatario", null, exampleTags);
 #line 10
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -121,11 +125,92 @@ this.ScenarioInitialize(scenarioInfo);
 this.FeatureBackground();
 #line hidden
 #line 11
- testRunner.When("Envia mensaje", "Necesito ayuda", ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
+ testRunner.When(string.Format("Envia {0}", mensaje), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 15
+#line 12
  testRunner.Then("Recibe mensaje", "Gracias por tu mensaje! Por favor envianos una \r\nfoto de tu DNI para registrarte " +
                         "para recibir ayuda.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Contacto inicial con mensaje confuso")]
+        [Xunit.TraitAttribute("FeatureTitle", "Bandeja de entrada")]
+        [Xunit.TraitAttribute("Description", "Contacto inicial con mensaje confuso")]
+        public virtual void ContactoInicialConMensajeConfuso()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Contacto inicial con mensaje confuso", null, ((string[])(null)));
+#line 25
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 7
+this.FeatureBackground();
+#line hidden
+#line 26
+ testRunner.When("Envia mensaje", "Foo", ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
+#line hidden
+#line 30
+ testRunner.Then("Recibe mensaje", "Gracias por tu mensaje! Comentanos si necesitas \r\nayuda o estás interesando en ay" +
+                        "udar a otros.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Contacto inicial de un donante")]
+        [Xunit.TraitAttribute("FeatureTitle", "Bandeja de entrada")]
+        [Xunit.TraitAttribute("Description", "Contacto inicial de un donante")]
+        public virtual void ContactoInicialDeUnDonante()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Contacto inicial de un donante", null, ((string[])(null)));
+#line 36
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 7
+this.FeatureBackground();
+#line hidden
+#line 37
+ testRunner.When("Envia mensaje", "Quiero ayudar", ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
+#line hidden
+#line 41
+ testRunner.Then("Recibe mensaje", "Gracias por tu mensaje! Cuánto querés donar?", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }
             this.ScenarioCleanup();

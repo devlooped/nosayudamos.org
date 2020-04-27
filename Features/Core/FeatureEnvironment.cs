@@ -20,7 +20,10 @@ namespace NosAyudamos
                 values = new JObject();
             }
 
-            values.Add("TEST", bool.TrueString);
+            if (!values.ContainsKey("AZURE_FUNCTIONS_ENVIRONMENT"))
+                values.Add("AZURE_FUNCTIONS_ENVIRONMENT", bool.TrueString);
+
+            values.Add("TESTING", bool.TrueString);
         }
 
         public string GetVariable(string name)

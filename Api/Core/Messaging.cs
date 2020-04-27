@@ -2,11 +2,14 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using NosAyudamos.Events;
 
 namespace NosAyudamos
 {
     class Messaging : IMessaging, IDisposable
     {
+        readonly Lazy<string> chatApiNumber;
+
         readonly Lazy<IMessaging> twilio;
         readonly Lazy<IMessaging> chatApi;
         readonly Lazy<IMessaging> log;
@@ -20,6 +23,8 @@ namespace NosAyudamos
             twilio = new Lazy<IMessaging>(() => new TwilioMessaging(enviroment));
             chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(enviroment, httpClient));
             log = new Lazy<IMessaging>(() => new LogMessaging(logger));
+
+            chatApiNumber = new Lazy<string>(() => enviroment.GetVariable("ChatApiNumber").TrimStart('+'));
         }
 
         public void Dispose()
@@ -31,19 +36,21 @@ namespace NosAyudamos
                 td.Dispose();
         }
 
+        public Task HandleAsync(MessageSent e) => SendTextAsync(e.From, e.Body, e.To);
+
         public async Task SendTextAsync(string from, string body, string to)
         {
             var sendMessage = enviroment.GetVariable("SendMessages", true);
 
             if (sendMessage)
             {
-                if (from == enviroment.GetVariable("ChatApiNumber"))
+                if (from == chatApiNumber.Value)
                     await chatApi.Value.SendTextAsync(from, body, to);
                 else
                     await twilio.Value.SendTextAsync(from, body, to);
             }
 
-            if (enviroment.GetVariable("AZURE_FUNCTIONS_ENVIRONMENT", "Production") == "Development")
+            if (enviroment.IsDevelopment())
             {
                 await log.Value.SendTextAsync(from, body, to);
             }

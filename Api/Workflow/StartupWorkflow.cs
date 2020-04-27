@@ -51,12 +51,12 @@ namespace NosAyudamos
             {
                 var intents = await languageUnderstanding.GetIntentsAsync(message.Body);
 
-                if (intents.Contains("help"))
+                if (intents.ContainsKey("help"))
                 {
                     await messaging.SendTextAsync(
                         message.To, "Gracias por contactarnos, envianos foto de tu DNI para registarte primero.", message.From);
                 }
-                else if (intents.Contains("donate"))
+                else if (intents.ContainsKey("donate"))
                 {
                     var workflow = workflowSelector.Value.Select(Workflow.Donor);
                     await workflow.RunAsync(message);

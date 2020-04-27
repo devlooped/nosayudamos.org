@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace NosAyudamos.Core
+namespace NosAyudamos
 {
     class Serializer : ISerializer
     {
