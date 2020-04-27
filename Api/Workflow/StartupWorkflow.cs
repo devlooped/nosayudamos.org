@@ -1,9 +1,9 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using NosAyudamos.Events;
 
 namespace NosAyudamos
 {
@@ -39,17 +39,18 @@ namespace NosAyudamos
                             (this.enviroment, this.languageUnderstanding, this.messaging, this.workflowSelector, this.blobStorage, this.personRecognizer, this.repositoryFactory, this.personRepository, this.httpClient, this.logger) =
                                 (enviroment, languageUnderstanding, messaging, workflowSelector, blobStorage, personRecognizer, repositoryFactory, personRepository, httpClient, logger);
 
-        public async Task RunAsync(Message message)
+        public async Task RunAsync(MessageEvent @event)
         {
             //TODO: Find person by phone number and execute person workflow
+            var message = (TextMessageReceived)@event;
 
-            if (Uri.TryCreate(message.Body, UriKind.Absolute, out var url))
+            if (Uri.TryCreate(message.Text, UriKind.Absolute, out var url))
             {
                 await RegisterDoneeAsync(message);
             }
             else
             {
-                var intents = await languageUnderstanding.GetIntentsAsync(message.Body);
+                var intents = await languageUnderstanding.GetIntentsAsync(message.Text);
 
                 if (intents.ContainsKey("help"))
                 {
@@ -69,9 +70,9 @@ namespace NosAyudamos
             }
         }
 
-        private async Task RegisterDoneeAsync(Message message)
+        private async Task RegisterDoneeAsync(TextMessageReceived message)
         {
-            if (Uri.TryCreate(message.Body, UriKind.Absolute, out var imageUri))
+            if (Uri.TryCreate(message.Text, UriKind.Absolute, out var imageUri))
             {
                 var person = await personRecognizer.RecognizeAsync(imageUri);
                 var actionRetryRepository = repositoryFactory.Create<ActionRetryEntity>();

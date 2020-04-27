@@ -23,7 +23,7 @@ namespace NosAyudamos.Functions
         }
 
         [FunctionName("chat")]
-        public async Task<IActionResult> EncodeAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
         {
             using var reader = new StreamReader(req.Body);
             var payload = await reader.ReadToEndAsync();
