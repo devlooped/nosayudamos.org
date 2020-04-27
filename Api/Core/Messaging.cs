@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NosAyudamos.Events;
+using Polly.Registry;
 
 namespace NosAyudamos
 {
@@ -13,14 +14,12 @@ namespace NosAyudamos
         readonly Lazy<IMessaging> twilio;
         readonly Lazy<IMessaging> chatApi;
         readonly Lazy<IMessaging> log;
-        readonly HttpClient httpClient;
         readonly IEnvironment enviroment;
 
-        public Messaging(IEnvironment enviroment, HttpClient httpClient, ILogger<Messaging> logger)
+        public Messaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment enviroment, HttpClient httpClient, ILogger<Messaging> logger)
         {
             this.enviroment = enviroment;
-            this.httpClient = httpClient;
-            twilio = new Lazy<IMessaging>(() => new TwilioMessaging(enviroment));
+            twilio = new Lazy<IMessaging>(() => new TwilioMessaging(registry, enviroment));
             chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(enviroment, httpClient));
             log = new Lazy<IMessaging>(() => new LogMessaging(logger));
 

@@ -1,5 +1,7 @@
 using System.Composition;
 using System.Threading.Tasks;
+using Polly;
+using Polly.Registry;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 
@@ -9,9 +11,11 @@ namespace NosAyudamos
     class TwilioMessaging : IMessaging
     {
         static bool initialized;
-        IEnvironment environment;
+        readonly IEnvironment environment;
+        readonly IReadOnlyPolicyRegistry<string> registry;
 
-        public TwilioMessaging(IEnvironment environment) => this.environment = environment;
+        public TwilioMessaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment) => (this.registry, this.environment) = (registry, environment);
+
 
         public async Task SendTextAsync(string from, string body, string to)
         {
@@ -24,10 +28,14 @@ namespace NosAyudamos
                 initialized = true;
             }
 
-            var message = await MessageResource.CreateAsync(
-               from: new Twilio.Types.PhoneNumber("whatsapp:+" + from),
-               to: new Twilio.Types.PhoneNumber("whatsapp:+" + to),
-               body: body).ConfigureAwait(false);
+
+            var policy = registry.Get<IAsyncPolicy>("TwilioPolicy");
+
+            await policy.ExecuteAsync(async () =>
+                await MessageResource.CreateAsync(
+                   from: new Twilio.Types.PhoneNumber("whatsapp:+" + from),
+                   to: new Twilio.Types.PhoneNumber("whatsapp:+" + to),
+                   body: body).ConfigureAwait(false));
         }
     }
 }

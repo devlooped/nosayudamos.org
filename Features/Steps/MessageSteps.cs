@@ -29,11 +29,11 @@ namespace NosAyudamos.Steps
         {
             if (context.TryGetValue<Person>(out var person))
             {
-                events.Push(new MessageReceived(person.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
+                events.Push(new TextMessageReceived(person.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
             }
             else
             {
-                events.Push(new MessageReceived(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
+                events.Push(new TextMessageReceived(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
             }
         }
 
