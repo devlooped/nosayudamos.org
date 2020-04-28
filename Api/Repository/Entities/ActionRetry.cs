@@ -13,16 +13,11 @@ namespace NosAyudamos
 
         public ActionRetryEntity() { }
 
-        public ActionRetryEntity(string id, string action, int retryCount = 1)
+        public ActionRetryEntity(string id, string action, int retryCount = 0)
         {
             PartitionKey = id;
             RowKey = action;
             RetryCount = retryCount;
         }
-    }
-
-    enum Action
-    {
-        RecognizeId
     }
 }
