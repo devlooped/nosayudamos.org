@@ -12,7 +12,7 @@ namespace NosAyudamos
     [Shared]
     class TextAnalysis : ITextAnalysis
     {
-        private readonly IEnvironment environment;
+        readonly IEnvironment environment;
         readonly IReadOnlyPolicyRegistry<string> registry;
 
         public TextAnalysis(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment) => (this.registry, this.environment) = (registry, environment);
