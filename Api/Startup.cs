@@ -124,7 +124,7 @@ namespace NosAyudamos
                 services.AddHttpClient<IPersonRecognizer, PersonRecognizer>().AddPolicyHandler(policy);
                 services.AddHttpClient<IQRCode, QRCode>().AddPolicyHandler(policy);
                 services.AddHttpClient<IStartupWorkflow, StartupWorkflow>().AddPolicyHandler(policy);
-                services.AddHttpClient<ChatApi>().AddPolicyHandler(policy);
+                services.AddHttpClient<ChatApiIncoming>().AddPolicyHandler(policy);
             }
 
             services.AddPolicyRegistry(registry);

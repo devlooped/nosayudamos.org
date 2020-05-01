@@ -9,13 +9,13 @@ using System.Text.Json;
 
 namespace NosAyudamos.Functions
 {
-    class MercadoPago
+    class MercadoPagoIncoming
     {
-        readonly ILogger<MercadoPago> logger;
+        readonly ILogger<MercadoPagoIncoming> logger;
 
-        public MercadoPago(ILogger<MercadoPago> logger) => this.logger = logger;
+        public MercadoPagoIncoming(ILogger<MercadoPagoIncoming> logger) => this.logger = logger;
 
-        [FunctionName("mercadopago")]
+        [FunctionName("mercadopago_incoming")]
         public async Task<IActionResult> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req)
         {

@@ -11,12 +11,12 @@ using NosAyudamos.Events;
 
 namespace NosAyudamos.Functions
 {
-    class ChatApi
+    class ChatApiIncoming
     {
         readonly Lazy<string> chatApiNumber;
         readonly IEventStream events;
 
-        public ChatApi(IEnvironment enviroment, IEventStream events)
+        public ChatApiIncoming(IEnvironment enviroment, IEventStream events)
         {
             chatApiNumber = new Lazy<string>(() => enviroment.GetVariable("ChatApiNumber").TrimStart('+'));
             this.events = events;
