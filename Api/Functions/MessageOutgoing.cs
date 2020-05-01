@@ -6,20 +6,15 @@ using NosAyudamos.Events;
 
 namespace NosAyudamos.Functions
 {
-    /// <summary>
-    /// Initial handler of uncategorized incoming messages from event grid 
-    /// callbacks into our azure function. Made testable by implementing 
-    /// <see cref="IEventHandler{TEvent}"/>.
-    /// </summary>
-    class Sender : IEventHandler<MessageSent>
+    class MessageOutgoing : IEventHandler<MessageSent>
     {
         readonly IMessaging messaging;
         readonly ISerializer serializer;
 
-        public Sender(IMessaging messaging, ISerializer serializer)
+        public MessageOutgoing(IMessaging messaging, ISerializer serializer)
             => (this.messaging, this.serializer) = (messaging, serializer);
 
-        [FunctionName("sender")]
+        [FunctionName("message_outgoing")]
         public Task RunAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<MessageSent>(serializer));
 
         public Task HandleAsync(MessageSent e) => messaging.SendTextAsync(e.From, e.Body, e.To);

@@ -14,13 +14,13 @@ using System.Linq;
 
 namespace NosAyudamos.Functions
 {
-    class Twilio
+    class TwilioIncoming
     {
         readonly IEventStream events;
-        readonly ILogger<Twilio> logger;
+        readonly ILogger<TwilioIncoming> logger;
         readonly IStartupWorkflow workflow;
 
-        public Twilio(IEventStream events, IStartupWorkflow workflow, ILogger<Twilio> logger)
+        public TwilioIncoming(IEventStream events, IStartupWorkflow workflow, ILogger<TwilioIncoming> logger)
         {
             this.events = events;
             this.workflow = workflow;

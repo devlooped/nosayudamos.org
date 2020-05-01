@@ -57,8 +57,8 @@ namespace NosAyudamos
             {
                 typeof(IEnvironment),
                 typeof(Messaging),
-                typeof(SlackForwarder),
-                typeof(Sender),
+                typeof(SlackOutgoing),
+                typeof(MessageOutgoing),
                 typeof(IRepositoryFactory),
                 typeof(IPersonRepository),
                 typeof(HttpClient),
