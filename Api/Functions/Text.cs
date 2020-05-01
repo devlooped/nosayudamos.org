@@ -33,13 +33,7 @@ namespace NosAyudamos.Functions
             if (message.PersonId == null)
             {
                 var intents = await language.GetIntentsAsync(message.Text);
-                if (intents.ContainsKey("None"))
-                {
-                    // Can't figure out intent, ask specifically
-                    events.Push(new UnknownMessageReceived(message.From, message.To, message.Text) { When = message.When });
-                    events.Push(new MessageSent(message.To, message.From, Strings.UI.UnknownIntent));
-                }
-                else if (intents.TryGetValue("help", out var helpIntent) &&
+                if (intents.TryGetValue("help", out var helpIntent) &&
                     helpIntent.Score >= 0.85)
                 {
                     // User wants to be a donee, we need the ID
@@ -49,6 +43,12 @@ namespace NosAyudamos.Functions
                     donateIntent.Score >= 0.85)
                 {
                     events.Push(new MessageSent(message.To, message.From, Strings.UI.Donor.SendAmount));
+                }
+                else
+                {
+                    // Can't figure out intent, or score is to low.
+                    events.Push(new UnknownMessageReceived(message.From, message.To, message.Text) { When = message.When });
+                    events.Push(new MessageSent(message.To, message.From, Strings.UI.UnknownIntent));
                 }
             }
             else
