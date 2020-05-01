@@ -1,40 +1,259 @@
 {
-    "token": "PNft94fbk2C91b9CU9qhC7AP",
-    "team_id": "T011TNYNK35",
-    "api_app_id": "A012X6ZUT5X",
-    "event": {
-        "client_msg_id": "7edd68e4-9c68-4c38-bc93-339a52b27118",
-        "type": "message",
-        "text": "Gracias!",
-        "user": "U012H291YGG",
-        "ts": "1587934104.004600",
-        "team": "T011TNYNK35",
-        "blocks": [
+  "messages": [
+    {
+      "type": "message",
+      "subtype": "bot_message",
+      "text": "",
+      "ts": "1587940714.005100",
+      "bot_id": "B012R314REY",
+      "thread_ts": "1587940714.005100",
+      "reply_count": 8,
+      "reply_users_count": 1,
+      "latest_reply": "1588310132.001400",
+      "reply_users": [
+        "U012H291YGG"
+      ],
+      "subscribed": false,
+      "attachments": [
+        {
+          "fallback": "From:5491159278282\nBody:Foobar\nTo:18102076400",
+          "footer": "Unknown",
+          "id": 1,
+          "ts": 1587940611,
+          "color": "daa038",
+          "fields": [
             {
-                "type": "rich_text",
-                "block_id": "DgDC",
-                "elements": [
-                    {
-                        "type": "rich_text_section",
-                        "elements": [
-                            {
-                                "type": "text",
-                                "text": "Gracias!"
-                            }
-                        ]
-                    }
-                ]
+              "title": "From",
+              "value": "5491159278282",
+              "short": true
+            },
+            {
+              "title": "To",
+              "value": "18102076400",
+              "short": true
+            },
+            {
+              "title": "Body",
+              "value": "Foobar",
+              "short": false
             }
-        ],
-        "thread_ts": "1587933939.004300",
-        "channel": "C012C5W43U6",
-        "event_ts": "1587934104.004600",
-        "channel_type": "channel"
+          ]
+        }
+      ]
     },
-    "type": "event_callback",
-    "event_id": "Ev012K1KTLJW",
-    "event_time": 1587934104,
-    "authed_users": [
-        "U012XFKUT97"
-    ]
+    {
+      "client_msg_id": "d82dbeae-6c44-4c9d-9659-20a139b3a23b",
+      "type": "message",
+      "text": "No entendi nada",
+      "user": "U012H291YGG",
+      "ts": "1587940765.005200",
+      "team": "T011TNYNK35",
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "vYjbW",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "No entendi nada"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "thread_ts": "1587940714.005100"
+    },
+    {
+      "client_msg_id": "6bc96558-94da-4b1a-83c9-3f9fcbaaebfc",
+      "type": "message",
+      "text": "Buenas, que necesitas?",
+      "user": "U012H291YGG",
+      "ts": "1588308441.000200",
+      "team": "T011TNYNK35",
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "7f7y",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Buenas, que necesitas?"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "thread_ts": "1587940714.005100"
+    },
+    {
+      "client_msg_id": "9a905096-edb3-435b-8c5f-f667ec53c9fd",
+      "type": "message",
+      "text": "Buenas, no entendimos tu mensaje",
+      "user": "U012H291YGG",
+      "ts": "1588308478.000400",
+      "team": "T011TNYNK35",
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "Nw1LJ",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Buenas, no entendimos tu mensaje"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "thread_ts": "1587940714.005100"
+    },
+    {
+      "client_msg_id": "98c00943-78f1-48db-8ac8-b5f4964a9925",
+      "type": "message",
+      "text": "Buenas, no entendimos tu mensaje",
+      "user": "U012H291YGG",
+      "ts": "1588308532.000600",
+      "team": "T011TNYNK35",
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "lC7KW",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Buenas, no entendimos tu mensaje"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "thread_ts": "1587940714.005100"
+    },
+    {
+      "client_msg_id": "67bc4c92-591a-4510-b189-a0f29ebd37d2",
+      "type": "message",
+      "text": "Buenas, no entendimos tu mensaje :disappointed:",
+      "user": "U012H291YGG",
+      "ts": "1588309590.000800",
+      "team": "T011TNYNK35",
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "Kp06",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "Buenas, no entendimos tu mensaje "
+                },
+                {
+                  "type": "emoji",
+                  "name": "disappointed"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "thread_ts": "1587940714.005100"
+    },
+    {
+      "client_msg_id": "996ce201-1417-4029-bc8c-6ea6527f982b",
+      "type": "message",
+      "text": "...",
+      "user": "U012H291YGG",
+      "ts": "1588309646.001000",
+      "team": "T011TNYNK35",
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "P=6r2",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "..."
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "thread_ts": "1587940714.005100"
+    },
+    {
+      "client_msg_id": "67d7b741-6f3f-4178-a37a-f51993687d35",
+      "type": "message",
+      "text": "mm",
+      "user": "U012H291YGG",
+      "ts": "1588309952.001200",
+      "team": "T011TNYNK35",
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "ZbJ+",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "mm"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "thread_ts": "1587940714.005100"
+    },
+    {
+      "client_msg_id": "b07c7f6f-084b-4093-8670-6941e76782be",
+      "type": "message",
+      "text": "asdf",
+      "user": "U012H291YGG",
+      "ts": "1588310132.001400",
+      "team": "T011TNYNK35",
+      "blocks": [
+        {
+          "type": "rich_text",
+          "block_id": "8Ef",
+          "elements": [
+            {
+              "type": "rich_text_section",
+              "elements": [
+                {
+                  "type": "text",
+                  "text": "asdf"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "thread_ts": "1587940714.005100"
+    }
+  ],
+  "has_more": false,
+  "ok": true
 }

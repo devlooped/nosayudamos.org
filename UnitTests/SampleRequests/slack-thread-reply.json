@@ -1,0 +1,40 @@
+{
+  "token": "PNft94fbk2C91b9CU9qhC7AP",
+  "team_id": "T011TNYNK35",
+  "api_app_id": "A012X6ZUT5X",
+  "event": {
+    "client_msg_id": "7edd68e4-9c68-4c38-bc93-339a52b27118",
+    "type": "message",
+    "text": "Gracias!",
+    "user": "U012H291YGG",
+    "ts": "1587934104.004600",
+    "team": "T011TNYNK35",
+    "blocks": [
+      {
+        "type": "rich_text",
+        "block_id": "DgDC",
+        "elements": [
+          {
+            "type": "rich_text_section",
+            "elements": [
+              {
+                "type": "text",
+                "text": "Gracias!"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "thread_ts": "1587933939.004300",
+    "channel": "C012C5W43U6",
+    "event_ts": "1587934104.004600",
+    "channel_type": "channel"
+  },
+  "type": "event_callback",
+  "event_id": "Ev012K1KTLJW",
+  "event_time": 1587934104,
+  "authed_users": [
+    "U012XFKUT97"
+  ]
+}
