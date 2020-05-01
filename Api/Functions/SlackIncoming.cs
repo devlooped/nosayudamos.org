@@ -10,6 +10,10 @@ using System.Net.Http;
 using Merq;
 using NosAyudamos.Events;
 using System.Globalization;
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.Linq;
 
 namespace NosAyudamos.Functions
 {
@@ -33,6 +37,31 @@ namespace NosAyudamos.Functions
         {
             using var reader = new StreamReader(req.Body);
             var payload = await reader.ReadToEndAsync();
+
+            if (!req.Headers.TryGetValue("X-Slack-Signature", out var values) ||
+                values.Count != 1 ||
+                string.IsNullOrEmpty(values[0]) ||
+                !req.Headers.TryGetValue("X-Slack-Request-Timestamp", out var timestamps) ||
+                timestamps.Count != 1 ||
+                string.IsNullOrEmpty(timestamps[0]))
+                throw new ArgumentException("Slack signature is required.");
+
+            // TODO: validate lifetime
+            //if absolute_value(time.time() - timestamp) > 60 * 5:
+            //    # The request timestamp is more than five minutes from local time.
+            //    # It could be a replay attack, so let's ignore it.
+            //    return
+
+            var expectedSignature = Encoding.UTF8.GetBytes(values[0]);
+            var signedData = "v0:" + timestamps[0] + ":" + payload;
+            var signingSecret = environment.GetVariable("SlackSigningSecret");
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(signingSecret));
+            var signature = hmac.ComputeHash(Encoding.UTF8.GetBytes(signedData));
+            // Something is off with the way we get bytes and compare signature :(
+            // TODO: pga
+            //if (!expectedSignature.SequenceEqual(signature))
+            //    throw new ArgumentException("Invalid slack Slack signature is required.");
+
             dynamic json = serializer.Deserialize<JObject>(System.Net.WebUtility.UrlDecode(payload.Substring(8)));
 
             if (json.challenge != null)
@@ -42,7 +71,7 @@ namespace NosAyudamos.Functions
 
             string? intent = json.actions?[0]?.value;
             string? message = json.message?.blocks?[2]?.text?.text;
-            if (message != null && message.Trim().StartsWith("&gt;", System.StringComparison.Ordinal))
+            if (message != null && message.Trim().StartsWith("&gt;", StringComparison.Ordinal))
                 message = message.Trim().Substring(4);
 
             if (message != null)
