@@ -13,6 +13,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
     <PackageReference Include="Xunit.SkippableFact" Version="1.4.8" />
+    <PackageReference Include="Humanizer" Version="*" />
 
     <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="3.0.0-beta*" IncludeAssets="none" ExcludeAssets="all" />
     <PackageReference Include="Microsoft.NetCore.Analyzers" Version="3.0.0-beta*" IncludeAssets="none" ExcludeAssets="all" />

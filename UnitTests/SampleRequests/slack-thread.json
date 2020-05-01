@@ -1,258 +1,115 @@
 {
   "messages": [
-    {
-      "type": "message",
-      "subtype": "bot_message",
-      "text": "",
-      "ts": "1587940714.005100",
-      "bot_id": "B012R314REY",
-      "thread_ts": "1587940714.005100",
-      "reply_count": 8,
-      "reply_users_count": 1,
-      "latest_reply": "1588310132.001400",
-      "reply_users": [
-        "U012H291YGG"
-      ],
-      "subscribed": false,
-      "attachments": [
-        {
-          "fallback": "From:5491159278282\nBody:Foobar\nTo:18102076400",
-          "footer": "Unknown",
-          "id": 1,
-          "ts": 1587940611,
-          "color": "daa038",
-          "fields": [
-            {
-              "title": "From",
-              "value": "5491159278282",
-              "short": true
-            },
-            {
-              "title": "To",
-              "value": "18102076400",
-              "short": true
-            },
-            {
-              "title": "Body",
-              "value": "Foobar",
-              "short": false
-            }
+      {
+          "type": "message",
+          "subtype": "bot_message",
+          "text": "This content can't be displayed.",
+          "ts": "1588321401.009600",
+          "bot_id": "B012R314REY",
+          "thread_ts": "1588321401.009600",
+          "reply_count": 1,
+          "reply_users_count": 1,
+          "latest_reply": "1588321453.009700",
+          "reply_users": [
+              "U012H291YGG"
+          ],
+          "subscribed": false,
+          "blocks": [
+              {
+                  "type": "divider",
+                  "block_id": "\/N5"
+              },
+              {
+                  "type": "section",
+                  "block_id": "b+m",
+                  "fields": [
+                      {
+                          "type": "plain_text",
+                          "text": ":point_right: 5491159278282",
+                          "emoji": true
+                      },
+                      {
+                          "type": "plain_text",
+                          "text": ":whatsapp: 18102076400",
+                          "emoji": true
+                      }
+                  ]
+              },
+              {
+                  "type": "section",
+                  "block_id": "+23",
+                  "text": {
+                      "type": "mrkdwn",
+                      "text": "&gt; S\u00ed, a qui\u00e9n no le vendr\u00eda bien unos mangos eh",
+                      "verbatim": false
+                  }
+              },
+              {
+                  "type": "context",
+                  "block_id": "NTwTT",
+                  "elements": [
+                      {
+                          "type": "plain_text",
+                          "text": "by Unknown, 3 seconds ago",
+                          "emoji": true
+                      }
+                  ]
+              },
+              {
+                  "type": "actions",
+                  "block_id": "K8b\/x",
+                  "elements": [
+                      {
+                          "type": "button",
+                          "action_id": "NnY",
+                          "text": {
+                              "type": "plain_text",
+                              "text": "Train as :pray:",
+                              "emoji": true
+                          },
+                          "style": "primary",
+                          "value": "help"
+                      },
+                      {
+                          "type": "button",
+                          "action_id": "vYc",
+                          "text": {
+                              "type": "plain_text",
+                              "text": "Train as :money_with_wings:",
+                              "emoji": true
+                          },
+                          "value": "donate"
+                      }
+                  ]
+              }
           ]
-        }
-      ]
-    },
-    {
-      "client_msg_id": "d82dbeae-6c44-4c9d-9659-20a139b3a23b",
-      "type": "message",
-      "text": "No entendi nada",
-      "user": "U012H291YGG",
-      "ts": "1587940765.005200",
-      "team": "T011TNYNK35",
-      "blocks": [
-        {
-          "type": "rich_text",
-          "block_id": "vYjbW",
-          "elements": [
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "No entendi nada"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "thread_ts": "1587940714.005100"
-    },
-    {
-      "client_msg_id": "6bc96558-94da-4b1a-83c9-3f9fcbaaebfc",
-      "type": "message",
-      "text": "Buenas, que necesitas?",
-      "user": "U012H291YGG",
-      "ts": "1588308441.000200",
-      "team": "T011TNYNK35",
-      "blocks": [
-        {
-          "type": "rich_text",
-          "block_id": "7f7y",
-          "elements": [
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "Buenas, que necesitas?"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "thread_ts": "1587940714.005100"
-    },
-    {
-      "client_msg_id": "9a905096-edb3-435b-8c5f-f667ec53c9fd",
-      "type": "message",
-      "text": "Buenas, no entendimos tu mensaje",
-      "user": "U012H291YGG",
-      "ts": "1588308478.000400",
-      "team": "T011TNYNK35",
-      "blocks": [
-        {
-          "type": "rich_text",
-          "block_id": "Nw1LJ",
-          "elements": [
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "Buenas, no entendimos tu mensaje"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "thread_ts": "1587940714.005100"
-    },
-    {
-      "client_msg_id": "98c00943-78f1-48db-8ac8-b5f4964a9925",
-      "type": "message",
-      "text": "Buenas, no entendimos tu mensaje",
-      "user": "U012H291YGG",
-      "ts": "1588308532.000600",
-      "team": "T011TNYNK35",
-      "blocks": [
-        {
-          "type": "rich_text",
-          "block_id": "lC7KW",
-          "elements": [
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "Buenas, no entendimos tu mensaje"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "thread_ts": "1587940714.005100"
-    },
-    {
-      "client_msg_id": "67bc4c92-591a-4510-b189-a0f29ebd37d2",
-      "type": "message",
-      "text": "Buenas, no entendimos tu mensaje :disappointed:",
-      "user": "U012H291YGG",
-      "ts": "1588309590.000800",
-      "team": "T011TNYNK35",
-      "blocks": [
-        {
-          "type": "rich_text",
-          "block_id": "Kp06",
-          "elements": [
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "Buenas, no entendimos tu mensaje "
-                },
-                {
-                  "type": "emoji",
-                  "name": "disappointed"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "thread_ts": "1587940714.005100"
-    },
-    {
-      "client_msg_id": "996ce201-1417-4029-bc8c-6ea6527f982b",
-      "type": "message",
-      "text": "...",
-      "user": "U012H291YGG",
-      "ts": "1588309646.001000",
-      "team": "T011TNYNK35",
-      "blocks": [
-        {
-          "type": "rich_text",
-          "block_id": "P=6r2",
-          "elements": [
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "..."
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "thread_ts": "1587940714.005100"
-    },
-    {
-      "client_msg_id": "67d7b741-6f3f-4178-a37a-f51993687d35",
-      "type": "message",
-      "text": "mm",
-      "user": "U012H291YGG",
-      "ts": "1588309952.001200",
-      "team": "T011TNYNK35",
-      "blocks": [
-        {
-          "type": "rich_text",
-          "block_id": "ZbJ+",
-          "elements": [
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "mm"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "thread_ts": "1587940714.005100"
-    },
-    {
-      "client_msg_id": "b07c7f6f-084b-4093-8670-6941e76782be",
-      "type": "message",
-      "text": "asdf",
-      "user": "U012H291YGG",
-      "ts": "1588310132.001400",
-      "team": "T011TNYNK35",
-      "blocks": [
-        {
-          "type": "rich_text",
-          "block_id": "8Ef",
-          "elements": [
-            {
-              "type": "rich_text_section",
-              "elements": [
-                {
-                  "type": "text",
-                  "text": "asdf"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "thread_ts": "1587940714.005100"
-    }
+      },
+      {
+          "client_msg_id": "55f07c00-46d9-4be8-87e2-3811ab1cd23b",
+          "type": "message",
+          "text": "Queres ayudar o necesitas ayuda?",
+          "user": "U012H291YGG",
+          "ts": "1588321453.009700",
+          "team": "T011TNYNK35",
+          "blocks": [
+              {
+                  "type": "rich_text",
+                  "block_id": "U0XfL",
+                  "elements": [
+                      {
+                          "type": "rich_text_section",
+                          "elements": [
+                              {
+                                  "type": "text",
+                                  "text": "Queres ayudar o necesitas ayuda?"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ],
+          "thread_ts": "1588321401.009600"
+      }
   ],
   "has_more": false,
   "ok": true

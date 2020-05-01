@@ -1,0 +1,128 @@
+{
+    "type": "block_actions",
+    "user": {
+        "id": "U012H291YGG",
+        "username": "daniel",
+        "name": "daniel",
+        "team_id": "T011TNYNK35"
+    },
+    "api_app_id": "A012X6ZUT5X",
+    "token": "PNft94fbk2C91b9CU9qhC7AP",
+    "container": {
+        "type": "message",
+        "message_ts": "1588321401.009600",
+        "channel_id": "C012C5W43U6",
+        "is_ephemeral": false,
+        "thread_ts": "1588321401.009600"
+    },
+    "trigger_id": "1110927661329.1061780767107.73fc513793d24a0ca70e4f9a0450539d",
+    "team": {
+        "id": "T011TNYNK35",
+        "domain": "nosayudamos"
+    },
+    "channel": {
+        "id": "C012C5W43U6",
+        "name": "users"
+    },
+    "message": {
+        "type": "message",
+        "subtype": "bot_message",
+        "text": "This content can't be displayed.",
+        "ts": "1588321401.009600",
+        "bot_id": "B012R314REY",
+        "thread_ts": "1588321401.009600",
+        "reply_count": 2,
+        "reply_users_count": 1,
+        "latest_reply": "1588322126.009900",
+        "reply_users": [
+            "U012H291YGG"
+        ],
+        "subscribed": true,
+        "last_read": "1588322126.009900",
+        "blocks": [
+            {
+                "type": "divider",
+                "block_id": "\/N5"
+            },
+            {
+                "type": "section",
+                "block_id": "b+m",
+                "fields": [
+                    {
+                        "type": "plain_text",
+                        "text": ":point_right: 5491159278282",
+                        "emoji": true
+                    },
+                    {
+                        "type": "plain_text",
+                        "text": ":whatsapp: 18102076400",
+                        "emoji": true
+                    }
+                ]
+            },
+            {
+                "type": "section",
+                "block_id": "+23",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "&gt; S\u00ed, a qui\u00e9n no le vendr\u00eda bien unos mangos eh",
+                    "verbatim": false
+                }
+            },
+            {
+                "type": "context",
+                "block_id": "NTwTT",
+                "elements": [
+                    {
+                        "type": "plain_text",
+                        "text": "by Unknown, 3 seconds ago",
+                        "emoji": true
+                    }
+                ]
+            },
+            {
+                "type": "actions",
+                "block_id": "K8b\/x",
+                "elements": [
+                    {
+                        "type": "button",
+                        "action_id": "NnY",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Train as :pray:",
+                            "emoji": true
+                        },
+                        "style": "primary",
+                        "value": "help"
+                    },
+                    {
+                        "type": "button",
+                        "action_id": "vYc",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Train as :money_with_wings:",
+                            "emoji": true
+                        },
+                        "value": "donate"
+                    }
+                ]
+            }
+        ]
+    },
+    "response_url": "https:\/\/hooks.slack.com\/actions\/T011TNYNK35\/1098305183778\/4j9fKMfpUaUoYWlQ7vAXLBpJ",
+    "actions": [
+        {
+            "action_id": "NnY",
+            "block_id": "K8b\/x",
+            "text": {
+                "type": "plain_text",
+                "text": "Train as :pray:",
+                "emoji": true
+            },
+            "value": "help",
+            "style": "primary",
+            "type": "button",
+            "action_ts": "1588322252.689719"
+        }
+    ]
+}
