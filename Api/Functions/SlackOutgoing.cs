@@ -11,18 +11,18 @@ using SlackMessage = SlackBotMessages.Models.Message;
 
 namespace NosAyudamos.Functions
 {
-    class SlackForwarder : IEventHandler<UnknownMessageReceived>
+    class SlackOutgoing : IEventHandler<UnknownMessageReceived>
     {
         readonly ISerializer serializer;
         readonly IEnvironment environment;
         readonly IPersonRepository repository;
-        readonly ILogger<Slack> logger;
+        readonly ILogger<SlackIncoming> logger;
 
-        public SlackForwarder(ISerializer serializer, IEnvironment environment, IPersonRepository repository, ILogger<Slack> logger) =>
+        public SlackOutgoing(ISerializer serializer, IEnvironment environment, IPersonRepository repository, ILogger<SlackIncoming> logger) =>
             (this.serializer, this.environment, this.repository, this.logger) = (serializer, environment, repository, logger);
 
-        [FunctionName("slack_forward")]
-        public Task ForwardAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
+        [FunctionName("slack_outgoing")]
+        public Task SendAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
 
         public async Task HandleAsync(UnknownMessageReceived e)
         {
