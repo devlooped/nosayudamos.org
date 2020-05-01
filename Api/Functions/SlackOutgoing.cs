@@ -29,7 +29,7 @@ namespace NosAyudamos.Functions
             (this.serializer, this.environment, this.repository, this.language, this.http, this.logger) = (serializer, environment, repository, language, http, logger);
 
         [FunctionName("slack_outgoing")]
-        public Task SendAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
+        public Task HandleUnknownIntentAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
 
         public async Task HandleAsync(UnknownMessageReceived e)
         {
