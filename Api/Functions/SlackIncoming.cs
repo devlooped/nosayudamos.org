@@ -46,21 +46,15 @@ namespace NosAyudamos.Functions
                 string.IsNullOrEmpty(timestamps[0]))
                 throw new ArgumentException("Slack signature is required.");
 
-            // TODO: validate lifetime
-            //if absolute_value(time.time() - timestamp) > 60 * 5:
-            //    # The request timestamp is more than five minutes from local time.
-            //    # It could be a replay attack, so let's ignore it.
-            //    return
+            var expectedSignature = values[0];
+            var signedData = Encoding.UTF8.GetBytes("v0:" + timestamps[0] + ":" + payload);
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(environment.GetVariable("SlackSigningSecret")));
+            var signature = "v0=" + hmac.ComputeHash(signedData).Aggregate("", (s, b) => s + b.ToString("x2", CultureInfo.CurrentCulture));
 
-            var expectedSignature = Encoding.UTF8.GetBytes(values[0]);
-            var signedData = "v0:" + timestamps[0] + ":" + payload;
-            var signingSecret = environment.GetVariable("SlackSigningSecret");
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(signingSecret));
-            var signature = hmac.ComputeHash(Encoding.UTF8.GetBytes(signedData));
-            // Something is off with the way we get bytes and compare signature :(
-            // TODO: pga
-            //if (!expectedSignature.SequenceEqual(signature))
-            //    throw new ArgumentException("Invalid slack Slack signature is required.");
+            if (!expectedSignature.Equals(signature, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("Invalid Slack signature.");
+            }
 
             dynamic json = serializer.Deserialize<JObject>(System.Net.WebUtility.UrlDecode(payload.Substring(8)));
 
