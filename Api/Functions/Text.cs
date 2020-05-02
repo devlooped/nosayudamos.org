@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Merq;
+﻿using System.Threading.Tasks;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
@@ -16,10 +14,9 @@ namespace NosAyudamos.Functions
         readonly ISerializer serializer;
         readonly IPersonRepository repository;
         readonly ILanguageUnderstanding language;
-        readonly IEventStream events;
+        readonly IEventStreamAsync events;
 
-
-        public Text(ILogger log, ISerializer serializer, IPersonRepository repository, ILanguageUnderstanding language, IEventStream events)
+        public Text(ILogger log, ISerializer serializer, IPersonRepository repository, ILanguageUnderstanding language, IEventStreamAsync events)
             => (this.log, this.serializer, this.repository, this.language, this.events) = (log, serializer, repository, language, events);
 
         [FunctionName("text")]
@@ -37,18 +34,18 @@ namespace NosAyudamos.Functions
                     helpIntent.Score >= 0.85)
                 {
                     // User wants to be a donee, we need the ID
-                    events.Push(new MessageSent(message.To, message.From, Strings.UI.Donee.SendIdentifier));
+                    await events.PushAsync(new MessageSent(message.To, message.From, Strings.UI.Donee.SendIdentifier));
                 }
                 else if (intents.TryGetValue("donate", out var donateIntent) &&
                     donateIntent.Score >= 0.85)
                 {
-                    events.Push(new MessageSent(message.To, message.From, Strings.UI.Donor.SendAmount));
+                    await events.PushAsync(new MessageSent(message.To, message.From, Strings.UI.Donor.SendAmount));
                 }
                 else
                 {
                     // Can't figure out intent, or score is to low.
-                    events.Push(new UnknownMessageReceived(message.From, message.To, message.Text) { When = message.When });
-                    events.Push(new MessageSent(message.To, message.From, Strings.UI.UnknownIntent));
+                    await events.PushAsync(new UnknownMessageReceived(message.From, message.To, message.Text) { When = message.When });
+                    await events.PushAsync(new MessageSent(message.To, message.From, Strings.UI.UnknownIntent));
                 }
             }
             else
@@ -59,9 +56,9 @@ namespace NosAyudamos.Functions
                 if (intents.ContainsKey("None"))
                 {
                     if (person.Role == Role.Donee)
-                        events.Push(new MessageSent(message.To, message.From, Strings.UI.UnknownIntent));
+                        await events.PushAsync(new MessageSent(message.To, message.From, Strings.UI.UnknownIntent));
                     else
-                        events.Push(new MessageSent(message.To, message.From, Strings.UI.Donor.SendAmount));
+                        await events.PushAsync(new MessageSent(message.To, message.From, Strings.UI.Donor.SendAmount));
                 }
 
                 // TODO load worklow for person, run it.

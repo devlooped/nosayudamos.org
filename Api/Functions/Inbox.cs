@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Merq;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
@@ -19,9 +18,9 @@ namespace NosAyudamos.Functions
         readonly ILogger log;
         readonly ISerializer serializer;
         readonly IPersonRepository repository;
-        readonly IEventStream events;
+        readonly IEventStreamAsync events;
 
-        public Inbox(ILogger log, ISerializer serializer, IPersonRepository repository, IEventStream events)
+        public Inbox(ILogger log, ISerializer serializer, IPersonRepository repository, IEventStreamAsync events)
             => (this.log, this.serializer, this.repository, this.events) = (log, serializer, repository, events);
 
         [FunctionName("inbox")]
@@ -39,11 +38,11 @@ namespace NosAyudamos.Functions
 
             if (Uri.TryCreate(e.Body, UriKind.Absolute, out var uri))
             {
-                events.Push(new ImageMessageReceived(e.From, e.To, uri) { PersonId = id, When = e.When });
+                await events.PushAsync(new ImageMessageReceived(e.From, e.To, uri) { PersonId = id, When = e.When });
             }
             else
             {
-                events.Push(new TextMessageReceived(e.From, e.To, e.Body) { PersonId = id, When = e.When });
+                await events.PushAsync(new TextMessageReceived(e.From, e.To, e.Body) { PersonId = id, When = e.When });
             }
         }
     }

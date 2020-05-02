@@ -7,13 +7,10 @@ using System.IO;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
-using Merq;
 using NosAyudamos.Events;
-using System.Globalization;
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using System.Linq;
 
 namespace NosAyudamos.Functions
 {
@@ -23,12 +20,12 @@ namespace NosAyudamos.Functions
 
         readonly ISerializer serializer;
         readonly IEnvironment environment;
-        readonly IEventStream events;
+        readonly IEventStreamAsync events;
         readonly ILanguageUnderstanding language;
         readonly HttpClient http;
         readonly ILogger<SlackIncoming> logger;
 
-        public SlackIncoming(ISerializer serializer, IEnvironment environment, IEventStream events, ILanguageUnderstanding language, HttpClient http, ILogger<SlackIncoming> logger) =>
+        public SlackIncoming(ISerializer serializer, IEnvironment environment, IEventStreamAsync events, ILanguageUnderstanding language, HttpClient http, ILogger<SlackIncoming> logger) =>
             (this.serializer, this.environment, this.events, this.language, this.http, this.logger) = (serializer, environment, events, language, http, logger);
 
         [FunctionName("slack_interaction")]
@@ -113,7 +110,7 @@ namespace NosAyudamos.Functions
                 string? to = json.messages?[0]?.blocks?[1]?.fields?[1]?.text;
 
                 if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(to) && !string.IsNullOrEmpty(text))
-                    events.Push(new MessageSent(to.Substring(to.LastIndexOf(':') + 1).Trim(), from.Substring(from.LastIndexOf(':') + 1).Trim(), text));
+                    await events.PushAsync(new MessageSent(to.Substring(to.LastIndexOf(':') + 1).Trim(), from.Substring(from.LastIndexOf(':') + 1).Trim(), text));
             }
 
             return new OkResult();

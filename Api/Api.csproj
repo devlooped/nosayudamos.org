@@ -41,7 +41,7 @@
     <PackageReference Include="Humanizer" Version="2.8.*" />
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Merq.Core" Version="1.2.0" />
+    <PackageReference Include="Merq.Core" Version="1.2.*" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.*" />
     <PackageReference Include="Polly" Version="7.2.0" />
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />

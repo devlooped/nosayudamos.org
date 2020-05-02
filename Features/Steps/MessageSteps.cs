@@ -1,9 +1,8 @@
-﻿using Autofac;
-using Merq;
-using NosAyudamos.Events;
+﻿using NosAyudamos.Events;
 using TechTalk.SpecFlow;
 using Xunit;
 using System;
+using System.Threading.Tasks;
 
 namespace NosAyudamos.Steps
 {
@@ -11,13 +10,13 @@ namespace NosAyudamos.Steps
     public class MessageSteps
     {
         ScenarioContext context;
-        IEventStream events;
+        IEventStreamAsync events;
         MessageSent sent;
 
         public MessageSteps(FeatureContainer container, ScenarioContext context)
         {
             this.context = context;
-            events = container.Resolve<IEventStream>();
+            events = container.Resolve<IEventStreamAsync>();
             events
                 .Of<MessageSent>()
                 .Subscribe(e => sent = e);
@@ -25,15 +24,15 @@ namespace NosAyudamos.Steps
 
         [When(@"Envia (.*)")]
         [When(@"Envia mensaje")]
-        public void WhenMessageReceived(string message)
+        public async Task WhenMessageReceived(string message)
         {
             if (context.TryGetValue<Person>(out var person))
             {
-                events.Push(new TextMessageReceived(person.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
+                await events.PushAsync(new TextMessageReceived(person.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
             }
             else
             {
-                events.Push(new TextMessageReceived(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
+                await events.PushAsync(new TextMessageReceived(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
             }
         }
 

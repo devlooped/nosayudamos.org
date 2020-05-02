@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Merq;
 using Microsoft.Azure.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
-using NosAyudamos.Events;
 
 namespace NosAyudamos
 {
     [Shared]
-    class EventGridStream : EventStream
+    class EventGridStream : EventStream, IEventStreamAsync, IDisposable
     {
-        Lazy<Uri> gridUri;
-        Lazy<string> apiKey;
+        readonly ThreadLocal<bool?> asyncCall = new ThreadLocal<bool?>();
+        readonly Lazy<Uri> gridUri;
+        readonly Lazy<string> apiKey;
         readonly IServiceProvider services;
         readonly IEnvironment environment;
         readonly ISerializer serializer;
@@ -26,42 +27,93 @@ namespace NosAyudamos
             apiKey = new Lazy<string>(() => environment.GetVariable("EventGridAccessKey"));
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0022:Use expression body for methods", Justification = "WIP")]
-        public override void Push<TEvent>(TEvent @event)
+        public async Task PushAsync<TEvent>(TEvent args)
         {
-            base.Push(@event);
-
-            if (environment.IsDevelopment())
+            try
             {
-                var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
-
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-                Task.WaitAll(handlers.Select(x => x.HandleAsync(@event)).ToArray());
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
-            }
-
-            if (!environment.IsDevelopment() || environment.GetVariable("SendToGridInDevelopment", false))
-            {
-                var credentials = new TopicCredentials(apiKey.Value);
-                var domain = gridUri.Value.Host;
-                using var client = new EventGridClient(credentials);
-
-                client.PublishEventsAsync(domain, new List<EventGridEvent>
+                // By setting this variable which is thread-local, the Push method below will not 
+                // invoke the async handlers at all.
+                asyncCall.Value = true;
+                Push(args);
+                if (environment.IsDevelopment())
                 {
-                    new EventGridEvent
+                    var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
+
+                    foreach (var handler in handlers)
                     {
-                        Id = Guid.NewGuid().ToString(),
-                        Topic = "NosAyudamos",
-                        EventType = typeof(TEvent).FullName,
-                        EventTime = DateTime.UtcNow,
-                        Subject = typeof(TEvent).Namespace,
-                        Data = serializer.Serialize(@event),
-                        DataVersion = "1.0",
+                        await handler.HandleAsync(args);
                     }
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-                }).Wait();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+                }
+
+                if (!environment.IsDevelopment() || environment.GetVariable("SendToGridInDevelopment", false))
+                {
+                    var credentials = new TopicCredentials(apiKey.Value);
+                    var domain = gridUri.Value.Host;
+                    using var client = new EventGridClient(credentials);
+
+                    await client.PublishEventsAsync(domain, new List<EventGridEvent>
+                    {
+                        new EventGridEvent
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Topic = "NosAyudamos",
+                            EventType = typeof(TEvent).FullName,
+                            EventTime = DateTime.UtcNow,
+                            Subject = typeof(TEvent).Namespace,
+                            Data = serializer.Serialize(args),
+                            DataVersion = "1.0",
+                        }
+                    });
+                }
+            }
+            finally
+            {
+                asyncCall.Value = null;
             }
         }
+
+        public override void Push<TEvent>(TEvent args)
+        {
+            base.Push(args);
+
+            if (asyncCall.Value != true)
+            {
+                // This is duplicated but for a good reason: this should only be used in tests 
+                // when the PushAsync cannot be used for some reason.
+                if (environment.IsDevelopment())
+                {
+                    var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
+
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
+                    Task.WaitAll(handlers.Select(handler => handler.HandleAsync(args)).ToArray());
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+                }
+
+                if (!environment.IsDevelopment() || environment.GetVariable("SendToGridInDevelopment", false))
+                {
+                    var credentials = new TopicCredentials(apiKey.Value);
+                    var domain = gridUri.Value.Host;
+                    using var client = new EventGridClient(credentials);
+
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
+                    client.PublishEventsAsync(domain, new List<EventGridEvent>
+                    {
+                        new EventGridEvent
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Topic = "NosAyudamos",
+                            EventType = typeof(TEvent).FullName,
+                            EventTime = DateTime.UtcNow,
+                            Subject = typeof(TEvent).Namespace,
+                            Data = serializer.Serialize(args),
+                            DataVersion = "1.0",
+                        }
+                    }).Wait();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+                }
+            }
+        }
+
+        public void Dispose() => asyncCall.Dispose();
     }
 }
