@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NosAyudamos.Events;
+using Polly.Registry;
 
 namespace NosAyudamos
 {
