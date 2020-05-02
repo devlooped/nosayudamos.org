@@ -6,9 +6,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Diagnostics.Contracts;
 using System.Net;
-using Merq;
 using NosAyudamos.Events;
 using System.Linq;
 
@@ -16,11 +14,11 @@ namespace NosAyudamos.Functions
 {
     class TwilioIncoming
     {
-        readonly IEventStream events;
+        readonly IEventStreamAsync events;
         readonly ILogger<TwilioIncoming> logger;
         readonly IStartupWorkflow workflow;
 
-        public TwilioIncoming(IEventStream events, IStartupWorkflow workflow, ILogger<TwilioIncoming> logger)
+        public TwilioIncoming(IEventStreamAsync events, IStartupWorkflow workflow, ILogger<TwilioIncoming> logger)
         {
             this.events = events;
             this.workflow = workflow;
@@ -71,7 +69,7 @@ namespace NosAyudamos.Functions
                     message = mediaUrl;
                 }
 
-                events.Push(new MessageReceived(from, to, message));
+                await events.PushAsync(new MessageReceived(from, to, message));
 
                 return new OkResult();
             }

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Merq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -14,9 +13,9 @@ namespace NosAyudamos.Functions
     class ChatApiIncoming
     {
         readonly Lazy<string> chatApiNumber;
-        readonly IEventStream events;
+        readonly IEventStreamAsync events;
 
-        public ChatApiIncoming(IEnvironment enviroment, IEventStream events)
+        public ChatApiIncoming(IEnvironment enviroment, IEventStreamAsync events)
         {
             chatApiNumber = new Lazy<string>(() => enviroment.GetVariable("ChatApiNumber").TrimStart('+'));
             this.events = events;
@@ -43,7 +42,7 @@ namespace NosAyudamos.Functions
                 if (from == chatApiNumber.Value)
                     continue;
 
-                events.Push(new MessageReceived(from, chatApiNumber.Value, body));
+                await events.PushAsync(new MessageReceived(from, chatApiNumber.Value, body));
             }
 
             return new OkResult();
