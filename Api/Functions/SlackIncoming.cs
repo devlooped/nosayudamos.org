@@ -7,7 +7,6 @@ using System.IO;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
-using NosAyudamos.Events;
 using System;
 using System.Security.Cryptography;
 using System.Text;
