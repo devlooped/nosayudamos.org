@@ -17,13 +17,13 @@ namespace NosAyudamos
         /// </summary>
         Task<Person> PutAsync(Person person);
         /// <summary>
-        /// Retrieves an existing person from its <paramref name="nationalId"/>.
+        /// Retrieves an existing person from its <paramref name="id"/>.
         /// </summary>
-        /// <param name="nationalId">The national identifier for the person.</param>
+        /// <param name="id">The national identifier for the person.</param>
         /// <param name="readOnly">If <see langword="true"/>, will only return the last-known state for the person, 
         /// rather than loading its history too, and no mutation operations will be allowed on it.</param>
-        /// <returns>The stored person information or <see langword="null"/> if none was found with the given <paramref name="nationalId"/>.</returns>
-        Task<Person?> GetAsync(string nationalId, bool readOnly = true);
+        /// <returns>The stored person information or <see langword="null"/> if none was found with the given <paramref name="id"/>.</returns>
+        Task<Person?> GetAsync(string id, bool readOnly = true);
         /// <summary>
         /// Tries to locate the person that matches the given phone number.
         /// </summary>
@@ -47,7 +47,7 @@ namespace NosAyudamos
         public async Task<Person> PutAsync(Person person)
         {
             var table = await GetTableAsync();
-            var existing = await GetAsync(person.NationalId, readOnly: true).ConfigureAwait(false);
+            var existing = await GetAsync(person.Id!, readOnly: true).ConfigureAwait(false);
 
             // First check if the person changed phone numbers since our last interaction
             if (existing != null && existing.PhoneNumber != person.PhoneNumber)
@@ -64,12 +64,12 @@ namespace NosAyudamos
 
             await table.ExecuteAsync(
                 TableOperation.InsertOrReplace(
-                    new PhoneIdMapEntity(person.PhoneNumber, person.NationalId))).ConfigureAwait(false);
+                    new PhoneIdMapEntity(person.PhoneNumber, person.Id!))).ConfigureAwait(false);
 
-            var partition = new Partition(table, person.NationalId);
+            var partition = new Partition(table, person.Id!);
             var result = await Stream.TryOpenAsync(partition);
             var stream = result.Found ? result.Stream : new Stream(partition);
-            var header = DataEntity.Create(person.NationalId, person, serializer);
+            var header = DataEntity.Create(person.Id!, person, serializer);
             header.Version = stream.Version + person.Events.Count();
 
             await Stream.WriteAsync(stream, person.Events.Select((e, i) =>
@@ -80,11 +80,11 @@ namespace NosAyudamos
             return person;
         }
 
-        public async Task<Person?> GetAsync(string nationalId, bool readOnly = true)
+        public async Task<Person?> GetAsync(string id, bool readOnly = true)
         {
             if (readOnly)
             {
-                var header = await GetAsync<DataEntity>(nationalId, typeof(Person).FullName!).ConfigureAwait(false);
+                var header = await GetAsync<DataEntity>(id, typeof(Person).FullName!).ConfigureAwait(false);
                 if (header == null)
                     return default;
 
@@ -95,7 +95,7 @@ namespace NosAyudamos
             }
 
             var table = await GetTableAsync();
-            var partition = new Partition(table, nationalId);
+            var partition = new Partition(table, id);
             var existent = await Stream.TryOpenAsync(partition);
             if (!existent.Found)
                 return default;
@@ -151,7 +151,7 @@ namespace NosAyudamos
                 throw new ArgumentException(Strings.PersonRepository.EmptyData);
 
             var e = (DomainEvent)serializer.Deserialize(entity.Data, entityType);
-            e.Id = (entity.EventId ?? Guid.NewGuid());
+            e.EventId = (entity.EventId ?? Guid.NewGuid());
             e.Version = entity.Version;
             e.When = entity.Timestamp;
             return e;
@@ -161,7 +161,7 @@ namespace NosAyudamos
         {
             var properties = new
             {
-                e.Id,
+                e.EventId,
                 EventType = e.GetType().FullName,
                 Data = new Serializer().Serialize(e),
                 DataVersion = (e.GetType().Assembly.GetName().Version ?? new Version(1, 0)).ToString(2),

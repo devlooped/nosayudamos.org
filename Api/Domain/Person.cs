@@ -12,17 +12,15 @@ namespace NosAyudamos
             : this() => Load(history);
 
         public Person(
+            string id,
             string firstName,
             string lastName,
-            string nationalId,
             string phoneNumber,
             string? dateOfBirth = default,
             string? sex = default)
-            : this()
-        {
+            : this() =>
             // TODO: validate args.
-            Raise(new PersonRegistered(firstName, lastName, nationalId, phoneNumber, dateOfBirth, sex));
-        }
+            Raise(new PersonRegistered(id, firstName, lastName, phoneNumber, dateOfBirth, sex));
 
         /// <summary>
         /// Deserialization ctor for readonly quick loading from repository
@@ -30,9 +28,9 @@ namespace NosAyudamos
         [JsonConstructor]
         [SuppressMessage("Design", "IDE0051:Remove unused private members", Justification = "Deserialization constructor.")]
         Person(
+            string id,
             string firstName,
             string lastName,
-            string nationalId,
             string phoneNumber,
             int state,
             string? dateOfBirth = default,
@@ -40,8 +38,8 @@ namespace NosAyudamos
             Role role = Role.Donee,
             double donatedAmount = 0)
             : this()
-            => (FirstName, LastName, NationalId, PhoneNumber, State, DateOfBirth, Sex, Role, DonatedAmount, IsReadOnly)
-            = (firstName, lastName, nationalId, phoneNumber, state, dateOfBirth, sex, role, donatedAmount, true);
+            => (Id, FirstName, LastName, PhoneNumber, State, DateOfBirth, Sex, Role, DonatedAmount, IsReadOnly)
+            = (id, firstName, lastName, phoneNumber, state, dateOfBirth, sex, role, donatedAmount, true);
 
         Person()
         {
@@ -50,9 +48,9 @@ namespace NosAyudamos
             Handles<PhoneNumberUpdated>(OnPhoneNumberUpdated);
         }
 
+        public string Id { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
-        public string NationalId { get; private set; }
         public string PhoneNumber { get; private set; }
         public string? DateOfBirth { get; private set; }
         public string? Sex { get; private set; }
@@ -81,8 +79,8 @@ namespace NosAyudamos
         }
 
         void OnRegistered(PersonRegistered e)
-            => (FirstName, LastName, NationalId, PhoneNumber, DateOfBirth, Sex)
-            = (e.FirstName, e.LastName, e.NationalId, e.PhoneNumber, e.DateOfBirth, e.Sex);
+            => (Id, FirstName, LastName, PhoneNumber, DateOfBirth, Sex)
+            = (e.Id, e.FirstName, e.LastName, e.PhoneNumber, e.DateOfBirth, e.Sex);
 
         void OnDonated(Donated e) => DonatedAmount += e.Amount;
 

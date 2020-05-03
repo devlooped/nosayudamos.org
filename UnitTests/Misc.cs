@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Resources;
-using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
 namespace NosAyudamos

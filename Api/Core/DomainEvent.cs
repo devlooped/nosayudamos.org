@@ -4,11 +4,11 @@ namespace NosAyudamos
 {
     public abstract class DomainEvent
     {
-        protected DomainEvent() => Id = Guid.NewGuid();
+        protected DomainEvent() => EventId = Guid.NewGuid();
 
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
-        public Guid Id { get; set; }
+        public Guid EventId { get; set; }
 
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]

@@ -20,8 +20,8 @@ namespace NosAyudamos
 
         public Task<Person> PutAsync(Person person)
         {
-            phoneIdMap[person.PhoneNumber] = person.NationalId;
-            people[person.NationalId] = person;
+            phoneIdMap[person.PhoneNumber] = person.Id;
+            people[person.Id] = person;
             return Task.FromResult(person);
         }
     }

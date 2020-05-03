@@ -34,7 +34,7 @@ namespace NosAyudamos.Functions
             // and whether it's a text or image message.
 
             var person = await repository.FindAsync(e.From);
-            var id = person?.NationalId;
+            var id = person?.Id;
 
             if (Uri.TryCreate(e.Body, UriKind.Absolute, out var uri))
             {
