@@ -5,32 +5,49 @@ using System.IO;
 using System;
 using System.Drawing;
 using System.Globalization;
-using System.Composition;
 using System.Net.Http;
 
 namespace NosAyudamos
 {
-    static class PersonRecognizerExtensions
+    class PersonalId
     {
-        public static Task<Person?> RecognizeAsync(this IPersonRecognizer recognizer, string? imageUrl)
+        public PersonalId(
+            string firstName,
+            string lastName,
+            string nationalId,
+            string dateOfBirth,
+            string sex)
+            => (FirstName, LastName, NationalId, DateOfBirth, Sex)
+            = (firstName, lastName, nationalId, dateOfBirth, sex);
+
+        public string FirstName { get; }
+        public string LastName { get; }
+        public string NationalId { get; }
+        public string DateOfBirth { get; }
+        public string Sex { get; }
+    }
+
+    static class PersonalIdRecognizerExtensions
+    {
+        public static Task<PersonalId?> RecognizeAsync(this IPersonalIdRecognizer recognizer, string? imageUrl)
         {
             if (imageUrl == null ||
                 !Uri.TryCreate(imageUrl, UriKind.Absolute, out var imageUri) ||
                 imageUri == null)
             {
-                return Task.FromResult<Person?>(default);
+                return Task.FromResult<PersonalId?>(default);
             }
 
             return (recognizer ?? throw new ArgumentNullException(nameof(recognizer))).RecognizeAsync(imageUri);
         }
     }
 
-    class PersonRecognizer : IPersonRecognizer
+    class PersonalIdRecognizer : IPersonalIdRecognizer
     {
         readonly Lazy<BarcodeReader> reader;
         readonly HttpClient httpClient;
 
-        public PersonRecognizer(HttpClient httpClient)
+        public PersonalIdRecognizer(HttpClient httpClient)
         {
             this.httpClient = httpClient;
 
@@ -47,7 +64,7 @@ namespace NosAyudamos
                 });
         }
 
-        public async Task<Person?> RecognizeAsync(Uri imageUri)
+        public async Task<PersonalId?> RecognizeAsync(Uri imageUri)
         {
             var bytes = await httpClient.GetByteArrayAsync(imageUri);
 
@@ -62,7 +79,7 @@ namespace NosAyudamos
 
                 if (elements.Length > 0)
                 {
-                    return new Person(
+                    return new PersonalId(
                         CultureInfo.CurrentCulture.TextInfo.ToTitleCase(elements[2].ToLower(CultureInfo.CurrentCulture)),
                         CultureInfo.CurrentCulture.TextInfo.ToTitleCase(elements[1].ToLower(CultureInfo.CurrentCulture)),
                         elements[4],
@@ -75,8 +92,8 @@ namespace NosAyudamos
         }
     }
 
-    interface IPersonRecognizer
+    interface IPersonalIdRecognizer
     {
-        Task<Person?> RecognizeAsync(Uri imageUri);
+        Task<PersonalId?> RecognizeAsync(Uri imageUri);
     }
 }

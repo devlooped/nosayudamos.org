@@ -38,9 +38,10 @@ namespace NosAyudamos.Functions
 
             var url = environment.GetVariable("SlackUsersWebHook");
             var from = "Unknown";
-            if (e.PersonId != null)
+            if (e.PersonId != null &&
+                await repository.GetAsync(e.PersonId) is Person person &&
+                person != null)
             {
-                var person = await repository.GetAsync(e.PersonId);
                 from = person.FirstName + " " + person.LastName;
             }
 

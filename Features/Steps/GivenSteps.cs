@@ -47,7 +47,7 @@ namespace NosAyudamos.Steps
             var repo = container.Resolve<IPersonRepository>();
             var names = fullName.Split(' ');
 
-            var person = new Person(string.Join(' ', names[..^1]), names[^1], nationalId, "", "", phoneNumber: phoneNumber);
+            var person = new Person(string.Join(' ', names[..^1]), names[^1], nationalId, phoneNumber);
 
             repo.PutAsync(person);
 

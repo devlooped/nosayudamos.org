@@ -10,20 +10,27 @@ namespace NosAyudamos
         JsonSerializerSettings settings = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
+#if DEBUG
             Formatting = Formatting.Indented,
+#endif
         };
 
-        public T Deserialize<T>(object data)
+        public object Deserialize(string data, Type type)
+            => JsonConvert.DeserializeObject(data?.ToString() ?? throw new ArgumentNullException(nameof(data)), type, settings)!;
+
+        public T Deserialize<T>(string data)
             => JsonConvert.DeserializeObject<T>(data?.ToString() ?? throw new ArgumentNullException(nameof(data)), settings)!;
 
-        public object Serialize<T>(T value)
+        public string Serialize<T>(T value)
             => JsonConvert.SerializeObject(value, settings);
     }
 
     interface ISerializer
     {
-        object Serialize<T>(T value);
+        string Serialize<T>(T value);
 
-        T Deserialize<T>(object data);
+        T Deserialize<T>(string data);
+
+        object Deserialize(string data, Type type);
     }
 }

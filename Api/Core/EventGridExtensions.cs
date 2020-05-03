@@ -10,7 +10,7 @@ namespace NosAyudamos
             if (e.EventType != typeof(T).FullName)
                 throw new NotSupportedException($"Expected {typeof(T).FullName} as event type but got {e.EventType}");
 
-            return serializer.Deserialize<T>(e.Data);
+            return serializer.Deserialize<T>(e.Data.ToString() ?? throw new ArgumentException("Cannot deserialize empty data."));
         }
     }
 }

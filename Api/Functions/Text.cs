@@ -26,8 +26,11 @@ namespace NosAyudamos.Functions
         {
             log.Verbose("{@Message:j}", message);
 
+            var person = message.PersonId == null ? default :
+                await repository.GetAsync(message.PersonId);
+
             // Person is still not registered, need to discover intent
-            if (message.PersonId == null)
+            if (person == null)
             {
                 var intents = await language.GetIntentsAsync(message.Text);
                 if (intents.TryGetValue("help", out var helpIntent) &&
@@ -50,7 +53,6 @@ namespace NosAyudamos.Functions
             }
             else
             {
-                var person = await repository.GetAsync(message.PersonId);
                 var intents = await language.GetIntentsAsync(message.Text);
 
                 if (intents.ContainsKey("None"))

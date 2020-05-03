@@ -1,4 +1,5 @@
-﻿using NosAyudamos.Events;
+﻿using Autofac;
+using NosAyudamos.Events;
 using TechTalk.SpecFlow;
 using Xunit;
 using System;
