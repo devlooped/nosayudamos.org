@@ -66,6 +66,17 @@ namespace NosAyudamos
             // History is not loaded when creating readonly
             Assert.Equal(0, person.History.Count());
             Assert.Equal(1500, person.DonatedAmount);
+
+            person = await repo.GetAsync("23696294", false);
+            person.UpdatePhoneNumber("541156109999");
+
+            Assert.Single(person.Events);
+
+            await repo.PutAsync(person);
+
+            person = await repo.GetAsync("23696294", true);
+
+            Assert.Equal("541156109999", person.PhoneNumber);
         }
     }
 }
