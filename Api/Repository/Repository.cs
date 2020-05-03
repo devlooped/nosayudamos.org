@@ -6,15 +6,13 @@ namespace NosAyudamos
     class Repository<T> : IRepository<T>
         where T : class, ITableEntity
     {
-        readonly string connectionString;
+        readonly CloudStorageAccount storageAccount;
         readonly string tableName;
         CloudTable? table;
 
-        public Repository(string connectionString, string tableName)
-        {
-            this.connectionString = connectionString;
-            this.tableName = tableName;
-        }
+        public Repository(CloudStorageAccount storageAccount, string tableName)
+            => (this.storageAccount, this.tableName)
+            = (storageAccount, tableName);
 
         public async Task<T> PutAsync(T entity)
         {
@@ -45,13 +43,10 @@ namespace NosAyudamos
             return (T)result.Result;
         }
 
-        static CloudStorageAccount CreateCloudStorageAccount(string connectionString) => CloudStorageAccount.Parse(connectionString);
-
         async Task<CloudTable> GetTableAsync()
         {
             if (table == null)
             {
-                var storageAccount = CreateCloudStorageAccount(connectionString);
                 var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
                 var table = tableClient.GetTableReference(tableName);
 

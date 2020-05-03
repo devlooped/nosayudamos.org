@@ -15,6 +15,7 @@ using System.Runtime.CompilerServices;
 using NosAyudamos.Functions;
 using NosAyudamos.Properties;
 using System.IO;
+using Microsoft.Azure.Cosmos.Table;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -125,6 +126,11 @@ namespace NosAyudamos
                 services.AddHttpClient<IStartupWorkflow, StartupWorkflow>().AddPolicyHandler(policy);
                 services.AddHttpClient<ChatApiIncoming>().AddPolicyHandler(policy);
             }
+
+            if (environment.IsDevelopment())
+                services.AddSingleton(CloudStorageAccount.DevelopmentStorageAccount);
+            else
+                services.AddSingleton(CloudStorageAccount.Parse(environment.GetVariable("StorageConnectionString")));            
 
             services.AddPolicyRegistry(registry);
         }

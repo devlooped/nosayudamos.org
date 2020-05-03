@@ -34,19 +34,15 @@ namespace NosAyudamos
         Task<Person?> FindAsync(string phoneNumber, bool readOnly = true);
     }
 
-    class PersonRepository : DomainModelRepository, IPersonRepository
+    class PersonRepository : IPersonRepository
     {
         readonly ISerializer serializer;
+        readonly CloudStorageAccount storageAccount;
         readonly CloudTable? cloudTable = null;
 
-        // Test constructor
-        internal PersonRepository(ISerializer serializer, CloudStorageAccount storageAccount)
-            : base(storageAccount)
-            => (this.serializer) = (serializer);
-
-        public PersonRepository(ISerializer serializer, IEnvironment environment)
-            : base(environment.GetVariable("StorageConnectionString"))
-            => this.serializer = serializer;
+        public PersonRepository(ISerializer serializer, CloudStorageAccount storageAccount)
+            => (this.serializer, this.storageAccount)
+            = (serializer, storageAccount);
 
         public async Task<Person> PutAsync(Person person)
         {
@@ -73,7 +69,7 @@ namespace NosAyudamos
             var partition = new Partition(table, person.NationalId);
             var result = await Stream.TryOpenAsync(partition);
             var stream = result.Found ? result.Stream : new Stream(partition);
-            var header = EntityData.Create(person.NationalId, person, serializer);
+            var header = DataEntity.Create(person.NationalId, person, serializer);
             header.Version = stream.Version + person.Events.Count();
 
             await Stream.WriteAsync(stream, person.Events.Select((e, i) =>
@@ -88,7 +84,7 @@ namespace NosAyudamos
         {
             if (readOnly)
             {
-                var header = await GetAsync<EntityData>(nationalId, typeof(Person).FullName!).ConfigureAwait(false);
+                var header = await GetAsync<DataEntity>(nationalId, typeof(Person).FullName!).ConfigureAwait(false);
                 if (header == null)
                     return default;
 
@@ -133,21 +129,14 @@ namespace NosAyudamos
         async Task<CloudTable> GetTableAsync()
             => cloudTable ?? await GetTableAsync("Person");
 
-        static EventData ToEventData(DomainEvent e, int version, params ITableEntity[] includes)
+        async Task<CloudTable> GetTableAsync(string tableName)
         {
-            var properties = new
-            {
-                e.Id,
-                EventType = e.GetType().FullName,
-                Data = new Serializer().Serialize(e),
-                DataVersion = (e.GetType().Assembly.GetName().Version ?? new Version(1, 0)).ToString(2),
-                Version = version,
-            };
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var table = tableClient.GetTableReference(tableName);
 
-            return new EventData(
-                EventId.None,
-                EventProperties.From(properties),
-                EventIncludes.From(includes.Select(x => Include.InsertOrReplace(x))));
+            await table.CreateIfNotExistsAsync();
+
+            return table;
         }
 
         DomainEvent ToDomainEvent(DomainEventEntity entity)
@@ -166,6 +155,23 @@ namespace NosAyudamos
             e.Version = entity.Version;
             e.When = entity.Timestamp;
             return e;
+        }
+
+        static EventData ToEventData(DomainEvent e, int version, params ITableEntity[] includes)
+        {
+            var properties = new
+            {
+                e.Id,
+                EventType = e.GetType().FullName,
+                Data = new Serializer().Serialize(e),
+                DataVersion = (e.GetType().Assembly.GetName().Version ?? new Version(1, 0)).ToString(2),
+                Version = version,
+            };
+
+            return new EventData(
+                EventId.None,
+                EventProperties.From(properties),
+                EventIncludes.From(includes.Select(x => Include.InsertOrReplace(x))));
         }
     }
 }
