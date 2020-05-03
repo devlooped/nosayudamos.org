@@ -2,7 +2,6 @@
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
-using NosAyudamos.Events;
 
 namespace NosAyudamos.Functions
 {

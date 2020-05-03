@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using NosAyudamos.Events;
 using TechTalk.SpecFlow;
 using Xunit;
 using System;
@@ -29,11 +28,11 @@ namespace NosAyudamos.Steps
         {
             if (context.TryGetValue<Person>(out var person))
             {
-                await events.PushAsync(new TextMessageReceived(person.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
+                await events.PushAsync(new MessageReceived(person.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
             }
             else
             {
-                await events.PushAsync(new TextMessageReceived(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
+                await events.PushAsync(new MessageReceived(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber, message.ToSingleLine()));
             }
         }
 

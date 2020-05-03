@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using NosAyudamos.Events;
 
 namespace NosAyudamos
 {

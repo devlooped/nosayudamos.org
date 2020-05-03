@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
-using NosAyudamos.Events;
 using System.Linq;
 
 namespace NosAyudamos.Functions
