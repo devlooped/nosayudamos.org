@@ -130,7 +130,7 @@ namespace NosAyudamos
             if (environment.IsDevelopment())
                 services.AddSingleton(CloudStorageAccount.DevelopmentStorageAccount);
             else
-                services.AddSingleton(CloudStorageAccount.Parse(environment.GetVariable("StorageConnectionString")));            
+                services.AddSingleton(CloudStorageAccount.Parse(environment.GetVariable("StorageConnectionString")));
 
             services.AddPolicyRegistry(registry);
         }
