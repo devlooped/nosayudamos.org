@@ -4,6 +4,7 @@ using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using NosAyudamos.Events;
+using NosAyudamos.Repository;
 using Serilog;
 
 namespace NosAyudamos.Functions
@@ -21,7 +22,8 @@ namespace NosAyudamos.Functions
         readonly IEventStreamAsync events;
 
         public Inbox(ILogger log, ISerializer serializer, IPersonRepository repository, IEventStreamAsync events)
-            => (this.log, this.serializer, this.repository, this.events) = (log, serializer, repository, events);
+            => (this.log, this.serializer, this.repository, this.events) 
+            = (log, serializer, repository, events);
 
         [FunctionName("inbox")]
         public Task RunAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<MessageReceived>(serializer));

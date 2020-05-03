@@ -10,7 +10,9 @@ using Autofac.Core.Lifetime;
 using Autofac.Core.Resolving;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using NosAyudamos.Core;
 using NosAyudamos.Functions;
+using NosAyudamos.Repository;
 
 namespace NosAyudamos
 {
@@ -60,6 +62,9 @@ namespace NosAyudamos
                 typeof(SlackOutgoing),
                 typeof(MessageOutgoing),
                 typeof(IRepositoryFactory),
+                typeof(IRepository<>),
+                typeof(IEntityRepository<>),
+                typeof(IEntityRepositoryFactory),
                 typeof(IPersonRepository),
                 typeof(HttpClient),
             };
@@ -116,9 +121,13 @@ namespace NosAyudamos
             }
 
             builder.RegisterType<FeatureEnvironment>().As<IEnvironment>().SingleInstance();
+
             builder.RegisterType<FeatureRepositoryFactory>().As<IRepositoryFactory>().SingleInstance();
+            builder.RegisterType<FeatureEntityRepositoryFactory>().As<IEntityRepositoryFactory>().SingleInstance();
             builder.RegisterType<FeaturePersonRepository>().As<IPersonRepository>().SingleInstance();
             builder.RegisterGeneric(typeof(FeatureRepository<>)).As(typeof(IRepository<>)).SingleInstance();
+            builder.RegisterGeneric(typeof(EntityRepository<>)).As(typeof(IEntityRepository<>)).SingleInstance();
+
             builder.RegisterInstance(Mock.Of<IMessaging>());
 
             // For some reason, the built-in registrations we were providing via Startup for HttpClient weren't working.

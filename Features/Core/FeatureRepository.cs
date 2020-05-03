@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Autofac;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace NosAyudamos
@@ -28,5 +29,14 @@ namespace NosAyudamos
             values[(entity.PartitionKey, entity.RowKey)] = entity;
             return Task.FromResult(entity);
         }
+    }
+
+    class FeatureRepositoryFactory : IRepositoryFactory
+    {
+        readonly IContainer container;
+
+        public FeatureRepositoryFactory(IContainer container) => this.container = container;
+
+        IRepository<T> IRepositoryFactory.Create<T>() => container.Resolve<IRepository<T>>();
     }
 }

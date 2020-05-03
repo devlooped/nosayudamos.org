@@ -1,4 +1,5 @@
 using Microsoft.Azure.Cosmos.Table;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace NosAyudamos
@@ -10,6 +11,11 @@ namespace NosAyudamos
         readonly string tableName;
         CloudTable? table;
 
+        public Repository(CloudStorageAccount storageAccount)
+            : this(storageAccount, typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name) 
+        { 
+        }
+        
         public Repository(CloudStorageAccount storageAccount, string tableName)
             => (this.storageAccount, this.tableName)
             = (storageAccount, tableName);
