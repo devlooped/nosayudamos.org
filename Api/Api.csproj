@@ -6,13 +6,14 @@
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
     <LangVersion>Latest</LangVersion>
     <Nullable>Enable</Nullable>
-    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     <TreatWarningsAsErrors Condition="$(CI) Or '$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
     <NoWarn>CA1812</NoWarn>
     <NeutralLanguage>es-AR</NeutralLanguage>
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="GitInfo" Version="2.0.26" PrivateAssets="all" />
+
     <PackageReference Include="Azure.AI.TextAnalytics" Version="1.0.0-preview.4" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.4.1" />
 
@@ -21,7 +22,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.*" />
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Language.LUIS.Authoring" Version="3.1.0" />
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="2.0.0-preview" />
+    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.7" />
     <PackageReference Include="Microsoft.Azure.EventGrid" Version="3.2.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="2.1.0" />
@@ -38,9 +39,8 @@
 
     <PackageReference Include="System.Composition" Version="1.4.0" />
 
-    <PackageReference Include="Humanizer" Version="2.8.*" />
-    <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="StreamStone" Version="*" />
+    <PackageReference Include="Humanizer" Version="2.8.11" />
     <PackageReference Include="Merq.Core" Version="1.2.*" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.*" />
     <PackageReference Include="Polly" Version="7.2.0" />
@@ -67,6 +67,12 @@
       <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
+
+  <!--
+  <ItemGroup>
+    <ProjectReference Include="..\External\Streamstone\Source\Streamstone\Streamstone.csproj" />
+  </ItemGroup>
+  -->
 
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

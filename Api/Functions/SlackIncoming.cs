@@ -11,6 +11,8 @@ using NosAyudamos.Events;
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Linq;
+using System.Globalization;
 
 namespace NosAyudamos.Functions
 {

@@ -17,7 +17,7 @@ namespace NosAyudamos.Functions
 
         [FunctionName("mercadopago_incoming")]
         public async Task<IActionResult> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "mp")] HttpRequest req)
         {
             using var reader = new StreamReader(req.Body);
             var body = await reader.ReadToEndAsync();

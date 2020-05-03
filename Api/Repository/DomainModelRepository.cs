@@ -11,11 +11,14 @@ namespace NosAyudamos
         public DomainModelRepository(string connectionString)
             => storageAccount = new Lazy<CloudStorageAccount>(() => CloudStorageAccount.Parse(connectionString));
 
+        public DomainModelRepository(CloudStorageAccount storageAccount)
+            => this.storageAccount = new Lazy<CloudStorageAccount>(() => storageAccount);
+
         protected CloudStorageAccount StorageAccount => storageAccount.Value;
 
         protected async Task<CloudTable> GetTableAsync(string tableName)
         {
-            var tableClient = StorageAccount.CreateCloudTableClient(new TableClientConfiguration());
+            var tableClient = StorageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference(tableName);
 
             await table.CreateIfNotExistsAsync();

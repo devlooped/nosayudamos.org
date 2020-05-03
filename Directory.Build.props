@@ -3,4 +3,8 @@
 		<CI>false</CI>
 		<CI Condition="'$(TF_BUILD)' == 'true'">true</CI>
 	</PropertyGroup>
+
+  <PropertyGroup>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+  </PropertyGroup>
 </Project>

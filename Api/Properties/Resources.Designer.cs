@@ -61,6 +61,42 @@ namespace NosAyudamos.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The current instance is read-only, so events cannot be produced..
+        /// </summary>
+        internal static string DomainObject_ReadOnly {
+            get {
+                return ResourceManager.GetString("DomainObject_ReadOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot deserialize empty data..
+        /// </summary>
+        internal static string PersonRepository_EmptyData {
+            get {
+                return ResourceManager.GetString("PersonRepository_EmptyData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot deserialize empty event type..
+        /// </summary>
+        internal static string PersonRepository_EmptyEventType {
+            get {
+                return ResourceManager.GetString("PersonRepository_EmptyEventType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Event type &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string PersonRepository_InvalidEventType {
+            get {
+                return ResourceManager.GetString("PersonRepository_InvalidEventType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Person with ID &apos;{0}&apos; was not found..
         /// </summary>
         internal static string PersonRepository_NationalIdNotFound {

@@ -8,24 +8,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="EventStoreTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="EventStoreTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.*" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
     <PackageReference Include="Xunit.SkippableFact" Version="1.4.8" />
-    <PackageReference Include="Humanizer" Version="*" />
+  </ItemGroup>
 
-    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="3.0.0-beta*" IncludeAssets="none" ExcludeAssets="all" />
-    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="3.0.0-beta*" IncludeAssets="none" ExcludeAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.*" IncludeAssets="none" ExcludeAssets="all" />
+  <ItemGroup>
+    <ProjectReference Include="..\Api\Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="SampleRequests\**\*.*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   
-  <ItemGroup>
-    <ProjectReference Include="..\Api\Api.csproj" />
-  </ItemGroup>
-
 </Project>
