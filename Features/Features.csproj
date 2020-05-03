@@ -21,7 +21,6 @@
     <PackageReference Include="Xunit.SkippableFact" Version="1.4.8" />
 
     <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="3.0.0-beta*" IncludeAssets="none" ExcludeAssets="all" />
-    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="3.0.0-beta*" IncludeAssets="none" ExcludeAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.*" IncludeAssets="none" ExcludeAssets="all" />
   </ItemGroup>
 

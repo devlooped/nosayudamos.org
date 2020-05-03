@@ -132,6 +132,9 @@ namespace NosAyudamos
             else
                 services.AddSingleton(CloudStorageAccount.Parse(environment.GetVariable("StorageConnectionString")));
 
+            services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
             services.AddPolicyRegistry(registry);
         }
     }

@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace NosAyudamos
 {
-
     [Export]
     class InteractiveAction
     {
-        readonly IRepositoryFactory repositoryFactory;
+        readonly IRepository<ActionRetryEntity> repository;
         readonly IEnvironment environment;
 
-        public InteractiveAction(IRepositoryFactory repositoryFactory, IEnvironment environment) => (this.repositoryFactory, this.environment) = (repositoryFactory, environment);
+        public InteractiveAction(IRepository<ActionRetryEntity> repository, IEnvironment environment) 
+            => (this.repository, this.environment) 
+            = (repository, environment);
 
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Catching general exeception because if retry pattern")]
-
         public async Task<TResult?> ExecuteAsync<TResult>(
             Func<Task<TResult>> action,
             Func<Task> onRetry,
@@ -24,12 +24,11 @@ namespace NosAyudamos
             [CallerMemberName] string actionName = "") where TResult : class
         {
             var actionId = typeof(InteractiveAction).Name;
-            var actionRetryRepository = repositoryFactory.Create<ActionRetryEntity>();
-            var actionRetry = await actionRetryRepository.GetAsync(actionId, actionName);
+            var actionRetry = await repository.GetAsync(actionId, actionName);
 
             if (actionRetry != null)
             {
-                await actionRetryRepository.DeleteAsync(actionRetry);
+                await repository.DeleteAsync(actionRetry);
             }
             else
             {
@@ -57,11 +56,11 @@ namespace NosAyudamos
             catch (Exception)
             {
                 actionRetry.RetryCount += 1;
-                await actionRetryRepository.PutAsync(actionRetry);
+                await repository.PutAsync(actionRetry);
                 await onRetry();
             }
 
-            return default(TResult);
+            return default;
         }
     }
 }
