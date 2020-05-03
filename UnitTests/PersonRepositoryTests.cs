@@ -23,7 +23,7 @@ namespace NosAyudamos
         {
             var repo = new PersonRepository(serializer, CloudStorageAccount.DevelopmentStorageAccount);
 
-            await repo.PutAsync(new Person("Daniel", "Cazzulino", "23696294", "5491159278282"));
+            await repo.PutAsync(new Person("23696294", "Daniel", "Cazzulino", "5491159278282"));
 
             var expected = await repo.GetAsync("23696294");
 
@@ -35,9 +35,9 @@ namespace NosAyudamos
 
             Assert.False(person.IsReadOnly);
 
+            Assert.Equal(expected.Id, person.Id);
             Assert.Equal(expected.FirstName, person.FirstName);
             Assert.Equal(expected.LastName, person.LastName);
-            Assert.Equal(expected.NationalId, person.NationalId);
             Assert.Equal(expected.PhoneNumber, person.PhoneNumber);
             Assert.Equal(expected.DateOfBirth, person.DateOfBirth);
             Assert.Equal(expected.Sex, person.Sex);
