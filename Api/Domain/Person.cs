@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace NosAyudamos
@@ -48,6 +47,7 @@ namespace NosAyudamos
         {
             Handles<PersonRegistered>(OnRegistered);
             Handles<Donated>(OnDonated);
+            Handles<PhoneNumberUpdated>(OnPhoneNumberUpdated);
         }
 
         public string FirstName { get; private set; }
@@ -69,10 +69,23 @@ namespace NosAyudamos
             Raise(new Donated(amount));
         }
 
+        public void UpdatePhoneNumber(string phoneNumber)
+        {
+            if (PhoneNumber == phoneNumber)
+                return;
+
+            if (string.IsNullOrEmpty(phoneNumber))
+                throw new ArgumentException("Phone number cannot be empty.", nameof(phoneNumber));
+
+            Raise(new PhoneNumberUpdated(PhoneNumber, phoneNumber));
+        }
+
         void OnRegistered(PersonRegistered e)
             => (FirstName, LastName, NationalId, PhoneNumber, DateOfBirth, Sex)
             = (e.FirstName, e.LastName, e.NationalId, e.PhoneNumber, e.DateOfBirth, e.Sex);
 
         void OnDonated(Donated e) => DonatedAmount += e.Amount;
+
+        void OnPhoneNumberUpdated(PhoneNumberUpdated e) => PhoneNumber = e.NewNumber;
     }
 }

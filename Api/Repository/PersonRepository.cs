@@ -89,6 +89,9 @@ namespace NosAyudamos
             if (readOnly)
             {
                 var header = await GetAsync<EntityData>(nationalId, typeof(Person).FullName!).ConfigureAwait(false);
+                if (header == null)
+                    return default;
+
                 if (header.Data == null)
                     throw new ArgumentException(Strings.PersonRepository.EmptyData);
 

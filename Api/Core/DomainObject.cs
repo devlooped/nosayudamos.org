@@ -7,15 +7,15 @@ namespace NosAyudamos
     abstract class DomainObject
     {
         Dictionary<Type, Action<DomainEvent>> handlers = new Dictionary<Type, Action<DomainEvent>>();
-        List<DomainEvent> events = new List<DomainEvent>();
-        List<DomainEvent> history = new List<DomainEvent>();
+        List<DomainEvent>? events;
+        List<DomainEvent>? history;
 
         // This is basically a sort of memento pattern to get the 
         // observable state changes for the object but represented 
         // as a list of events.
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
-        public IEnumerable<DomainEvent> Events => events;
+        public IEnumerable<DomainEvent> Events => events ??= new List<DomainEvent>();
 
         /// <summary>
         /// When the domain object is loaded from history, provides access to 
@@ -23,7 +23,7 @@ namespace NosAyudamos
         /// </summary>
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
-        public IEnumerable<DomainEvent> History => history;
+        public IEnumerable<DomainEvent> History => history ??= new List<DomainEvent>();
 
         /// <summary>
         /// Whether the domain object was created in a readonly manner, meaning 
@@ -38,7 +38,8 @@ namespace NosAyudamos
         /// </summary>
         public void AcceptEvents()
         {
-            history.AddRange(events);
+            history ??= new List<DomainEvent>();
+            history.AddRange(events ??= new List<DomainEvent>());
             events.Clear();
         }
 
@@ -65,6 +66,7 @@ namespace NosAyudamos
             if (handlers.TryGetValue(e.GetType(), out var handler))
                 handler(e);
 
+            events ??= new List<DomainEvent>();
             events.Add(e);
         }
 
@@ -83,6 +85,7 @@ namespace NosAyudamos
                 if (handlers.TryGetValue(e.GetType(), out var handler))
                     handler(e);
 
+                this.history ??= new List<DomainEvent>();
                 this.history.Add(e);
             }
         }

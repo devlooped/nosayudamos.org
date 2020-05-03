@@ -59,8 +59,17 @@ namespace NosAyudamos
                 await blobStorage.UploadAsync(
                     image, enviroment.GetVariable("AttachmentsContainerName"), $"dni_{id.NationalId}.png");
 
-                var person = new Person(id.FirstName, id.LastName, id.NationalId, e.From, id.DateOfBirth, id.Sex);
-                await personRepository.PutAsync(person);
+                var person = await personRepository.GetAsync(id.NationalId, readOnly: false);
+                if (person == null)
+                {
+                    await personRepository.PutAsync(
+                        new Person(id.FirstName, id.LastName, id.NationalId, e.From, id.DateOfBirth, id.Sex));
+                }
+                else
+                {
+                    person.UpdatePhoneNumber(e.From);
+                    await personRepository.PutAsync(person);
+                }
             }
         }
     }
