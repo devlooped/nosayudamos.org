@@ -8,13 +8,13 @@ namespace NosAyudamos
         public static DataEntity Create<T>(string partitionKey, T data, ISerializer serializer) =>
             new DataEntity(partitionKey, typeof(T).FullName!)
             {
-                Data = serializer.Serialize(data),
+                Data = serializer.Serialize(data ?? throw new ArgumentNullException(nameof(data))),
                 DataVersion = (typeof(T).Assembly.GetName().Version ?? new Version(1, 0)).ToString(2)
             };
 
         public DataEntity() { }
 
-        private DataEntity(string partitionKey, string rowKey)
+        public DataEntity(string partitionKey, string rowKey)
             : base(partitionKey, rowKey)
         {
         }

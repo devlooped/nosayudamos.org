@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Azure.EventGrid.Models;
 
 namespace NosAyudamos
@@ -10,7 +11,53 @@ namespace NosAyudamos
             if (e.EventType != typeof(T).FullName)
                 throw new NotSupportedException($"Expected {typeof(T).FullName} as event type but got {e.EventType}");
 
-            return serializer.Deserialize<T>(e.Data.ToString() ?? throw new ArgumentException("Cannot deserialize empty data."));
+            return serializer.Deserialize<T>(e.Data.ToString()!);
         }
+
+        public static object? GetData(this EventGridEvent e, ISerializer serializer)
+        {
+            var type = Type.GetType(e.EventType);
+            // TODO: throw?
+            if (type == null)
+                return null;
+
+            return serializer.Deserialize(e.Data.ToString()!, type);
+        }
+
+        public static EventGridEvent ToEventGrid(this object data, ISerializer serializer)
+        {
+            var metadata = data as IEventMetadata;
+
+            return new EventGridEvent
+            {
+                Id = metadata?.EventId ?? Guid.NewGuid().ToString(),
+                Subject = metadata?.Subject ?? data.GetType().Namespace,
+                // Unless the object itself provides a different default, 
+                // like DomainEvent does, we send everything to the System 
+                Topic = metadata?.Topic ?? "System",
+
+                EventType = data.GetType().FullName!,
+                EventTime = metadata?.EventTime ?? DateTime.UtcNow,
+                Data = serializer.Serialize(data),
+                DataVersion = data.GetType().Assembly.GetName().Version?.ToString(2) ?? "1.0",
+            };
+        }
+
+        public static EventGridEventEntity ToEntity(this EventGridEvent e) => new EventGridEventEntity
+        {
+            PartitionKey = nameof(EventGridEvent),
+            RowKey = e.Id,
+            Data = e.Data.ToString(),
+            DataVersion = e.DataVersion,
+            EventTime = e.EventTime,
+            EventType = e.EventType,
+            Subject = e.Subject,
+            // The actual topic contains a gigantic amount of useless jargon like:
+            // /subscriptions/4498a56e-cfc2-4aec-927f-415b126251e0/resourceGroups/nosayudamos/providers/Microsoft.EventGrid/domains/nosayudamos/topics/NosAyudamos
+            // The only useful bit of domain information is the actual topic at the end, which we could find a use for.
+            Topic = e.Topic.Contains("/topics/", StringComparison.Ordinal)
+                ? string.Join('/', e.Topic.Split('/').SkipWhile(x => !"topics".Equals(x, StringComparison.Ordinal)).Skip(1))
+                : e.Topic,
+        };
     }
 }

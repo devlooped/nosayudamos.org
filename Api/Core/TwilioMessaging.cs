@@ -1,4 +1,3 @@
-using System.Composition;
 using System.Threading.Tasks;
 using Polly;
 using Polly.Registry;
@@ -7,7 +6,7 @@ using Twilio.Rest.Api.V2010.Account;
 
 namespace NosAyudamos
 {
-    [Shared]
+    [NoExport]
     class TwilioMessaging : IMessaging
     {
         static bool initialized;

@@ -17,6 +17,7 @@ using NosAyudamos.Properties;
 using System.IO;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.VisualStudio.Threading;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -94,7 +95,7 @@ namespace NosAyudamos
                     !t.IsGenericTypeDefinition &&
                     !t.IsValueType &&
                     // Omit explicitly opted-out components
-                    t.GetCustomAttribute<PartNotDiscoverableAttribute>() == null &&
+                    t.GetCustomAttribute<NoExportAttribute>(true) == null &&
                     // Omit generated types like local state capturing
                     t.GetCustomAttribute<CompilerGeneratedAttribute>() == null &&
                     // Omit generated types for async state machines
@@ -138,6 +139,12 @@ namespace NosAyudamos
             services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.Decorate<IPersonRepository, EventGridPersonRepository>();
+
+#pragma warning disable CA2000 // Dispose objects before losing scope: This factory is intended to live for the duration of the app.
+            var jtc = new JoinableTaskContext();
+#pragma warning restore CA2000 // Dispose objects before losing scope
+            services.AddSingleton(jtc);
+            services.AddSingleton(jtc.Factory);
 
             services.AddPolicyRegistry(registry);
             services.AddMemoryCache();

@@ -9,10 +9,6 @@ using Autofac.Core;
 using Autofac.Core.Lifetime;
 using Autofac.Core.Resolving;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
-using NosAyudamos.Core;
-using NosAyudamos.Functions;
-using NosAyudamos.Repository;
 
 namespace NosAyudamos
 {
@@ -58,15 +54,6 @@ namespace NosAyudamos
             var testServices = new HashSet<Type>
             {
                 typeof(IEnvironment),
-                typeof(Messaging),
-                typeof(SlackOutgoing),
-                typeof(MessageOutgoing),
-                // We use the actual repository implementations and run against the local storage emulator
-                //typeof(IRepositoryFactory),
-                //typeof(IRepository<>),
-                //typeof(IEntityRepository<>),
-                //typeof(IEntityRepositoryFactory),
-                //typeof(IPersonRepository),
                 typeof(HttpClient),
             };
 
@@ -122,16 +109,6 @@ namespace NosAyudamos
             }
 
             builder.RegisterType<FeatureEnvironment>().As<IEnvironment>().SingleInstance();
-
-            // We use the actual repository implementations and run against the local storage emulator
-            //builder.RegisterType<FeatureRepositoryFactory>().As<IRepositoryFactory>().SingleInstance();
-            //builder.RegisterType<FeatureEntityRepositoryFactory>().As<IEntityRepositoryFactory>().SingleInstance();
-            //builder.RegisterType<FeaturePersonRepository>().As<IPersonRepository>().SingleInstance();
-            //builder.RegisterGeneric(typeof(FeatureRepository<>)).As(typeof(IRepository<>)).SingleInstance();
-            //builder.RegisterGeneric(typeof(EntityRepository<>)).As(typeof(IEntityRepository<>)).SingleInstance();
-
-            builder.RegisterInstance(Mock.Of<IMessaging>());
-
             // For some reason, the built-in registrations we were providing via Startup for HttpClient weren't working.
             builder.RegisterType<HttpClient>().InstancePerDependency();
 
@@ -201,76 +178,34 @@ namespace NosAyudamos
 
         public event EventHandler<LifetimeScopeBeginningEventArgs> ChildLifetimeScopeBeginning
         {
-            add
-            {
-                container.ChildLifetimeScopeBeginning += value;
-            }
-
-            remove
-            {
-                container.ChildLifetimeScopeBeginning -= value;
-            }
+            add => container.ChildLifetimeScopeBeginning += value;
+            remove => container.ChildLifetimeScopeBeginning -= value;
         }
 
         public event EventHandler<LifetimeScopeEndingEventArgs> CurrentScopeEnding
         {
-            add
-            {
-                container.CurrentScopeEnding += value;
-            }
-
-            remove
-            {
-                container.CurrentScopeEnding -= value;
-            }
+            add => container.CurrentScopeEnding += value;
+            remove => container.CurrentScopeEnding -= value;
         }
 
         public event EventHandler<ResolveOperationBeginningEventArgs> ResolveOperationBeginning
         {
-            add
-            {
-                container.ResolveOperationBeginning += value;
-            }
-
-            remove
-            {
-                container.ResolveOperationBeginning -= value;
-            }
+            add => container.ResolveOperationBeginning += value;
+            remove => container.ResolveOperationBeginning -= value;
         }
 
-        public ILifetimeScope BeginLifetimeScope()
-        {
-            return container.BeginLifetimeScope();
-        }
+        public ILifetimeScope BeginLifetimeScope() => container.BeginLifetimeScope();
 
-        public ILifetimeScope BeginLifetimeScope(object tag)
-        {
-            return container.BeginLifetimeScope(tag);
-        }
+        public ILifetimeScope BeginLifetimeScope(object tag) => container.BeginLifetimeScope(tag);
 
-        public ILifetimeScope BeginLifetimeScope(Action<ContainerBuilder> configurationAction)
-        {
-            return container.BeginLifetimeScope(configurationAction);
-        }
+        public ILifetimeScope BeginLifetimeScope(Action<ContainerBuilder> configurationAction) => container.BeginLifetimeScope(configurationAction);
 
-        public ILifetimeScope BeginLifetimeScope(object tag, Action<ContainerBuilder> configurationAction)
-        {
-            return container.BeginLifetimeScope(tag, configurationAction);
-        }
+        public ILifetimeScope BeginLifetimeScope(object tag, Action<ContainerBuilder> configurationAction) => container.BeginLifetimeScope(tag, configurationAction);
 
-        public void Dispose()
-        {
-            container.Dispose();
-        }
+        public void Dispose() => container.Dispose();
 
-        public ValueTask DisposeAsync()
-        {
-            return container.DisposeAsync();
-        }
+        public ValueTask DisposeAsync() => container.DisposeAsync();
 
-        public object ResolveComponent(ResolveRequest request)
-        {
-            return container.ResolveComponent(request);
-        }
+        public object ResolveComponent(ResolveRequest request) => container.ResolveComponent(request);
     }
 }

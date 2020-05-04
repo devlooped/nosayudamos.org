@@ -1,5 +1,4 @@
-﻿using System.Composition;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 
 namespace NosAyudamos
@@ -9,7 +8,7 @@ namespace NosAyudamos
     /// events from changes in domain objects to EventGrid.
     /// </summary>
     // We make it non-discoverable since we register it as a decorator instead.
-    [PartNotDiscoverable]
+    [NoExport]
     class EventGridPersonRepository : IPersonRepository
     {
         readonly IPersonRepository repository;
@@ -30,13 +29,10 @@ namespace NosAyudamos
             var changes = person.Events.ToArray();
             var saved = await repository.PutAsync(person);
 
-            foreach (dynamic change in changes)
+            foreach (var change in changes)
             {
-                await events.PushAsync(change, new EventMetadata
-                {
-                    EventId = change.EventId.ToString(),
-                    Subject = person.Id,
-                });
+                change.SourceId = person.Id;
+                await events.PushAsync((dynamic)change);
             }
 
             return saved;
