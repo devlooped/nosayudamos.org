@@ -10,6 +10,8 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.1.*" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.*" />
     <PackageReference Include="Moq" Version="4.14.0" />
     <PackageReference Include="SpecFlow.xUnit" Version="3.1.*" />
@@ -19,9 +21,6 @@
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
     <PackageReference Include="RxFree" Version="1.0.0-rc.*" />
     <PackageReference Include="Xunit.SkippableFact" Version="1.4.8" />
-
-    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="3.0.0-beta*" IncludeAssets="none" ExcludeAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.*" IncludeAssets="none" ExcludeAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

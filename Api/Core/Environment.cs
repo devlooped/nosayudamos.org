@@ -1,5 +1,9 @@
+using System;
 using System.ComponentModel;
 using System.Composition;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace NosAyudamos
 {
@@ -25,11 +29,29 @@ namespace NosAyudamos
     [Shared]
     class Environment : IEnvironment
     {
+        const string KV = "kv-";
+
+        IMemoryCache cache;
+        Lazy<SecretClient> client;
+
+        public Environment(IMemoryCache cache)
+        {
+            this.cache = cache;
+            client = new Lazy<SecretClient>(() => new SecretClient(new Uri(GetVariable("KeyVaultUrl")), new DefaultAzureCredential()));
+        }
+
         public string GetVariable(string name)
         {
-            return Ensure.NotEmpty(
+            var value = Ensure.NotEmpty(
                     System.Environment.GetEnvironmentVariable(
                         Ensure.NotEmpty(name, nameof(name))), name);
+
+            if (IsDev())
+            {
+                return value.StartsWith(KV, StringComparison.OrdinalIgnoreCase) ? GetSecret(value) : value;
+            }
+
+            return value;
         }
 
         public T GetVariable<T>(string name, T defaultValue = default)
@@ -39,6 +61,11 @@ namespace NosAyudamos
 
             if (value != null)
             {
+                if (IsDev())
+                {
+                    value = value.StartsWith(KV, StringComparison.OrdinalIgnoreCase) ? GetSecret(value) : value;
+                }
+
                 if (value is T typed)
                     return typed;
 
@@ -48,6 +75,29 @@ namespace NosAyudamos
             }
 
             return defaultValue;
+        }
+
+        private string GetSecret(string name)
+        {
+            if (!cache.TryGetValue(name, out string value))
+            {
+                var secret = client.Value.GetSecret(name);
+                var val = secret?.Value?.Value ?? throw new ArgumentException(name);
+                cache.Set(name, val);
+
+                value = val;
+            }
+
+            return value;
+        }
+
+        private bool IsDev()
+        {
+            var value = System.Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT");
+
+            value ??= "Production";
+
+            return value == "Development";
         }
     }
 

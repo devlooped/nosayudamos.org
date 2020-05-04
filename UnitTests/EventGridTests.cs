@@ -27,7 +27,7 @@ namespace NosAyudamos
         [SkippableFact]
         public async Task SendCustomEvent()
         {
-            Skip.IfNot(File.Exists("local.settings.json"));
+            Skip.If(!File.Exists("local.settings.json") || !Guid.TryParse(gridKey, out _));
 
             var domain = gridUri.Host;
             var credentials = new TopicCredentials(gridKey);
