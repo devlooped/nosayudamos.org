@@ -22,4 +22,3 @@ provisionator.msbuild.props
 *.lock.json
 *.nuget.props
 *.nuget.targets
-local.settings.json

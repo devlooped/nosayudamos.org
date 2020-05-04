@@ -1,0 +1,31 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "KeyVaultUrl": "https://nosayudamos.vault.azure.net/",
+    "TwilioAccountSid": "kv-TwilioAccountId",
+    "TwilioAuthToken": "kv-TwilioAuthToken",
+    "LuisSubscriptionKey": "kv-LuisSubscriptionKey",
+    "LuisAuthoringKey": "kv-LuisAuthoringKey",
+    "LuisEndpoint": "https://nosayudamos-lu.cognitiveservices.azure.com/",
+    "LuisAuthoringEndpoint": "https://nosayudamos-lu-authoring.cognitiveservices.azure.com/",
+    "LuisAppId": "kv-LuisAppId",
+    "LuisAppSlot": "staging",
+    "TextAnalysisEndpoint": "https://nosayudamos-ta.cognitiveservices.azure.com/",
+    "TextAnalysisSubscriptionKey": "kv-TextAnalysisSubscriptionKey",
+    "ComputerVisionEndpoint": "https://nosayudamos-cv.cognitiveservices.azure.com/",
+    "ComputerVisionSubscriptionKey": "kv-ComputerVisionSubscriptionKey",
+    "StorageConnectionString": "kv-StorageConnectionString",
+    "AttachmentsContainerName": "attachments",
+    "SlackApiWebHook": "https://hooks.slack.com/services/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",
+    "ChatApiNumber": "1234",
+    "ChatApiUrl": "https://nosayudamos-lu.cognitiveservices.azure.com/",
+    "SendMessages": false,
+    "ResilientNumberOfRetries": 3,
+    "EventGridUrl": "https://nosayudamos.brazilsouth-1.eventgrid.azure.net/api/events",
+    "EventGridAccessKey": "kv-EventGridAccessKey",
+    "SlackLogWebHook": "foo",
+    "SlackSigningSecret": "kv-SlackSigningSecret"
+  }
+}

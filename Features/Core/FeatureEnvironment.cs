@@ -1,55 +1,37 @@
-﻿using System.ComponentModel;
-using System.IO;
+﻿using System.IO;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 
 namespace NosAyudamos
 {
     class FeatureEnvironment : IEnvironment
     {
-        Environment env = new Environment();
-        JObject values;
+        Environment env = new Environment(new MemoryCache(new MemoryCacheOptions()));
 
         public FeatureEnvironment()
         {
             if (File.Exists("local.settings.json"))
             {
-                values = JObject.Parse(File.ReadAllText("local.settings.json")).Value<JObject>("Values");
-            }
-            else
-            {
-                values = new JObject();
-            }
+                var values = JObject.Parse(File.ReadAllText("local.settings.json")).Value<JObject>("Values");
 
-            if (!values.ContainsKey("AZURE_FUNCTIONS_ENVIRONMENT"))
-                values.Add("AZURE_FUNCTIONS_ENVIRONMENT", bool.TrueString);
+                foreach (var value in values)
+                {
+                    System.Environment.SetEnvironmentVariable(value.Key, value.Value.ToString());
+                }
 
-            values.Add("TESTING", bool.TrueString);
+                System.Environment.SetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT", "Development");
+                System.Environment.SetEnvironmentVariable("TESTING", bool.TrueString);
+            }
         }
 
         public string GetVariable(string name)
         {
-            if (values.TryGetValue(name, out var value))
-                return value.ToString();
-            else
-                return env.GetVariable(name);
+            return env.GetVariable(name);
         }
 
         public T GetVariable<T>(string name, T defaultValue = default)
         {
-            var value = values.TryGetValue(name, out var token) ?
-                token.ToString() : System.Environment.GetEnvironmentVariable(name);
-
-            if (value != null)
-            {
-                if (value is T typed)
-                    return typed;
-
-                var converter = TypeDescriptor.GetConverter(typeof(T));
-
-                return (T)converter.ConvertFromString(value);
-            }
-
-            return defaultValue;
+            return env.GetVariable<T>(name, defaultValue);
         }
     }
 }

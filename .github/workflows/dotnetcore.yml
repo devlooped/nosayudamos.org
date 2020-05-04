@@ -35,13 +35,9 @@ jobs:
     - name: Test
       run: dotnet test --no-restore
       env:
-        LuisAppId: ${{ secrets.LuisAppId }}
-        LuisAppSlot: staging
-        LuisEndpoint: https://nosayudamos-lu.cognitiveservices.azure.com/
-        LuisSubscriptionKey: ${{ secrets.LuisSubscriptionKey }}
-        TextAnalysisEndpoint: https://nosayudamos-ta.cognitiveservices.azure.com/
-        TextAnalysisSubscriptionKey: ${{ secrets.TextAnalysisSubscriptionKey }}
-        StorageConnectionString: ${{ secrets.StorageConnectionString }}
+        AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
     - name: Log
       run: dir log.txt -s | gc
       shell: pwsh

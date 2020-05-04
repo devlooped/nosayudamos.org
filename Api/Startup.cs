@@ -16,6 +16,7 @@ using NosAyudamos.Functions;
 using NosAyudamos.Properties;
 using System.IO;
 using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Extensions.Caching.Memory;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -29,7 +30,7 @@ namespace NosAyudamos
             builder.Services.AddApplicationInsightsTelemetry();
 
             // testable service registrations in the test-invoked method.
-            Configure(builder.Services, new Environment());
+            Configure(builder.Services, new Environment(new MemoryCache(new MemoryCacheOptions())));
         }
 
         internal void Configure(IServiceCollection services, IEnvironment environment)
@@ -139,6 +140,7 @@ namespace NosAyudamos
             services.Decorate<IPersonRepository, EventGridPersonRepository>();
 
             services.AddPolicyRegistry(registry);
+            services.AddMemoryCache();
         }
     }
 }

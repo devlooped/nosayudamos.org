@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Autofac;
+using Xunit;
+using System;
 
 namespace NosAyudamos
 {
@@ -21,6 +23,13 @@ namespace NosAyudamos
             [Key]
             public string Id { get; set; }
             public string Value { get; set; }
+        }
+
+        public void EnvironmentGetSecret()
+        {
+            var env = new FeatureEnvironment();
+
+            Assert.True(Guid.TryParse(env.GetVariable("LuisAppId"), out _));
         }
     }
 }
