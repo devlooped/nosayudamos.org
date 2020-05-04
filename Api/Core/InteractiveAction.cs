@@ -12,8 +12,8 @@ namespace NosAyudamos
         readonly IRepository<ActionRetryEntity> repository;
         readonly IEnvironment environment;
 
-        public InteractiveAction(IRepository<ActionRetryEntity> repository, IEnvironment environment) 
-            => (this.repository, this.environment) 
+        public InteractiveAction(IRepository<ActionRetryEntity> repository, IEnvironment environment)
+            => (this.repository, this.environment)
             = (repository, environment);
 
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Catching general exeception because if retry pattern")]

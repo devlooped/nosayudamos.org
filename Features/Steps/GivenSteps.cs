@@ -1,4 +1,6 @@
-﻿using Autofac;
+﻿using System.Threading.Tasks;
+using Autofac;
+using Microsoft.Azure.Cosmos.Table;
 using TechTalk.SpecFlow;
 
 namespace NosAyudamos.Steps
@@ -11,6 +13,10 @@ namespace NosAyudamos.Steps
 
         public GivenSteps(FeatureContainer container, ScenarioContext context)
             => (this.container, this.context) = (container, context);
+
+        [Given(@"Un storage limpio")]
+        public async Task GivenAClearStorage()
+            => await CloudStorageAccount.DevelopmentStorageAccount.ClearStorageAsync();
 
         [Given(@"Un usuario no registrado")]
         public void GivenAnUnregisteredUser() { }

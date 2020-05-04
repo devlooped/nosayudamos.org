@@ -1,6 +1,6 @@
 ﻿namespace NosAyudamos
 {
-    class PhoneNumberUpdated : DomainEvent
+    public class PhoneNumberUpdated : DomainEvent
     {
         public PhoneNumberUpdated(string oldNumber, string newNumber)
             => (OldNumber, NewNumber)

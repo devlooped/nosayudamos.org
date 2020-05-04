@@ -12,10 +12,10 @@ namespace NosAyudamos
         CloudTable? table;
 
         public Repository(CloudStorageAccount storageAccount)
-            : this(storageAccount, typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name) 
-        { 
+            : this(storageAccount, typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name)
+        {
         }
-        
+
         public Repository(CloudStorageAccount storageAccount, string tableName)
             => (this.storageAccount, this.tableName)
             = (storageAccount, tableName);
