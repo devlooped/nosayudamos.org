@@ -27,7 +27,7 @@ namespace NosAyudamos
             apiKey = new Lazy<string>(() => environment.GetVariable("EventGridAccessKey"));
         }
 
-        public async Task PushAsync<TEvent>(TEvent args)
+        public async Task PushAsync<TEvent>(TEvent args, EventMetadata? metadata = null)
         {
             try
             {
@@ -35,36 +35,8 @@ namespace NosAyudamos
                 // invoke the async handlers at all.
                 asyncCall.Value = true;
                 Push(args);
-                if (environment.IsDevelopment())
-                {
-                    var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
-
-                    foreach (var handler in handlers)
-                    {
-                        await handler.HandleAsync(args);
-                    }
-                }
-
-                if (!environment.IsDevelopment() || environment.GetVariable("SendToGridInDevelopment", false))
-                {
-                    var credentials = new TopicCredentials(apiKey.Value);
-                    var domain = gridUri.Value.Host;
-                    using var client = new EventGridClient(credentials);
-
-                    await client.PublishEventsAsync(domain, new List<EventGridEvent>
-                    {
-                        new EventGridEvent
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Topic = "NosAyudamos",
-                            EventType = typeof(TEvent).FullName,
-                            EventTime = DateTime.UtcNow,
-                            Subject = typeof(TEvent).Namespace,
-                            Data = serializer.Serialize(args),
-                            DataVersion = "1.0",
-                        }
-                    });
-                }
+                await InvokeHandlersAsync(args);
+                await SendToGridAsync(args, metadata);
             }
             finally
             {
@@ -76,40 +48,54 @@ namespace NosAyudamos
         {
             base.Push(args);
 
+            // TODO: bring the code from EventStream into this project, 
+            // and remove the synchronous method entirely?
+            if (!environment.IsDevelopment())
+                throw new InvalidOperationException("In production, the PushAsync method should be used exclusively.");
+
             if (asyncCall.Value != true)
             {
-                // This is duplicated but for a good reason: this should only be used in tests 
-                // when the PushAsync cannot be used for some reason.
-                if (environment.IsDevelopment())
-                {
-                    var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
-
 #pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-                    Task.WaitAll(handlers.Select(handler => handler.HandleAsync(args)).ToArray());
+                InvokeHandlersAsync(args).Wait();
+                SendToGridAsync(args, null).Wait();
 #pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
-                }
+            }
+        }
 
-                if (!environment.IsDevelopment() || environment.GetVariable("SendToGridInDevelopment", false))
-                {
-                    var credentials = new TopicCredentials(apiKey.Value);
-                    var domain = gridUri.Value.Host;
-                    using var client = new EventGridClient(credentials);
+        async Task SendToGridAsync<TEvent>(TEvent args, EventMetadata? metadata)
+        {
+            if (!environment.IsDevelopment() || environment.GetVariable("SendToGridInDevelopment", false))
+            {
+                var credentials = new TopicCredentials(apiKey.Value);
+                var domain = gridUri.Value.Host;
+                using var client = new EventGridClient(credentials);
 
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-                    client.PublishEventsAsync(domain, new List<EventGridEvent>
+                await client.PublishEventsAsync(domain, new List<EventGridEvent>
                     {
                         new EventGridEvent
                         {
-                            Id = Guid.NewGuid().ToString(),
-                            Topic = "NosAyudamos",
+                            Id = metadata?.EventId ?? Guid.NewGuid().ToString(),
+                            Subject = metadata?.Subject ?? typeof(TEvent).Namespace,
+                            Topic = metadata?.Topic ?? "NosAyudamos",
+
                             EventType = typeof(TEvent).FullName,
                             EventTime = DateTime.UtcNow,
-                            Subject = typeof(TEvent).Namespace,
                             Data = serializer.Serialize(args),
                             DataVersion = "1.0",
                         }
-                    }).Wait();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+                    });
+            }
+        }
+
+        async Task InvokeHandlersAsync<TEvent>(TEvent args)
+        {
+            if (environment.IsDevelopment())
+            {
+                var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
+
+                foreach (var handler in handlers)
+                {
+                    await handler.HandleAsync(args);
                 }
             }
         }

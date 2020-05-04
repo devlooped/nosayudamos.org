@@ -61,11 +61,12 @@ namespace NosAyudamos
                 typeof(Messaging),
                 typeof(SlackOutgoing),
                 typeof(MessageOutgoing),
-                typeof(IRepositoryFactory),
-                typeof(IRepository<>),
-                typeof(IEntityRepository<>),
-                typeof(IEntityRepositoryFactory),
-                typeof(IPersonRepository),
+                // We use the actual repository implementations and run against the local storage emulator
+                //typeof(IRepositoryFactory),
+                //typeof(IRepository<>),
+                //typeof(IEntityRepository<>),
+                //typeof(IEntityRepositoryFactory),
+                //typeof(IPersonRepository),
                 typeof(HttpClient),
             };
 
@@ -122,11 +123,12 @@ namespace NosAyudamos
 
             builder.RegisterType<FeatureEnvironment>().As<IEnvironment>().SingleInstance();
 
-            builder.RegisterType<FeatureRepositoryFactory>().As<IRepositoryFactory>().SingleInstance();
-            builder.RegisterType<FeatureEntityRepositoryFactory>().As<IEntityRepositoryFactory>().SingleInstance();
-            builder.RegisterType<FeaturePersonRepository>().As<IPersonRepository>().SingleInstance();
-            builder.RegisterGeneric(typeof(FeatureRepository<>)).As(typeof(IRepository<>)).SingleInstance();
-            builder.RegisterGeneric(typeof(EntityRepository<>)).As(typeof(IEntityRepository<>)).SingleInstance();
+            // We use the actual repository implementations and run against the local storage emulator
+            //builder.RegisterType<FeatureRepositoryFactory>().As<IRepositoryFactory>().SingleInstance();
+            //builder.RegisterType<FeatureEntityRepositoryFactory>().As<IEntityRepositoryFactory>().SingleInstance();
+            //builder.RegisterType<FeaturePersonRepository>().As<IPersonRepository>().SingleInstance();
+            //builder.RegisterGeneric(typeof(FeatureRepository<>)).As(typeof(IRepository<>)).SingleInstance();
+            //builder.RegisterGeneric(typeof(EntityRepository<>)).As(typeof(IEntityRepository<>)).SingleInstance();
 
             builder.RegisterInstance(Mock.Of<IMessaging>());
 

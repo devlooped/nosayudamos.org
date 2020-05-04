@@ -92,6 +92,8 @@ namespace NosAyudamos
                     !t.IsAbstract &&
                     !t.IsGenericTypeDefinition &&
                     !t.IsValueType &&
+                    // Omit explicitly opted-out components
+                    t.GetCustomAttribute<PartNotDiscoverableAttribute>() == null &&
                     // Omit generated types like local state capturing
                     t.GetCustomAttribute<CompilerGeneratedAttribute>() == null &&
                     // Omit generated types for async state machines
@@ -134,6 +136,7 @@ namespace NosAyudamos
 
             services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.Decorate<IPersonRepository, EventGridPersonRepository>();
 
             services.AddPolicyRegistry(registry);
         }

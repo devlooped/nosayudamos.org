@@ -12,7 +12,7 @@ namespace NosAyudamos.Core
     class FeatureEntityRepository<T> : IEntityRepository<T>
     {
         ConcurrentDictionary<string, T> values = new ConcurrentDictionary<string, T>();
-        
+
         public Task DeleteAsync(T entity)
         {
             values.TryRemove(GetKey(entity), out _);

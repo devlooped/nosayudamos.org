@@ -22,7 +22,7 @@ namespace NosAyudamos.Functions
         readonly IEventStreamAsync events;
 
         public Inbox(ILogger log, ISerializer serializer, ILanguageUnderstanding language, IPersonRepository repository, IEventStreamAsync events)
-            => (this.log, this.serializer, this.language, this.repository, this.events) 
+            => (this.log, this.serializer, this.language, this.repository, this.events)
             = (log, serializer, language, repository, events);
 
         [FunctionName("inbox")]

@@ -1,6 +1,6 @@
 ﻿namespace NosAyudamos
 {
-    class PersonRegistered : DomainEvent
+    public class PersonRegistered : DomainEvent
     {
         public PersonRegistered(
             string id,
