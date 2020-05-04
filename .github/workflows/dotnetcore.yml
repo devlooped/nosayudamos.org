@@ -8,8 +8,10 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
     env:
       MSBUILDSINGLELOADCONTEXT: 1
     steps:
@@ -26,6 +28,10 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Start storage emulator
+      run: |
+        "%ProgramFiles(x86)%\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" init /server "(localdb)\MsSqlLocalDb"
+        "%ProgramFiles(x86)%\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator" start
     - name: Test
       run: dotnet test --no-restore
       env:
