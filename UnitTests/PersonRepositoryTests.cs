@@ -68,6 +68,9 @@ namespace NosAyudamos
             Assert.Equal(1500, person.DonatedAmount);
 
             person = await repo.GetAsync("23696294", false);
+
+            Assert.All(person.History, h => Assert.Equal("23696294", h.SourceId));
+
             person.UpdatePhoneNumber("541156109999");
 
             Assert.Single(person.Events);

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace NosAyudamos
 {
+    [NoExport]
     class ChatApiMessaging : IMessaging
     {
         readonly MediaTypeFormatter formatter = new JsonMediaTypeFormatter();

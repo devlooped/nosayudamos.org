@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Composition;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Merq;
 using Microsoft.Azure.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
+using Microsoft.VisualStudio.Threading;
 
 namespace NosAyudamos
 {
@@ -19,16 +19,23 @@ namespace NosAyudamos
         readonly IServiceProvider services;
         readonly IEnvironment environment;
         readonly ISerializer serializer;
+        readonly JoinableTaskFactory taskFactory;
 
-        public EventGridStream(IServiceProvider services, IEnvironment environment, ISerializer serializer)
+        public EventGridStream(IServiceProvider services, IEnvironment environment, ISerializer serializer, JoinableTaskFactory taskFactory)
         {
-            (this.services, this.environment, this.serializer) = (services, environment, serializer);
+            this.services = services;
+            this.environment = environment;
+            this.serializer = serializer;
+            this.taskFactory = taskFactory;
             gridUri = new Lazy<Uri>(() => new Uri(environment.GetVariable("EventGridUrl")));
             apiKey = new Lazy<string>(() => environment.GetVariable("EventGridAccessKey"));
         }
 
-        public async Task PushAsync<TEvent>(TEvent args, EventMetadata? metadata = null)
+        public async Task PushAsync<TEvent>(TEvent args)
         {
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
             try
             {
                 // By setting this variable which is thread-local, the Push method below will not 
@@ -36,7 +43,7 @@ namespace NosAyudamos
                 asyncCall.Value = true;
                 Push(args);
                 await InvokeHandlersAsync(args);
-                await SendToGridAsync(args, metadata);
+                await SendToGridAsync(args);
             }
             finally
             {
@@ -46,6 +53,9 @@ namespace NosAyudamos
 
         public override void Push<TEvent>(TEvent args)
         {
+            if (args == null)
+                throw new ArgumentNullException(nameof(args));
+
             base.Push(args);
 
             // TODO: bring the code from EventStream into this project, 
@@ -55,14 +65,15 @@ namespace NosAyudamos
 
             if (asyncCall.Value != true)
             {
-#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
-                InvokeHandlersAsync(args).Wait();
-                SendToGridAsync(args, null).Wait();
-#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
+                taskFactory.Run(async () =>
+                {
+                    await InvokeHandlersAsync(args);
+                    await SendToGridAsync(args);
+                });
             }
         }
 
-        async Task SendToGridAsync<TEvent>(TEvent args, EventMetadata? metadata)
+        async Task SendToGridAsync<TEvent>(TEvent args)
         {
             if (!environment.IsDevelopment() || environment.GetVariable("SendToGridInDevelopment", false))
             {
@@ -70,25 +81,15 @@ namespace NosAyudamos
                 var domain = gridUri.Value.Host;
                 using var client = new EventGridClient(credentials);
 
-                await client.PublishEventsAsync(domain, new List<EventGridEvent>
-                    {
-                        new EventGridEvent
-                        {
-                            Id = metadata?.EventId ?? Guid.NewGuid().ToString(),
-                            Subject = metadata?.Subject ?? typeof(TEvent).Namespace,
-                            Topic = metadata?.Topic ?? "NosAyudamos",
-
-                            EventType = typeof(TEvent).FullName,
-                            EventTime = DateTime.UtcNow,
-                            Data = serializer.Serialize(args),
-                            DataVersion = "1.0",
-                        }
-                    });
+                await client.PublishEventsAsync(domain, new List<EventGridEvent> { args!.ToEventGrid(serializer) });
             }
         }
 
         async Task InvokeHandlersAsync<TEvent>(TEvent args)
         {
+            // All of this is development time only, so it looks a bit hacky, 
+            // but it's fine: it allows us to test end-to-end from acceptance 
+
             if (environment.IsDevelopment())
             {
                 var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
@@ -96,6 +97,20 @@ namespace NosAyudamos
                 foreach (var handler in handlers)
                 {
                     await handler.HandleAsync(args);
+                }
+
+                var type = args!.GetType().BaseType;
+                while (type != null && type != typeof(object))
+                {
+                    var serviceType = typeof(IEnumerable<>).MakeGenericType(typeof(IEventHandler<>).MakeGenericType(type));
+                    var baseHandlers = (IEnumerable<dynamic>)services.GetService(serviceType);
+
+                    foreach (var handler in baseHandlers)
+                    {
+                        await handler.HandleAsync((dynamic)args);
+                    }
+
+                    type = type.BaseType;
                 }
             }
         }

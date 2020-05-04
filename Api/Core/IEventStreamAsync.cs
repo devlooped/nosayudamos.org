@@ -8,6 +8,6 @@ namespace NosAyudamos
         /// <summary>
         /// Pushes an event to the stream, causing any subscriber to be invoked if appropriate.
         /// </summary>
-        Task PushAsync<TEvent>(TEvent args, EventMetadata? metadata = null);
+        Task PushAsync<TEvent>(TEvent args);
     }
 }

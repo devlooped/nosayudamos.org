@@ -21,13 +21,13 @@ namespace NosAyudamos
         public T Deserialize<T>(string data)
             => JsonConvert.DeserializeObject<T>(data?.ToString() ?? throw new ArgumentNullException(nameof(data)), settings)!;
 
-        public string Serialize<T>(T value)
+        public string Serialize(object value)
             => JsonConvert.SerializeObject(value, settings);
     }
 
     interface ISerializer
     {
-        string Serialize<T>(T value);
+        string Serialize(object value);
 
         T Deserialize<T>(string data);
 

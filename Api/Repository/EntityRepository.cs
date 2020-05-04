@@ -14,7 +14,7 @@ namespace NosAyudamos
     {
         readonly CloudStorageAccount storageAccount;
         readonly ISerializer serializer;
-        AsyncLazy<CloudTable> table;
+        readonly AsyncLazy<CloudTable> table;
 
         public EntityRepository(CloudStorageAccount storageAccount, ISerializer serializer)
             : this(storageAccount, serializer, "Entity") { }

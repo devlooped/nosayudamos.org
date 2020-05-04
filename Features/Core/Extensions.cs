@@ -23,7 +23,7 @@ namespace NosAyudamos
                 .DeleteIfExistsAsync();
 
             await CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient()
-                .GetTableReference("Events")
+                .GetTableReference("Event")
                 .DeleteIfExistsAsync();
         }
     }

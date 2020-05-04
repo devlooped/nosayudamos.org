@@ -1,4 +1,5 @@
 using System;
+using System.Composition;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -6,6 +7,7 @@ using Polly.Registry;
 
 namespace NosAyudamos
 {
+    [Shared]
     class Messaging : IMessaging, IDisposable
     {
         readonly Lazy<string> chatApiNumber;

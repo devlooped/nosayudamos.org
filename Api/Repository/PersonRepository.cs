@@ -151,9 +151,10 @@ namespace NosAyudamos
                 throw new ArgumentException(Strings.PersonRepository.EmptyData);
 
             var e = (DomainEvent)serializer.Deserialize(entity.Data, entityType);
-            e.EventId = (entity.EventId ?? Guid.NewGuid());
+            e.SourceId = entity.PartitionKey;
+            e.EventId = entity.EventId ?? Guid.NewGuid().ToString();
             e.Version = entity.Version;
-            e.When = entity.Timestamp;
+            e.EventTime = entity.Timestamp.UtcDateTime;
             return e;
         }
 
