@@ -53,7 +53,7 @@
     <UpToDateCheckInput Include="@(Content);@(None)" />
   </ItemGroup>
 
-  <Target Name="PrepareLocalSettings" DependsOnTargets="CopyLocalSettings;MergeLocalSettings;ClearLocalSettings;IncludeLocalSettings" BeforeTargets="PrepareForBuild;PrepareForRun" />
+  <Target Name="PrepareLocalSettings" DependsOnTargets="CopyLocalSettings;MergeLocalSettings;WriteDefaultLocalSettings;IncludeLocalSettings" BeforeTargets="PrepareForBuild;PrepareForRun" />
 
   <Target Name="CopyLocalSettings" Inputs="local.settings.json;keyvault.json" Outputs="$(IntermediateOutputPath)local.settings.json">
     <Copy SourceFiles="local.settings.json" DestinationFolder="$(IntermediateOutputPath)" SkipUnchangedFiles="true" />
@@ -76,10 +76,10 @@
     <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_TENANT_ID)" JPath="$.Values.AZURE_TENANT_ID" />
   </Target>
 
-  <Target Name="ClearLocalSettings" Condition="!Exists('keyvault.json')">
-    <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="" JPath="$.Values.AZURE_CLIENT_ID" />
-    <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="" JPath="$.Values.AZURE_CLIENT_SECRET" />
-    <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="" JPath="$.Values.AZURE_TENANT_ID" />
+  <Target Name="WriteDefaultLocalSettings" Condition="!Exists('keyvault.json')">
+    <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_CLIENT_ID)" JPath="$.Values.AZURE_CLIENT_ID" />
+    <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_CLIENT_SECRET)" JPath="$.Values.AZURE_CLIENT_SECRET" />
+    <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_TENANT_ID)" JPath="$.Values.AZURE_TENANT_ID" />
   </Target>
 
   <Target Name="IncludeLocalSettings" Condition="Exists('$(IntermediateOutputPath)local.settings.json')" BeforeTargets="GetCopyToOutputDirectoryItems">
