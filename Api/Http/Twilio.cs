@@ -11,13 +11,13 @@ using System.Linq;
 
 namespace NosAyudamos.Functions
 {
-    class TwilioIncoming
+    class Twilio
     {
         readonly IEventStreamAsync events;
-        readonly ILogger<TwilioIncoming> logger;
+        readonly ILogger<Twilio> logger;
         readonly IStartupWorkflow workflow;
 
-        public TwilioIncoming(IEventStreamAsync events, IStartupWorkflow workflow, ILogger<TwilioIncoming> logger)
+        public Twilio(IEventStreamAsync events, IStartupWorkflow workflow, ILogger<Twilio> logger)
         {
             this.events = events;
             this.workflow = workflow;
@@ -68,7 +68,7 @@ namespace NosAyudamos.Functions
                     message = mediaUrl;
                 }
 
-                await events.PushAsync(new MessageReceived(from, to, message));
+                await events.PushAsync(new NosAyudamos.MessageReceived(from, to, message));
 
                 return new OkResult();
             }

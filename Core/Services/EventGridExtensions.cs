@@ -62,7 +62,7 @@ namespace NosAyudamos
         public static EventGridEventEntity ToEntity(this DomainEvent data, ISerializer serializer)
         {
             var metadata = data as IEventMetadata;
-            
+
             return new EventGridEventEntity
             {
                 RowKey = metadata?.EventId ?? Guid.NewGuid().ToString(),

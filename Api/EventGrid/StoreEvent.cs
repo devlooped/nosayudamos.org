@@ -8,14 +8,14 @@ using Microsoft.VisualStudio.Threading;
 
 namespace NosAyudamos.Functions
 {
-    class SaveEvent
+    class StoreEvent
     {
         readonly CloudStorageAccount storageAccount;
         readonly ISerializer serializer;
         readonly SaveDomainEventHandler handler;
         readonly AsyncLazy<CloudTable> table;
 
-        public SaveEvent(CloudStorageAccount storageAccount, ISerializer serializer, SaveDomainEventHandler handler)
+        public StoreEvent(CloudStorageAccount storageAccount, ISerializer serializer, SaveDomainEventHandler handler)
         {
             this.storageAccount = storageAccount;
             this.serializer = serializer;
@@ -24,7 +24,7 @@ namespace NosAyudamos.Functions
             table = new AsyncLazy<CloudTable>(() => GetTableAsync());
         }
 
-        [FunctionName("save-event")]
+        [FunctionName("store-event")]
         public async Task SaveAsync([EventGridTrigger] EventGridEvent e)
         {
             var type = Type.GetType(e.EventType);

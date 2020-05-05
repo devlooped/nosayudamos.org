@@ -4,6 +4,11 @@ using System.Text;
 
 namespace NosAyudamos
 {
+    /// <summary>
+    /// This will allow us to provide short urls that don't expose directly 
+    /// a user's personal ID in an obvious way. (i.e. to access your donor 
+    /// stats or the like).
+    /// </summary>
     public static class Base62
     {
         public static string Encode(int value)
