@@ -35,7 +35,7 @@
 
     <PackageReference Include="System.Composition" Version="1.4.0" />
 
-    <PackageReference Include="StreamStone" Version="*" />
+    <PackageReference Include="StreamStone" Version="2.3.0" />
     <PackageReference Include="Humanizer" Version="2.8.11" />
     <PackageReference Include="Merq.Core" Version="1.2.*" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.*" />
