@@ -17,11 +17,11 @@ namespace NosAyudamos
         readonly Lazy<IMessaging> log;
         readonly IEnvironment environment;
 
-        public Messaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment, HttpClient httpClient, ILogger<Messaging> logger)
+        public Messaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment, HttpClient httpClient, ISerializer serializer, ILogger<Messaging> logger)
         {
             this.environment = environment;
             twilio = new Lazy<IMessaging>(() => new TwilioMessaging(registry, environment));
-            chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(environment, httpClient));
+            chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(environment, httpClient, serializer));
             log = new Lazy<IMessaging>(() => new LogMessaging(logger));
 
             chatApiNumber = new Lazy<string>(() => environment.GetVariable("ChatApiNumber").TrimStart('+'));

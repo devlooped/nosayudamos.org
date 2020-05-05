@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace NosAyudamos.Properties {
+namespace NosAyudamos {
     using System;
     
     
