@@ -1,6 +1,9 @@
 {
   "IsEncrypted": false,
   "Values": {
+    "AZURE_CLIENT_ID": "PLACEHOLDER replaced with keyvault.json",
+    "AZURE_CLIENT_SECRET": "PLACEHOLDER replaced with keyvault.json",
+    "AZURE_TENANT_ID": "PLACEHOLDER replaced with keyvault.json",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
     "KeyVaultUrl": "https://nosayudamos.vault.azure.net/",
@@ -19,13 +22,17 @@
     "StorageConnectionString": "kv-StorageConnectionString",
     "AttachmentsContainerName": "attachments",
     "SlackApiWebHook": "https://hooks.slack.com/services/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",
-    "ChatApiNumber": "1234",
-    "ChatApiUrl": "https://nosayudamos-lu.cognitiveservices.azure.com/",
+    "SlackLogWebHook": "kv-SlackLogWebHook",
+    "SlackUsersWebHook": "kv-SlackUsersWebHook",
+    "ChatApiNumber": "+5491120400875",
+    "ChatApiUrl": "kv-ChatApiUrl",
     "SendMessages": false,
     "ResilientNumberOfRetries": 3,
     "EventGridUrl": "https://nosayudamos.brazilsouth-1.eventgrid.azure.net/api/events",
     "EventGridAccessKey": "kv-EventGridAccessKey",
-    "SlackLogWebHook": "foo",
-    "SlackSigningSecret": "kv-SlackSigningSecret"
+    "SlackSigningSecret": "kv-SlackSigningSecret",
+    "SendToGridInDevelopment": "true",
+    "SendToMessagingInDevelopment": "false",
+    "SendToSlackInDevelopment": "true"
   }
 }
