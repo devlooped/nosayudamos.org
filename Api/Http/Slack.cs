@@ -13,7 +13,7 @@ using System.Text;
 using System.Linq;
 using System.Globalization;
 
-namespace NosAyudamos.Functions
+namespace NosAyudamos.Http
 {
     class Slack
     {

@@ -12,7 +12,6 @@ using Serilog.Sinks.Slack;
 using Polly;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
-using NosAyudamos.Functions;
 using System.IO;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Caching.Memory;
@@ -129,7 +128,7 @@ namespace NosAyudamos
                 services.AddHttpClient<IPersonalIdRecognizer, PersonalIdRecognizer>().AddPolicyHandler(policy);
                 services.AddHttpClient<IQRCode, QRCode>().AddPolicyHandler(policy);
                 services.AddHttpClient<IStartupWorkflow, StartupWorkflow>().AddPolicyHandler(policy);
-                services.AddHttpClient<ChatApi>().AddPolicyHandler(policy);
+                services.AddHttpClient<ChatApiMessaging>().AddPolicyHandler(policy);
             }
 
             if (environment.IsDevelopment())

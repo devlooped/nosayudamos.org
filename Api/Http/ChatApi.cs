@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 
-namespace NosAyudamos.Functions
+namespace NosAyudamos.Http
 {
     class ChatApi
     {

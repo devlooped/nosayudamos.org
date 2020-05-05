@@ -9,7 +9,7 @@ using System;
 using System.Net;
 using System.Linq;
 
-namespace NosAyudamos.Functions
+namespace NosAyudamos.Http
 {
     class Twilio
     {
