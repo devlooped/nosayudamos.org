@@ -16,7 +16,8 @@ namespace NosAyudamos
 
                 foreach (var value in values)
                 {
-                    System.Environment.SetEnvironmentVariable(value.Key, value.Value.ToString());
+                    if (string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(value.Key)))
+                        System.Environment.SetEnvironmentVariable(value.Key, value.Value.ToString());
                 }
 
                 System.Environment.SetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT", "Development");
