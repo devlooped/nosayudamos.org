@@ -76,7 +76,7 @@
     <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_TENANT_ID)" JPath="$.Values.AZURE_TENANT_ID" />
   </Target>
 
-  <Target Name="WriteDefaultLocalSettings" Condition="!Exists('keyvault.json')">
+  <Target Name="WriteDefaultLocalSettings" Condition="'' != '' or !Exists('keyvault.json')">
     <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_CLIENT_ID)" JPath="$.Values.AZURE_CLIENT_ID" />
     <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_CLIENT_SECRET)" JPath="$.Values.AZURE_CLIENT_SECRET" />
     <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_TENANT_ID)" JPath="$.Values.AZURE_TENANT_ID" />
