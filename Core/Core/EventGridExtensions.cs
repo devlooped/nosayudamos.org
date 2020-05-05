@@ -45,7 +45,6 @@ namespace NosAyudamos
 
         public static EventGridEventEntity ToEntity(this EventGridEvent e) => new EventGridEventEntity
         {
-            PartitionKey = nameof(EventGridEvent),
             RowKey = e.Id,
             Data = e.Data.ToString(),
             DataVersion = e.DataVersion,
@@ -59,5 +58,21 @@ namespace NosAyudamos
                 ? string.Join('/', e.Topic.Split('/').SkipWhile(x => !"topics".Equals(x, StringComparison.Ordinal)).Skip(1))
                 : e.Topic,
         };
+
+        public static EventGridEventEntity ToEntity(this DomainEvent data, ISerializer serializer)
+        {
+            var metadata = data as IEventMetadata;
+            
+            return new EventGridEventEntity
+            {
+                RowKey = metadata?.EventId ?? Guid.NewGuid().ToString(),
+                Data = serializer.Serialize(data),
+                DataVersion = data.GetType().Assembly.GetName().Version?.ToString(2) ?? "1.0",
+                EventTime = data.EventTime,
+                EventType = data.GetType().FullName!,
+                Subject = metadata?.Subject ?? data.GetType().Namespace,
+                Topic = metadata?.Topic ?? "System",
+            };
+        }
     }
 }

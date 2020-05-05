@@ -17,7 +17,7 @@ namespace NosAyudamos
             = (repository, environment);
 
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Catching general exeception because if retry pattern")]
-        public async Task<TResult?> ExecuteAsync<TResult>(
+        public async Task<TResult> ExecuteAsync<TResult>(
             Func<Task<TResult>> action,
             Func<Task> onRetry,
             Func<Task> onCancel,
@@ -60,7 +60,9 @@ namespace NosAyudamos
                 await onRetry();
             }
 
+#pragma warning disable CS8603 // Possible null reference return.
             return default;
+#pragma warning restore CS8603 // Possible null reference return.
         }
     }
 }

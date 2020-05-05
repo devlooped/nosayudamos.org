@@ -5,17 +5,16 @@ using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 
 namespace NosAyudamos.Functions
 {
-    class MessageOutgoing : IEventHandler<MessageSent>
+    class MessageOutgoing
     {
-        readonly IMessaging messaging;
+        readonly MessageSentHandler handler;
         readonly ISerializer serializer;
 
-        public MessageOutgoing(IMessaging messaging, ISerializer serializer)
-            => (this.messaging, this.serializer) = (messaging, serializer);
+        public MessageOutgoing(MessageSentHandler handler, ISerializer serializer)
+            => (this.handler, this.serializer) 
+            = (handler, serializer);
 
         [FunctionName("message_outgoing")]
-        public Task RunAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<MessageSent>(serializer));
-
-        public Task HandleAsync(MessageSent e) => messaging.SendTextAsync(e.From, e.Body, e.To);
+        public Task RunAsync([EventGridTrigger] EventGridEvent e) => handler.HandleAsync(e.GetData<MessageSent>(serializer));
     }
 }

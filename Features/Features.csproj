@@ -32,6 +32,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </None>
+    <UpToDateCheckInput Include="@(Content);@(None)" />
   </ItemGroup>
 
   <ItemGroup>

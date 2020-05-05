@@ -13,7 +13,6 @@ using Polly;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using NosAyudamos.Functions;
-using NosAyudamos.Properties;
 using System.IO;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Caching.Memory;
@@ -31,7 +30,9 @@ namespace NosAyudamos
             builder.Services.AddApplicationInsightsTelemetry();
 
             // testable service registrations in the test-invoked method.
+#pragma warning disable CA2000 // Dispose objects before losing scope
             Configure(builder.Services, new Environment(new MemoryCache(new MemoryCacheOptions())));
+#pragma warning restore CA2000 // Dispose objects before losing scope
         }
 
         internal void Configure(IServiceCollection services, IEnvironment environment)
@@ -89,7 +90,7 @@ namespace NosAyudamos
             // 1. Candidates: types that implement at least one interface
             // 2. Looking at its attributes: if they don't have [Shared], they are registered as transient
             // 3. Optionally can have [Export] to force registration of a type without interfaces
-            var candidateTypes = Assembly.GetExecutingAssembly().GetTypes()
+            var candidateTypes = typeof(DomainObject).Assembly.GetTypes()
                 .Where(t =>
                     !t.IsAbstract &&
                     !t.IsGenericTypeDefinition &&

@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
-using NosAyudamos.Properties;
 using Streamstone;
 
 namespace NosAyudamos

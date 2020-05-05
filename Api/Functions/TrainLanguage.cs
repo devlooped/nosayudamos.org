@@ -19,7 +19,7 @@ namespace NosAyudamos.Functions
             (this.serializer, this.languageUnderstanding, this.logger) = (serializer, languageUnderstanding, logger);
 
         [FunctionName("train_language")]
-        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "train_language")] HttpRequest req)
+        public async Task<IActionResult> TrainAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "train_language")] HttpRequest req)
         {
             using var reader = new StreamReader(req.Body);
             var payload = await reader.ReadToEndAsync();
