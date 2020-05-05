@@ -25,8 +25,7 @@ namespace NosAyudamos.Http
         }
 
         [FunctionName("twilio")]
-        public async Task<IActionResult> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
+        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
         {
             using var reader = new StreamReader(req.Body);
             var raw = await reader.ReadToEndAsync();
