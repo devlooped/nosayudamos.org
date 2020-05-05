@@ -9,12 +9,12 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 
 namespace NosAyudamos.Functions
 {
-    class ChatApiIncoming
+    class ChatApi
     {
         readonly Lazy<string> chatApiNumber;
         readonly IEventStreamAsync events;
 
-        public ChatApiIncoming(IEnvironment enviroment, IEventStreamAsync events)
+        public ChatApi(IEnvironment enviroment, IEventStreamAsync events)
         {
             chatApiNumber = new Lazy<string>(() => enviroment.GetVariable("ChatApiNumber").TrimStart('+'));
             this.events = events;
@@ -41,7 +41,7 @@ namespace NosAyudamos.Functions
                 if (from == chatApiNumber.Value)
                     continue;
 
-                await events.PushAsync(new MessageReceived(from, chatApiNumber.Value, body));
+                await events.PushAsync(new NosAyudamos.MessageReceived(from, chatApiNumber.Value, body));
             }
 
             return new OkResult();

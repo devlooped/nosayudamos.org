@@ -31,8 +31,8 @@
     "EventGridUrl": "https://nosayudamos.brazilsouth-1.eventgrid.azure.net/api/events",
     "EventGridAccessKey": "kv-EventGridAccessKey",
     "SlackSigningSecret": "kv-SlackSigningSecret",
-    "SendToGridInDevelopment": "true",
+    "SendToGridInDevelopment": "false",
     "SendToMessagingInDevelopment": "false",
-    "SendToSlackInDevelopment": "true"
+    "SendToSlackInDevelopment": "false"
   }
 }

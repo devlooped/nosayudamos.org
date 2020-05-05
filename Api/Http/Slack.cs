@@ -15,7 +15,7 @@ using System.Globalization;
 
 namespace NosAyudamos.Functions
 {
-    class SlackIncoming
+    class Slack
     {
         const string ApiUrl = "https://slack.com/api/";
 
@@ -24,9 +24,9 @@ namespace NosAyudamos.Functions
         readonly IEventStreamAsync events;
         readonly ILanguageUnderstanding language;
         readonly HttpClient http;
-        readonly ILogger<SlackIncoming> logger;
+        readonly ILogger<Slack> logger;
 
-        public SlackIncoming(ISerializer serializer, IEnvironment environment, IEventStreamAsync events, ILanguageUnderstanding language, HttpClient http, ILogger<SlackIncoming> logger) =>
+        public Slack(ISerializer serializer, IEnvironment environment, IEventStreamAsync events, ILanguageUnderstanding language, HttpClient http, ILogger<Slack> logger) =>
             (this.serializer, this.environment, this.events, this.language, this.http, this.logger) = (serializer, environment, events, language, http, logger);
 
         [FunctionName("slack_interaction")]
@@ -70,13 +70,13 @@ namespace NosAyudamos.Functions
                 message = message.Trim();
 
             // TODO: uncomment when new API is merged.
-            //await language.AddUtteranceAsync(message, intent);
             logger.LogInformation("Training intent '{intent}' with new phrase: {phrase}", intent, message);
+            await language.AddUtteranceAsync(message, intent);
 
             return new OkResult();
         }
 
-        [FunctionName("slack_incoming")]
+        [FunctionName("slack_message")]
         public async Task<IActionResult> ReceiveAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "slack/message")] HttpRequest req)
         {
@@ -111,7 +111,7 @@ namespace NosAyudamos.Functions
                 string? to = json.messages?[0]?.blocks?[1]?.fields?[1]?.text;
 
                 if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(to) && !string.IsNullOrEmpty(text))
-                    await events.PushAsync(new MessageSent(to.Substring(to.LastIndexOf(':') + 1).Trim(), from.Substring(from.LastIndexOf(':') + 1).Trim(), text));
+                    await events.PushAsync(new NosAyudamos.MessageSent(to.Substring(to.LastIndexOf(':') + 1).Trim(), from.Substring(from.LastIndexOf(':') + 1).Trim(), text));
             }
 
             return new OkResult();

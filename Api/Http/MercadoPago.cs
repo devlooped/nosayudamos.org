@@ -9,15 +9,15 @@ using System.Text.Json;
 
 namespace NosAyudamos.Functions
 {
-    class MercadoPagoIncoming
+    class MercadoPago
     {
-        readonly ILogger<MercadoPagoIncoming> logger;
+        readonly ILogger<MercadoPago> logger;
 
-        public MercadoPagoIncoming(ILogger<MercadoPagoIncoming> logger) => this.logger = logger;
+        public MercadoPago(ILogger<MercadoPago> logger) => this.logger = logger;
 
-        [FunctionName("mercadopago_incoming")]
+        [FunctionName("mercadopago")]
         public async Task<IActionResult> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "mp")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "mercadopago")] HttpRequest req)
         {
             using var reader = new StreamReader(req.Body);
             var body = await reader.ReadToEndAsync();

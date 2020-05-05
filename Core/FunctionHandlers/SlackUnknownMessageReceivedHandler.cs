@@ -18,8 +18,8 @@ namespace NosAyudamos
         readonly ILanguageUnderstanding language;
         readonly HttpClient http;
 
-        public SlackUnknownMessageReceivedHandler(IEnvironment environment, IPersonRepository repository, ILanguageUnderstanding language, HttpClient http) 
-            => (this.environment, this.repository, this.language, this.http) 
+        public SlackUnknownMessageReceivedHandler(IEnvironment environment, IPersonRepository repository, ILanguageUnderstanding language, HttpClient http)
+            => (this.environment, this.repository, this.language, this.http)
             = (environment, repository, language, http);
 
         public async Task HandleAsync(UnknownMessageReceived e)

@@ -5,16 +5,16 @@ using Microsoft.Azure.EventGrid.Models;
 
 namespace NosAyudamos.Functions
 {
-    class SlackOutgoing
+    class UnknownMessage
     {
         readonly ISerializer serializer;
         readonly SlackUnknownMessageReceivedHandler handler;
 
-        public SlackOutgoing(ISerializer serializer, SlackUnknownMessageReceivedHandler handler)
+        public UnknownMessage(ISerializer serializer, SlackUnknownMessageReceivedHandler handler)
             => (this.serializer, this.handler)
             = (serializer, handler);
 
-        [FunctionName("slack_outgoing")]
+        [FunctionName("unknown_message")]
         public Task HandleUnknownIntentAsync([EventGridTrigger] EventGridEvent e) => handler.HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
     }
 }
