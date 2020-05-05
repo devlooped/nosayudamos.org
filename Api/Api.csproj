@@ -53,7 +53,7 @@
     <UpToDateCheckInput Include="@(Content);@(None)" />
   </ItemGroup>
 
-  <Target Name="PrepareLocalSettings" DependsOnTargets="CopyLocalSettings;MergeLocalSettings;IncludeLocalSettings" BeforeTargets="PrepareForBuild;PrepareForRun" />
+  <Target Name="PrepareLocalSettings" DependsOnTargets="CopyLocalSettings;MergeLocalSettings;ClearLocalSettings;IncludeLocalSettings" BeforeTargets="PrepareForBuild;PrepareForRun" />
 
   <Target Name="CopyLocalSettings" Inputs="local.settings.json;keyvault.json" Outputs="$(IntermediateOutputPath)local.settings.json">
     <Copy SourceFiles="local.settings.json" DestinationFolder="$(IntermediateOutputPath)" SkipUnchangedFiles="true" />
