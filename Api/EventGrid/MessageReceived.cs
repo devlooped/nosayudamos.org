@@ -19,7 +19,7 @@ namespace NosAyudamos.EventGrid
             => (this.handler, this.serializer)
             = (handler, serializer);
 
-        [FunctionName("inbox")]
+        [FunctionName("message-received")]
         public Task RunAsync([EventGridTrigger] EventGridEvent e) => handler.HandleAsync(e.GetData<NosAyudamos.MessageReceived>(serializer));
     }
 }

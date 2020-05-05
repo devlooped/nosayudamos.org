@@ -14,7 +14,7 @@ namespace NosAyudamos.EventGrid
             => (this.handler, this.serializer)
             = (handler, serializer);
 
-        [FunctionName("message_sent")]
+        [FunctionName("message-sent")]
         public Task RunAsync([EventGridTrigger] EventGridEvent e) => handler.HandleAsync(e.GetData<NosAyudamos.MessageSent>(serializer));
     }
 }

@@ -14,7 +14,7 @@ namespace NosAyudamos.EventGrid
             => (this.serializer, this.handler)
             = (serializer, handler);
 
-        [FunctionName("unknown_message")]
+        [FunctionName("unknown-message")]
         public Task HandleUnknownIntentAsync([EventGridTrigger] EventGridEvent e) => handler.HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
     }
 }
