@@ -6,5 +6,6 @@
 
   <PropertyGroup>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <LangVersion>Latest</LangVersion>
   </PropertyGroup>
 </Project>

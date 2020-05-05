@@ -4,7 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>NosAyudamos</RootNamespace>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
-    <LangVersion>Latest</LangVersion>
     <Nullable>Enable</Nullable>
     <TreatWarningsAsErrors Condition="$(CI) Or '$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
     <NoWarn>CA1812</NoWarn>
@@ -14,49 +13,23 @@
   <ItemGroup>
     <PackageReference Include="GitInfo" Version="2.0.26" PrivateAssets="all" />
 
-    <PackageReference Include="Azure.AI.TextAnalytics" Version="1.0.0-preview.4" />
-    <PackageReference Include="Azure.Identity" Version="1.1.1" />
-    <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.0.3" />
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.4.1" />
-
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.13.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.PerfCounterCollector" Version="2.13.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.*" />
-    <PackageReference Include="Microsoft.Azure.CognitiveServices.Language.LUIS.Authoring" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.7" />
-    <PackageReference Include="Microsoft.Azure.EventGrid" Version="3.2.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="2.1.0" />
 
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.3" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="3.1.3" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.6" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.*" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.7" />
 
-    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="3.0.0-beta*" />
-    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="3.0.0-beta*" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="16.6.13" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.6.*" />
-    <PackageReference Include="Slack.Webhooks" Version="1.1.3" />
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers" Version="3.0.0" />
+    <PackageReference Include="Microsoft.NetCore.Analyzers" Version="3.0.0" />
 
-    <PackageReference Include="System.Composition" Version="1.4.0" />
-
-    <PackageReference Include="StreamStone" Version="*" />
-    <PackageReference Include="Humanizer" Version="2.8.11" />
-    <PackageReference Include="Merq.Core" Version="1.2.*" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.*" />
-    <PackageReference Include="Polly" Version="7.2.0" />
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
-    <PackageReference Include="Serilog.Sinks.Slack" Version="1.2.63" />
-    <PackageReference Include="stateless" Version="5.1.1" />
-    <PackageReference Include="Twilio" Version="5.*" />
-    <PackageReference Include="Twilio.AspNet.Core" Version="5.*" />
-    <PackageReference Include="ZXing.Net" Version="0.16.5" />
-    <PackageReference Include="ZXing.Net.Bindings.CoreCompat.System.Drawing" Version="0.16.5-beta" />
-    <PackageReference Include="netfx-System.StringResources" Version="3.2.0-alpha" />
+    <PackageReference Include="JsonPoke.MSBuild" Version="1.0.9" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,35 +44,42 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <!--
   <ItemGroup>
-    <ProjectReference Include="..\External\Streamstone\Source\Streamstone\Streamstone.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
-  -->
+  
+  <ItemGroup>
+    <None Update="host.json" CopyToOutputDirectory="PreserveNewest" />
+    <UpToDateCheckInput Include="@(Content);@(None)" />
+  </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Update="host.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="local.settings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </None>
-  </ItemGroup>
-  
+  <Target Name="PrepareLocalSettings" DependsOnTargets="CopyLocalSettings;MergeLocalSettings;IncludeLocalSettings" BeforeTargets="PrepareForBuild;PrepareForRun" />
+
+  <Target Name="CopyLocalSettings" Inputs="local.settings.json;keyvault.json" Outputs="$(IntermediateOutputPath)local.settings.json">
+    <Copy SourceFiles="local.settings.json" DestinationFolder="$(IntermediateOutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="MergeLocalSettings" Condition="Exists('keyvault.json')">
+
+    <JsonPeek JPath="$.AZURE_CLIENT_ID" JsonInputPath="keyvault.json">
+      <Output TaskParameter="Result" PropertyName="AZURE_CLIENT_ID" />
+    </JsonPeek>
+    <JsonPeek JPath="$.AZURE_CLIENT_SECRET" JsonInputPath="keyvault.json">
+      <Output TaskParameter="Result" PropertyName="AZURE_CLIENT_SECRET" />
+    </JsonPeek>
+    <JsonPeek JPath="$.AZURE_TENANT_ID" JsonInputPath="keyvault.json">
+      <Output TaskParameter="Result" PropertyName="AZURE_TENANT_ID" />
+    </JsonPeek>
+
+    <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_CLIENT_ID)" JPath="$.Values.AZURE_CLIENT_ID" />
+    <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_CLIENT_SECRET)" JPath="$.Values.AZURE_CLIENT_SECRET" />
+    <JsonPoke JsonInputPath="$(IntermediateOutputPath)local.settings.json" JValue="$(AZURE_TENANT_ID)" JPath="$.Values.AZURE_TENANT_ID" />
+  </Target>
+
+  <Target Name="IncludeLocalSettings" Condition="Exists('$(IntermediateOutputPath)local.settings.json')" BeforeTargets="GetCopyToOutputDirectoryItems">
+    <ItemGroup>
+      <Content Include="$(IntermediateOutputPath)local.settings.json" CopyToOutputDirectory="PreserveNewest" Link="local.settings.json" />
+    </ItemGroup>
+  </Target>
+
 </Project>
