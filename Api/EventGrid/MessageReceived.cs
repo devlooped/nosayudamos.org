@@ -10,16 +10,16 @@ namespace NosAyudamos.EventGrid
     /// callbacks into our azure function. Made testable by implementing 
     /// <see cref="IEventHandler{TEvent}"/>.
     /// </summary>
-    public class MessageReceived
+    class MessageReceived
     {
         readonly MessageReceivedHandler handler;
         readonly ISerializer serializer;
 
-        internal MessageReceived(MessageReceivedHandler handler, ISerializer serializer)
+        public MessageReceived(MessageReceivedHandler handler, ISerializer serializer)
             => (this.handler, this.serializer)
             = (handler, serializer);
 
         [FunctionName("inbox")]
-        public Task RunAsync([EventGridTrigger] EventGridEvent e) => handler.HandleAsync(e!.GetData<NosAyudamos.MessageReceived>(serializer));
+        public Task RunAsync([EventGridTrigger] EventGridEvent e) => handler.HandleAsync(e.GetData<NosAyudamos.MessageReceived>(serializer));
     }
 }
