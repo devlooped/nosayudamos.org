@@ -50,6 +50,10 @@ namespace NosAyudamos
                 .Enrich.FromLogContext()
                 .WriteTo.Console();
 
+            var seqUrl = environment.GetVariable("SeqUrl", default(string));
+            if (!string.IsNullOrEmpty(seqUrl))
+                config.WriteTo.Seq(seqUrl);
+
             if (environment.IsTesting())
             {
                 if (File.Exists("log.txt"))
