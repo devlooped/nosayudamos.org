@@ -10,6 +10,8 @@ namespace NosAyudamos
         JsonSerializerSettings settings = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind,
 #if DEBUG
             Formatting = Formatting.Indented,
 #endif
