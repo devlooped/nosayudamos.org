@@ -60,7 +60,7 @@ namespace NosAyudamos
 
             // TODO: bring the code from EventStream into this project, 
             // and remove the synchronous method entirely?
-            if (!environment.IsDevelopment())
+            if (!environment.IsDevelopment() && asyncCall.Value != true)
                 throw new InvalidOperationException("In production, the PushAsync method should be used exclusively.");
 
             if (asyncCall.Value != true)
