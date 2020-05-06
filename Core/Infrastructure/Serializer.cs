@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Composition;
+using System.Globalization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NosAyudamos
 {
@@ -10,8 +12,14 @@ namespace NosAyudamos
         JsonSerializerSettings settings = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind,
+            Converters =
+            {
+                new IsoDateTimeConverter
+                {
+                    DateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss",
+                    DateTimeStyles = DateTimeStyles.RoundtripKind
+                }
+            },
 #if DEBUG
             Formatting = Formatting.Indented,
 #endif

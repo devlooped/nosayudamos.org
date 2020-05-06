@@ -32,9 +32,11 @@ namespace NosAyudamos
 
         public Environment()
         {
-            var basePath = System.Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") == "Development"
-                ? Directory.GetCurrentDirectory()
-                : new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.FullName;
+            var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            // In locally run tests, the file will be alongside the assembly.
+            // In azure, it will be one level up.
+            if (!File.Exists(Path.Combine(basePath, "appsettings.json")))
+                basePath = new DirectoryInfo(basePath).Parent.FullName;
 
             var builder = new ConfigurationBuilder()
                  .SetBasePath(basePath)
