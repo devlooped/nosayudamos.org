@@ -89,6 +89,11 @@ namespace NosAyudamos
                                 Text = new TextObject("Train as :money_with_wings:") { Emoji = true },
                                 Value = "donate"
                             },
+                            new Button
+                            {
+                                Text = new TextObject("Retry :repeat:") { Emoji = true },
+                                Value = "retry"
+                            },
                         }
                     }
                 },

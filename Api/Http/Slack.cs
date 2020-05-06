@@ -69,9 +69,20 @@ namespace NosAyudamos.Http
             if (message != null)
                 message = message.Trim();
 
-            // TODO: uncomment when new API is merged.
-            logger.LogInformation("Training intent '{intent}' with new phrase: {phrase}", intent, message);
-            await language.AddUtteranceAsync(message, intent);
+            if (intent == "retry")
+            {
+                string? from = json.messages?[0]?.blocks?[1]?.fields?[0]?.text;
+                string? to = json.messages?[0]?.blocks?[1]?.fields?[1]?.text;
+
+                if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(to) && !string.IsNullOrEmpty(message))
+                    await events.PushAsync(new NosAyudamos.MessageReceived(from.Substring(from.LastIndexOf(':') + 1).Trim(), to.Substring(to.LastIndexOf(':') + 1).Trim(), message));
+            }
+            else
+            {
+                // TODO: uncomment when new API is merged.
+                logger.LogInformation("Training intent '{intent}' with new phrase: {phrase}", intent, message);
+                await language.AddUtteranceAsync(message, intent);
+            }
 
             return new OkResult();
         }
