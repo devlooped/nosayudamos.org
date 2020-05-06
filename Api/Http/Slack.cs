@@ -25,9 +25,11 @@ namespace NosAyudamos.Http
         readonly ILanguageUnderstanding language;
         readonly HttpClient http;
         readonly ILogger<Slack> logger;
+        readonly MessageReceivedHandler handler;
 
-        public Slack(ISerializer serializer, IEnvironment environment, IEventStreamAsync events, ILanguageUnderstanding language, HttpClient http, ILogger<Slack> logger) =>
-            (this.serializer, this.environment, this.events, this.language, this.http, this.logger) = (serializer, environment, events, language, http, logger);
+        public Slack(ISerializer serializer, IEnvironment environment, IEventStreamAsync events, ILanguageUnderstanding language, HttpClient http, MessageReceivedHandler handler, ILogger<Slack> logger) 
+            => (this.serializer, this.environment, this.events, this.language, this.http, this.handler, this.logger) 
+            = (serializer, environment, events, language, http, handler, logger);
 
         [FunctionName("slack_interaction")]
         public async Task<IActionResult> InteractionAsync(
@@ -75,7 +77,7 @@ namespace NosAyudamos.Http
                 string? to = json.messages?[0]?.blocks?[1]?.fields?[1]?.text;
 
                 if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(to) && !string.IsNullOrEmpty(message))
-                    await events.PushAsync(new NosAyudamos.MessageReceived(from.Substring(from.LastIndexOf(':') + 1).Trim(), to.Substring(to.LastIndexOf(':') + 1).Trim(), message));
+                    await handler.HandleAsync(new NosAyudamos.MessageReceived(from.Substring(from.LastIndexOf(':') + 1).Trim(), to.Substring(to.LastIndexOf(':') + 1).Trim(), message));
             }
             else
             {
