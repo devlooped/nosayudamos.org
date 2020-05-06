@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Composition;
 using System.IO;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
 
 namespace NosAyudamos
@@ -31,8 +32,12 @@ namespace NosAyudamos
 
         public Environment()
         {
+            var basePath = System.Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT") == "Development"
+                ? Directory.GetCurrentDirectory()
+                : new DirectoryInfo(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)).Parent.FullName;
+
             var builder = new ConfigurationBuilder()
-                 .SetBasePath(Directory.GetCurrentDirectory())
+                 .SetBasePath(basePath)
                  .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                  .AddJsonFile("secrets.settings.json", optional: true, reloadOnChange: true)
                  .AddJsonFile("tests.settings.json", optional: true, reloadOnChange: true)

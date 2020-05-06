@@ -1,16 +1,21 @@
 {
-    "version": "2.0",
-    "logging": {
-        "applicationInsights": {
-            "samplingExcludedTypes": "Request",
-            "samplingSettings": {
-                "isEnabled": true
-            }
-        }
-    },
-    "extensions": {
-        "http": {
-            "routePrefix": ""
-        }
+  "version": "2.0",
+  "logging": {
+    "fileLoggingMode": "always",
+    "logLevel": { "default": "Information" },
+    "applicationInsights": {
+      "samplingExcludedTypes": "Request",
+      "samplingSettings": {
+        "isEnabled": true
+      },
+      "console": {
+        "isEnabled": "true"
+      }
     }
+  },
+  "extensions": {
+    "http": {
+      "routePrefix": ""
+    }
+  }
 }
