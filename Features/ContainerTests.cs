@@ -27,7 +27,7 @@ namespace NosAyudamos
 
         public void EnvironmentGetSecret()
         {
-            var env = new FeatureEnvironment();
+            var env = new Environment();
 
             Assert.True(Guid.TryParse(env.GetVariable("LuisAppId"), out _));
         }

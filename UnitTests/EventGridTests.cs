@@ -1,36 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Microsoft.Azure.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
-using Xunit;
 
 namespace NosAyudamos
 {
     public class EventGridTests
     {
-        Uri gridUri;
-        string gridKey;
-
-        public EventGridTests()
-        {
-            if (File.Exists("local.settings.json"))
-            {
-                dynamic settings = JObject.Parse(File.ReadAllText("local.settings.json"));
-                gridUri = new Uri((string)settings.Values.EventGridUrl);
-                gridKey = settings.Values.EventGridAccessKey;
-            }
-        }
-
-        [SkippableFact]
+        // NOTE: you can run this method with the ad-hoc TestDriven runner.
         public async Task SendCustomEvent()
         {
-            Skip.If(!File.Exists("local.settings.json") || !Guid.TryParse(gridKey, out _));
-
-            var domain = gridUri.Host;
-            var credentials = new TopicCredentials(gridKey);
+            var env = new Environment();
+            var domain = new Uri(env.GetVariable("EventGridUrl")).Host;
+            var credentials = new TopicCredentials(env.GetVariable("EventGridAccessKey"));
             using var client = new EventGridClient(credentials);
 
             await client.PublishEventsAsync(domain, new List<EventGridEvent>

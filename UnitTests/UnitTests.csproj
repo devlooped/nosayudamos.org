@@ -29,6 +29,11 @@
 
   <ItemGroup>
     <None Update="SampleRequests\**\*.*" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Features\tests.settings.json" Link="tests.settings.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Api\appsettings.json" Link="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Api\local.settings.json" Link="local.settings.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Api\secrets.settings.json" Condition="Exists('..\Api\secrets.settings.json')" Link="secrets.settings.json" CopyToOutputDirectory="PreserveNewest" />
+    <UpToDateCheckInput Include="@(Content);@(None)" />
   </ItemGroup>
   
 </Project>

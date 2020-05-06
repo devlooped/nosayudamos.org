@@ -28,10 +28,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="xunit.runner.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </None>
+    <None Update="tests.settings.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Api\appsettings.json" Link="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Api\local.settings.json" Link="local.settings.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Api\secrets.settings.json" Condition="Exists('..\Api\secrets.settings.json')" Link="secrets.settings.json" CopyToOutputDirectory="PreserveNewest" />
     <UpToDateCheckInput Include="@(Content);@(None)" />
   </ItemGroup>
 

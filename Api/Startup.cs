@@ -14,7 +14,6 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.IO;
 using Microsoft.Azure.Cosmos.Table;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.VisualStudio.Threading;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
@@ -30,7 +29,7 @@ namespace NosAyudamos
 
             // testable service registrations in the test-invoked method.
 #pragma warning disable CA2000 // Dispose objects before losing scope
-            Configure(builder.Services, new Environment(new MemoryCache(new MemoryCacheOptions())));
+            Configure(builder.Services, new Environment());
 #pragma warning restore CA2000 // Dispose objects before losing scope
         }
 
@@ -56,7 +55,9 @@ namespace NosAyudamos
                 if (File.Exists("log.txt"))
                 {
                     try
-                    { File.Delete("log.txt"); }
+                    {
+                        File.Delete("log.txt");
+                    }
                     catch (IOException) { }
                 }
 
@@ -67,15 +68,15 @@ namespace NosAyudamos
             if (!environment.IsTesting())
             {
                 config.WriteTo.Logger(lc => lc.Filter
-                    .ByIncludingOnly(e => e.Properties.ContainsKey("Category"))
-                    .WriteTo.Slack(new SlackSinkOptions
-                    {
-                        WebHookUrl = environment.GetVariable("SlackLogWebHook"),
-                        CustomChannel = "#api",
-                        ShowDefaultAttachments = false,
-                        ShowPropertyAttachments = false,
-                        ShowExceptionAttachments = true,
-                    }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}` ```{@Message:j}```"));
+                     .ByIncludingOnly(e => e.Properties.ContainsKey("Category"))
+                     .WriteTo.Slack(new SlackSinkOptions
+                     {
+                         WebHookUrl = environment.GetVariable("SlackLogWebHook"),
+                         CustomChannel = "#api",
+                         ShowDefaultAttachments = false,
+                         ShowPropertyAttachments = false,
+                         ShowExceptionAttachments = true,
+                     }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}` ```{@Message:j}```"));
             }
 
             var logger = config.CreateLogger();

@@ -1,4 +1,4 @@
-keyvault.json
+secrets.settings.json
 bin
 obj
 artifacts

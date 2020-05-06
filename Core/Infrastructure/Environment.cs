@@ -1,9 +1,7 @@
-using System;
 using System.ComponentModel;
 using System.Composition;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-using Microsoft.Extensions.Caching.Memory;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace NosAyudamos
 {
@@ -29,43 +27,39 @@ namespace NosAyudamos
     [Shared]
     class Environment : IEnvironment
     {
-        const string KV = "kv-";
+        readonly IConfiguration config;
 
-        IMemoryCache cache;
-        Lazy<SecretClient> client;
-
-        public Environment(IMemoryCache cache)
+        public Environment()
         {
-            this.cache = cache;
-            client = new Lazy<SecretClient>(() => new SecretClient(new Uri(GetVariable("KeyVaultUrl")), new DefaultAzureCredential()));
+            var builder = new ConfigurationBuilder()
+                 .SetBasePath(Directory.GetCurrentDirectory())
+                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                 .AddJsonFile("secrets.settings.json", optional: true, reloadOnChange: true)
+                 .AddJsonFile("tests.settings.json", optional: true, reloadOnChange: true)
+                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                 .AddEnvironmentVariables();
+
+            var config = builder.Build();
+
+            // Use the config above to initialize the keyvault config extension.
+            builder.AddAzureKeyVault(
+                $"https://{config["AzureKeyVaultName"]}.vault.azure.net/",
+                config["AZURE_CLIENT_ID"],
+                config["AZURE_CLIENT_SECRET"]);
+
+            // Now build the final version that includes the keyvault provider.
+            this.config = builder.Build();
         }
 
-        public string GetVariable(string name)
-        {
-            var value = Ensure.NotEmpty(
-                    System.Environment.GetEnvironmentVariable(
-                        Ensure.NotEmpty(name, nameof(name))), name);
-
-            if (IsDev())
-            {
-                return value.StartsWith(KV, StringComparison.OrdinalIgnoreCase) ? GetSecret(value) : value;
-            }
-
-            return value;
-        }
+        public string GetVariable(string name) =>
+            Ensure.NotEmpty(config[Ensure.NotEmpty(name, nameof(name))], name);
 
         public T GetVariable<T>(string name, T defaultValue = default)
         {
-            var value = System.Environment.GetEnvironmentVariable(
-                        Ensure.NotEmpty(name, nameof(name)));
+            var value = config[Ensure.NotEmpty(name, nameof(name))];
 
             if (value != null)
             {
-                if (IsDev())
-                {
-                    value = value.StartsWith(KV, StringComparison.OrdinalIgnoreCase) ? GetSecret(value) : value;
-                }
-
                 if (value is T typed)
                     return typed;
 
@@ -75,29 +69,6 @@ namespace NosAyudamos
             }
 
             return defaultValue;
-        }
-
-        private string GetSecret(string name)
-        {
-            if (!cache.TryGetValue(name, out string value))
-            {
-                var secret = client.Value.GetSecret(name);
-                var val = secret?.Value?.Value ?? throw new ArgumentException(name);
-                cache.Set(name, val);
-
-                value = val;
-            }
-
-            return value;
-        }
-
-        private bool IsDev()
-        {
-            var value = System.Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT");
-
-            value ??= "Production";
-
-            return value == "Development";
         }
     }
 

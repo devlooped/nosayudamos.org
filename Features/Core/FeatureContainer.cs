@@ -53,11 +53,10 @@ namespace NosAyudamos
 
             var testServices = new HashSet<Type>
             {
-                typeof(IEnvironment),
                 typeof(HttpClient),
             };
 
-            new Startup().Configure(services, new FeatureEnvironment());
+            new Startup().Configure(services, new Environment());
 
             var candidate = services.Where(desc =>
                 !testServices.Contains(desc.ServiceType) &&
@@ -108,7 +107,6 @@ namespace NosAyudamos
                 }
             }
 
-            builder.RegisterType<FeatureEnvironment>().As<IEnvironment>().SingleInstance();
             // For some reason, the built-in registrations we were providing via Startup for HttpClient weren't working.
             builder.RegisterType<HttpClient>().InstancePerDependency();
 
