@@ -17,7 +17,7 @@ namespace NosAyudamos
             string lastName,
             string phoneNumber,
             string? dateOfBirth = default,
-            string? sex = default)
+            Sex? sex = default)
             : this() =>
             // TODO: validate args.
             Raise(new PersonRegistered(id, firstName, lastName, phoneNumber, dateOfBirth, sex));
@@ -34,7 +34,7 @@ namespace NosAyudamos
             string phoneNumber,
             int state,
             string? dateOfBirth = default,
-            string? sex = default,
+            Sex? sex = default,
             Role role = Role.Donee,
             double donatedAmount = 0)
             : this()
@@ -53,7 +53,7 @@ namespace NosAyudamos
         public string LastName { get; private set; }
         public string PhoneNumber { get; private set; }
         public string? DateOfBirth { get; private set; }
-        public string? Sex { get; private set; }
+        public Sex? Sex { get; private set; }
         public int State { get; private set; } = 0;
         public Role Role { get; set; } = Role.Donee;
 
@@ -63,7 +63,7 @@ namespace NosAyudamos
         {
             if (amount < 0)
                 throw new ArgumentException("Can only donate positive amounts.");
-
+            
             Raise(new Donated(amount));
         }
 

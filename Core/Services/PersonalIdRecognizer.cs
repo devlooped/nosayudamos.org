@@ -16,7 +16,7 @@ namespace NosAyudamos
             string lastName,
             string nationalId,
             string dateOfBirth,
-            string sex)
+            Sex sex)
             => (FirstName, LastName, NationalId, DateOfBirth, Sex)
             = (firstName, lastName, nationalId, dateOfBirth, sex);
 
@@ -24,22 +24,7 @@ namespace NosAyudamos
         public string LastName { get; }
         public string NationalId { get; }
         public string DateOfBirth { get; }
-        public string Sex { get; }
-    }
-
-    static class PersonalIdRecognizerExtensions
-    {
-        public static Task<PersonalId?> RecognizeAsync(this IPersonalIdRecognizer recognizer, string? imageUrl)
-        {
-            if (imageUrl == null ||
-                !Uri.TryCreate(imageUrl, UriKind.Absolute, out var imageUri) ||
-                imageUri == null)
-            {
-                return Task.FromResult<PersonalId?>(default);
-            }
-
-            return (recognizer ?? throw new ArgumentNullException(nameof(recognizer))).RecognizeAsync(imageUri);
-        }
+        public Sex Sex { get; }
     }
 
     class PersonalIdRecognizer : IPersonalIdRecognizer
@@ -84,7 +69,7 @@ namespace NosAyudamos
                         CultureInfo.CurrentCulture.TextInfo.ToTitleCase(elements[1].ToLower(CultureInfo.CurrentCulture)),
                         elements[4],
                         elements[6],
-                        elements[3]);
+                        elements[3] == "M" ? Sex.Male : Sex.Female);
                 }
             }
 

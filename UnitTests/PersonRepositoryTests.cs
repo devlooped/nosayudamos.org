@@ -64,7 +64,7 @@ namespace NosAyudamos
             person = await repo.GetAsync("23696294", true);
 
             // History is not loaded when creating readonly
-            Assert.Equal(0, person.History.Count());
+            Assert.Empty(person.History);
             Assert.Equal(1500, person.DonatedAmount);
 
             person = await repo.GetAsync("23696294", false);
