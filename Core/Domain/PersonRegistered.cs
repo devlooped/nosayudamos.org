@@ -8,7 +8,7 @@
             string lastName,
             string phoneNumber,
             string? dateOfBirth,
-            string? sex)
+            Sex? sex)
             => (Id, FirstName, LastName, PhoneNumber, DateOfBirth, Sex)
             = (id, firstName, lastName, phoneNumber, dateOfBirth, sex);
 
@@ -17,6 +17,6 @@
         public string LastName { get; }
         public string PhoneNumber { get; }
         public string? DateOfBirth { get; }
-        public string? Sex { get; }
+        public Sex? Sex { get; }
     }
 }
