@@ -28,9 +28,9 @@ namespace NosAyudamos
     [Shared]
     class Environment : IEnvironment
     {
-        readonly IConfiguration config;
+        static readonly IConfiguration config;
 
-        public Environment()
+        static Environment()
         {
             var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             // In locally run tests, the file will be alongside the assembly.
@@ -46,16 +46,16 @@ namespace NosAyudamos
                  .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                  .AddEnvironmentVariables();
 
-            var config = builder.Build();
+            var cfg = builder.Build();
 
             // Use the config above to initialize the keyvault config extension.
             builder.AddAzureKeyVault(
-                $"https://{config["AzureKeyVaultName"]}.vault.azure.net/",
-                config["AZURE_CLIENT_ID"],
-                config["AZURE_CLIENT_SECRET"]);
+                $"https://{cfg["AzureKeyVaultName"]}.vault.azure.net/",
+                cfg["AZURE_CLIENT_ID"],
+                cfg["AZURE_CLIENT_SECRET"]);
 
             // Now build the final version that includes the keyvault provider.
-            this.config = builder.Build();
+            config = builder.Build();
         }
 
         public string GetVariable(string name) =>
