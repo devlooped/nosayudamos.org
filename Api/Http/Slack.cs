@@ -73,8 +73,8 @@ namespace NosAyudamos.Http
 
             if (intent == "retry")
             {
-                string? from = json.messages?[0]?.blocks?[1]?.fields?[0]?.text;
-                string? to = json.messages?[0]?.blocks?[1]?.fields?[1]?.text;
+                string? from = json.message?.blocks?[1]?.fields?[0]?.text;
+                string? to = json.message?.blocks?[1]?.fields?[1]?.text;
 
                 if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(to) && !string.IsNullOrEmpty(message))
                     await handler.HandleAsync(new NosAyudamos.MessageReceived(from.Substring(from.LastIndexOf(':') + 1).Trim(), to.Substring(to.LastIndexOf(':') + 1).Trim(), message));
