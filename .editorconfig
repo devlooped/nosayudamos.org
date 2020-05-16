@@ -184,3 +184,9 @@ dotnet_diagnostic.CA2234.severity = none
 
 # VSTHRD012: Provide JoinableTaskFactory where allowed
 dotnet_diagnostic.VSTHRD012.severity = none
+
+# CA1819: Properties should not return arrays
+dotnet_diagnostic.CA1819.severity = none
+
+# CA1810: Initialize reference type static fields inline
+dotnet_diagnostic.CA1810.severity = suggestion
