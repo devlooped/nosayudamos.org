@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Composition;
 using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
@@ -25,7 +24,7 @@ namespace NosAyudamos
             => environment.GetVariable("TESTING", false);
     }
 
-    [Shared]
+    [NoExport]
     class Environment : IEnvironment
     {
         static readonly IConfiguration config;

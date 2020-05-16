@@ -89,6 +89,7 @@ namespace NosAyudamos
 
             services.AddSingleton<ILogger>(logger);
             services.AddLogging(lb => lb.AddSerilog(logger));
+            services.AddSingleton(environment);
 
             // DI conventions are:
             // 1. Candidates: types that implement at least one interface
@@ -132,7 +133,7 @@ namespace NosAyudamos
                 services.AddHttpClient<IMessaging, Messaging>().AddPolicyHandler(policy);
                 services.AddHttpClient<IPersonalIdRecognizer, PersonalIdRecognizer>().AddPolicyHandler(policy);
                 services.AddHttpClient<IQRCode, QRCode>().AddPolicyHandler(policy);
-                services.AddHttpClient<IStartupWorkflow, StartupWorkflow>().AddPolicyHandler(policy);
+                services.AddHttpClient<StartupWorkflow>().AddPolicyHandler(policy);
                 services.AddHttpClient<ChatApiMessaging>().AddPolicyHandler(policy);
             }
 
