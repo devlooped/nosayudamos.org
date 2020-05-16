@@ -27,7 +27,7 @@ namespace NosAyudamos
             await blobClient.UploadAsync(stream, true).ConfigureAwait(false);
         }
 
-        private BlobServiceClient CreateBlobServiceClient() => new BlobServiceClient(enviroment.GetVariable("StorageConnectionString"));
+        BlobServiceClient CreateBlobServiceClient() => new BlobServiceClient(enviroment.GetVariable("AzureWebJobsStorage"));
     }
 
     interface IBlobStorage
