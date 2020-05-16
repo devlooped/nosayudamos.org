@@ -1,6 +1,4 @@
-using System.Reflection;
 using Microsoft.Azure.Cosmos.Table;
-using System.Diagnostics.Contracts;
 
 namespace NosAyudamos
 {
@@ -15,14 +13,6 @@ namespace NosAyudamos
 
         public RepositoryFactory(CloudStorageAccount storageAccount) => this.storageAccount = storageAccount;
 
-        public IRepository<T> Create<T>()
-            where T : class, ITableEntity
-        {
-            var table = typeof(T).GetTypeInfo().GetCustomAttribute<TableAttribute>();
-
-            Contract.Assert(table != null);
-
-            return new Repository<T>(storageAccount, table?.Name!);
-        }
+        public IRepository<T> Create<T>() where T : class, ITableEntity => new Repository<T>(storageAccount);
     }
 }

@@ -8,17 +8,10 @@ namespace NosAyudamos
         where T : class, ITableEntity
     {
         readonly CloudStorageAccount storageAccount;
-        readonly string tableName;
+        readonly string tableName = typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name;
         CloudTable? table;
 
-        public Repository(CloudStorageAccount storageAccount)
-            : this(storageAccount, typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name)
-        {
-        }
-
-        public Repository(CloudStorageAccount storageAccount, string tableName)
-            => (this.storageAccount, this.tableName)
-            = (storageAccount, tableName);
+        public Repository(CloudStorageAccount storageAccount) => this.storageAccount = storageAccount;
 
         public async Task<T> PutAsync(T entity)
         {
