@@ -7,8 +7,10 @@ namespace NosAyudamos
     class Repository<T> : IRepository<T>
         where T : class, ITableEntity
     {
+        static readonly string tableName = typeof(T).GetCustomAttribute<TableAttribute>()?.Name ??
+            typeof(T).Name.Replace("Entity", "", System.StringComparison.Ordinal);
+
         readonly CloudStorageAccount storageAccount;
-        readonly string tableName = typeof(T).GetCustomAttribute<TableAttribute>()?.Name ?? typeof(T).Name;
         CloudTable? table;
 
         public Repository(CloudStorageAccount storageAccount) => this.storageAccount = storageAccount;

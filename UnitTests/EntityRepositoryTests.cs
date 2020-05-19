@@ -1,17 +1,21 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
 namespace NosAyudamos
 {
-    public class EntityRepositoryTests
-    {
+    public class EntityRepositoryTests : IDisposable
+    { 
+        [Fact]
         public async Task CanSavePersonMessagingMap()
         {
             var expected = new PersonMessagingMap("23696294", "123", "987");
 
-            var repository = new EntityRepository<PersonMessagingMap>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer());
+            var repository = await GetRepositoryAsync<PersonMessagingMap>();
 
             await repository.PutAsync(expected);
 
@@ -22,6 +26,26 @@ namespace NosAyudamos
             Assert.Equal(expected.SystemNumber, actual.SystemNumber);
         }
 
+        [Fact]
+        public async Task CanGetAll()
+        {
+            var repository = await GetRepositoryAsync<NestedType>();
+
+            await repository.PutAsync(new NestedType { Id = Constants.Donee.PhoneNumber });
+            await repository.PutAsync(new NestedType { Id = Constants.Donor.PhoneNumber });
+            await repository.PutAsync(new NestedType { Id = Constants.System.PhoneNumber });
+
+            var count = 0;
+
+            await foreach (var entity in repository.GetAllAsync())
+            {
+                count++;
+            }
+
+            Assert.Equal(3, count);
+        }
+
+        [Fact]
         public async Task CanSaveNested()
         {
             var expected = new NestedType
@@ -31,7 +55,7 @@ namespace NosAyudamos
                 StringProp = "Foo"
             };
 
-            var repository = new EntityRepository<NestedType>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer());
+            var repository = await GetRepositoryAsync<NestedType>();
 
             await repository.PutAsync(expected);
 
@@ -39,6 +63,28 @@ namespace NosAyudamos
 
             Assert.Equal(expected.StringProp, actual.StringProp);
 
+        }
+
+        async Task<EntityRepository<T>> GetRepositoryAsync<T>([CallerMemberName] string? tableName = null)
+        {
+            var tableClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient();
+            var table = tableClient.GetTableReference(tableName);
+
+            await table.DeleteIfExistsAsync();
+            tableNames.Add(tableName);
+            return new EntityRepository<T>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer(), tableName);
+        }
+
+        List<string> tableNames = new List<string>();
+
+        public void Dispose()
+        {
+            var tableClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient();
+            foreach (var tableName in tableNames)
+            {
+                var table = tableClient.GetTableReference(tableName);
+                table.DeleteIfExists();
+            }
         }
 
         class NestedType

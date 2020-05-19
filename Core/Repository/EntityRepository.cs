@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace NosAyudamos
         {
             this.storageAccount = storageAccount;
             this.serializer = serializer;
-            table = new AsyncLazy<CloudTable>(() => GetTableAsync(tableName));
+            table = new AsyncLazy<CloudTable>(() => GetTableAsync(tableName ?? "Entity"));
         }
 
         public async Task DeleteAsync(T entity)
@@ -34,6 +35,22 @@ namespace NosAyudamos
             await table.ExecuteAsync(TableOperation.Delete(
                 new DynamicTableEntity(typeof(T).FullName!, key)))
                 .ConfigureAwait(false);
+        }
+
+        public async IAsyncEnumerable<T> GetAllAsync()
+        {
+            var table = await this.table.GetValueAsync().ConfigureAwait(false);
+            var query = new TableQuery().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, typeof(T).FullName!));
+
+            TableQuerySegment<DynamicTableEntity>? querySegment = null;
+            while (querySegment == null || querySegment.ContinuationToken != null)
+            {
+                querySegment = await table.ExecuteQuerySegmentedAsync(query, querySegment != null ? querySegment.ContinuationToken : null);
+                foreach (var entity in querySegment)
+                {
+                    yield return ToEntity(entity);
+                }
+            }
         }
 
         public async Task<T> GetAsync(string key)
@@ -124,6 +141,7 @@ namespace NosAyudamos
 
     interface IEntityRepository<T>
     {
+        IAsyncEnumerable<T> GetAllAsync();
         Task<T> GetAsync(string key);
         Task<T> PutAsync(T entity);
         Task DeleteAsync(T entity);
