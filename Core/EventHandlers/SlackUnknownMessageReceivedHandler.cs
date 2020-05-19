@@ -38,10 +38,10 @@ namespace NosAyudamos
 
             var intents = await language.GetIntentsAsync(e.Body);
             var context = new StringBuilder();
-            if (intents.TryGetValue("help", out var help))
+            if (intents.TryGetValue("Help", out var help))
                 context = context.Append(":pray: ").Append(help.Score?.ToString("0.##", CultureInfo.CurrentCulture));
 
-            if (intents.TryGetValue("donate", out var donate))
+            if (intents.TryGetValue("Donate", out var donate))
                 context = context.Append(":money_with_wings: ").Append(donate.Score?.ToString("0.##", CultureInfo.CurrentCulture));
 
             context = context.Append(" by ").Append(from).Append(", ").Append(e.When.Humanize());
