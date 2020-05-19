@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace NosAyudamos
@@ -16,6 +18,19 @@ namespace NosAyudamos
                 .DevelopmentStorageAccount
                 .CreateCloudTableClient()
                 .GetTableReference(nameof(Person)).DeleteIfExists();
+        }
+
+        public void PersonSerialization()
+        {
+            var person = Constants.Donee.Create();
+            var json = JsonConvert.SerializeObject(person);
+            var obj = JObject.Parse(json);
+            obj["TaxStatus"] = TaxStatus.Validated.ToString();
+
+            var actual = JsonConvert.DeserializeObject<Person>(obj.ToString());
+
+            Assert.Equal(TaxStatus.Validated, actual.TaxStatus);
+
         }
 
         //[Fact]

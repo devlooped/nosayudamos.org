@@ -2,14 +2,14 @@
 
 namespace NosAyudamos
 {
-    class PhoneIdMapEntity : TableEntity
+    class PhoneIdMap : TableEntity
     {
-        public PhoneIdMapEntity() { }
+        public PhoneIdMap() { }
 
-        public PhoneIdMapEntity(string phoneNumber, string nationalId)
+        public PhoneIdMap(string phoneNumber, string nationalId)
         {
             PartitionKey = phoneNumber;
-            RowKey = typeof(PhoneIdMapEntity).FullName;
+            RowKey = typeof(PhoneIdMap).FullName;
             NationalId = nationalId;
         }
 
