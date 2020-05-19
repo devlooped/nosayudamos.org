@@ -12,11 +12,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Features\Constants.cs" Link="Constants.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="EventStoreTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="5.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.*" />
+    <PackageReference Include="Moq" Version="4.14.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
@@ -28,11 +34,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="SampleRequests\**\*.*" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\Features\tests.settings.json" Link="tests.settings.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\Api\appsettings.json" Link="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\Api\local.settings.json" Link="local.settings.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\Api\secrets.settings.json" Condition="Exists('..\Api\secrets.settings.json')" Link="secrets.settings.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Features\LocalOnly\Content\**\*.*" LinkBase="Content" />
+    <None Include="..\Features\tests.settings.json" Link="tests.settings.json" />
+    <Content Include="..\Api\appsettings.json" Link="appsettings.json" />
+    <Content Include="..\Api\local.settings.json" Link="local.settings.json" />
+    <Content Include="..\Api\secrets.settings.json" Condition="Exists('..\Api\secrets.settings.json')" Link="secrets.settings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="@(None)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Update="@(Content)" CopyToOutputDirectory="PreserveNewest" />
     <UpToDateCheckInput Include="@(Content);@(None)" />
   </ItemGroup>
   

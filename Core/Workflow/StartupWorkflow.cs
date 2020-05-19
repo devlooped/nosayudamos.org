@@ -30,11 +30,11 @@ namespace NosAyudamos
             IPersonalIdRecognizer idRecognizer,
             ITaxIdRecognizer taxRecognizer,
             DurableAction durableAction,
-                            IMessaging messaging,
+            IMessaging messaging,
             HttpClient http,
-                            IBlobStorage blobStorage,
+            IBlobStorage blobStorage, 
             IPersonRepository personRepository,
-                            ILogger<StartupWorkflow> logger)
+            ILogger<StartupWorkflow> logger)
             => (this.environment, this.events, this.language, this.idRecognizer, this.taxRecognizer, this.durableAction, this.messaging, this.http, this.blobStorage, this.personRepository, this.logger)
             = (environment, events, language, idRecognizer, taxRecognizer, durableAction, messaging, http, blobStorage, personRepository, logger);
 
@@ -93,6 +93,10 @@ namespace NosAyudamos
                 if (person == null)
                 {
                     person = new Person(id.NationalId, id.FirstName, id.LastName, message.From, Role.Donee, id.DateOfBirth, id.Sex);
+
+                    var tax = await taxRecognizer.RecognizeAsync(person);
+                    if (tax != null)
+                        person.UpdateTaxStatus(tax);
 
                     await personRepository.PutAsync(person);
                 }

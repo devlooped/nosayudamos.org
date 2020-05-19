@@ -190,3 +190,6 @@ dotnet_diagnostic.CA1819.severity = none
 
 # CA1810: Initialize reference type static fields inline
 dotnet_diagnostic.CA1810.severity = suggestion
+
+# CA1034: Nested types should not be visible
+dotnet_diagnostic.CA1034.severity = suggestion

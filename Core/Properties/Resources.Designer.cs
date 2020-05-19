@@ -115,6 +115,15 @@ namespace NosAyudamos {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string UI_Donee_RejectedWithEarnings {
+            get {
+                return ResourceManager.GetString("UI_Donee_RejectedWithEarnings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Necesitás ayuda? Por favor decinos cuánto necesitas..
         /// </summary>
         internal static string UI_Donee_SendAmount {
@@ -147,6 +156,15 @@ namespace NosAyudamos {
         internal static string UI_UnknownIntent {
             get {
                 return ResourceManager.GetString("UI_UnknownIntent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ayudanos a proteger el sistema verificando que sos un ser humano. Por favor respondé con el número que ves en esta imagen (hacé click para ver la imagen completa). Gracias!.
+        /// </summary>
+        internal static string UI_VerifyCaptcha {
+            get {
+                return ResourceManager.GetString("UI_VerifyCaptcha", resourceCulture);
             }
         }
     }

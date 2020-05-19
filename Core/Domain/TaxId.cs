@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
 
 namespace NosAyudamos
 {
-    partial class TaxId
+    class TaxId : IEquatable<TaxId>
     {
         static readonly int[] multiplier = new[] { 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 };
 
@@ -40,5 +35,53 @@ namespace NosAyudamos
 
             return taxId + (mod == 0 ? "0" : mod == 1 ? "9" : (11 - mod).ToString(CultureInfo.InvariantCulture));
         }
+
+        public static TaxId Unknown { get; } = new TaxId(nameof(Unknown), TaxCategory.Unknown, TaxIdKind.Unknown);
+
+        /// <summary>
+        /// The person does not have a tax identification number.
+        /// </summary>
+        public static TaxId None { get; } = new TaxId(nameof(None), TaxCategory.NotApplicable, TaxIdKind.None);
+
+        public TaxId(string id, TaxCategory? category = default, TaxIdKind? kind = TaxIdKind.None)
+        {
+            Id = id;
+            Category = category ?? TaxCategory.Unknown;
+            Kind = kind ?? TaxIdKind.None;
+        }
+
+        /// <summary>
+        /// The tax identifier, either a <see cref="TaxIdKind.CUIT"/> or <see cref="TaxIdKind.CUIL"/>.
+        /// </summary>
+        public string Id { get; }
+
+        /// <summary>
+        /// Category for the simplified tax regime for individuals with low-ish income.
+        /// </summary>
+        public TaxCategory Category { get; set; }
+
+        public TaxIdKind Kind { get; set; } = TaxIdKind.None;
+
+        /// <summary>
+        /// Whether the tax registration includes income taxes.
+        /// </summary>
+        public bool? HasIncomeTax { get; set; }
+
+        public bool Equals(TaxId other) =>
+            Id == other.Id &&
+            Category == other.Category &&
+            Kind == other.Kind &&
+            HasIncomeTax == other.HasIncomeTax;
+
+        // override object.Equals
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is TaxId other))
+                return false;
+
+            return Equals(other);
+        }
+
+        public override int GetHashCode() => HashCode.Combine(Id, Category, Kind, HasIncomeTax);
     }
 }

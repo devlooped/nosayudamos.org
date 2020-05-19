@@ -51,7 +51,9 @@ namespace NosAyudamos
 
         public async Task<PersonalId?> RecognizeAsync(Uri imageUri)
         {
-            var bytes = await httpClient.GetByteArrayAsync(imageUri);
+            var bytes = imageUri.Scheme == "file" ?
+                await File.ReadAllBytesAsync(imageUri.AbsolutePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)) :
+                await httpClient.GetByteArrayAsync(imageUri);
 
             using var mem = new MemoryStream(bytes);
             using var image = (Bitmap)Image.FromStream(mem);
@@ -72,6 +74,7 @@ namespace NosAyudamos
                         elements[3] == "M" ? Sex.Male : Sex.Female);
                 }
             }
+            // TODO: add fallback via Computer Vision API + TaxIdRecognizer lookup to increase confidence and recognition results?
 
             return null;
         }

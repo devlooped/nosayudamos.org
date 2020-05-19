@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace NosAyudamos
 {
@@ -13,7 +14,7 @@ namespace NosAyudamos
         // observable state changes for the object but represented 
         // as a list of events.
         [System.Text.Json.Serialization.JsonIgnore]
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public IEnumerable<DomainEvent> Events => events ??= new List<DomainEvent>();
 
         /// <summary>
@@ -21,14 +22,15 @@ namespace NosAyudamos
         /// all its past events.
         /// </summary>
         [System.Text.Json.Serialization.JsonIgnore]
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public IEnumerable<DomainEvent> History => history ??= new List<DomainEvent>();
 
         /// <summary>
         /// Whether the domain object was created in a readonly manner, meaning 
         /// that events cannot be produced from it.
         /// </summary>
-        public bool IsReadOnly { get; protected set; }
+        [JsonIgnore]
+        public bool IsReadOnly { get; protected set; } = true;
 
         /// <summary>
         /// Accepts the pending events emitted by the domain object, and moves them to 
@@ -46,6 +48,12 @@ namespace NosAyudamos
         /// Registers a domain event handler.
         /// </summary>
         protected void Handles<T>(Action<T> handler) where T : DomainEvent => handlers.Add(typeof(T), e => handler((T)e));
+
+        /// <summary>
+        /// Raises and applies a new event of the specified type to the domain object.
+        /// See <see cref="Raise{T}(T)"/>.
+        /// </summary>
+        protected void Raise<T>() where T : DomainEvent, new() => Raise(new T());
 
         /// <summary>
         /// Raises and applies an event to the domain object.
@@ -79,6 +87,7 @@ namespace NosAyudamos
         /// </remarks>
         protected void Load(IEnumerable<DomainEvent> history)
         {
+            IsReadOnly = false;
             foreach (var e in history)
             {
                 if (handlers.TryGetValue(e.GetType(), out var handler))
