@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
 {
-    [Workflow("Donor")]
+    [Workflow(nameof(Role.Donor))]
     class DonorWorkflow : IWorkflow
     {
         readonly IEnvironment enviroment;
@@ -20,6 +20,6 @@ namespace NosAyudamos
                             (this.enviroment, this.textAnalysis, this.messaging, this.repositoryFactory, this.logger) =
                                 (enviroment, textAnalysis, messaging, repositoryFactory, logger);
 
-        public Task RunAsync(MessageEvent message) => Task.CompletedTask;
+        public Task RunAsync(MessageEvent message, Person? person) => Task.CompletedTask;
     }
 }

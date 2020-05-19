@@ -15,12 +15,10 @@ namespace NosAyudamos.Http
     {
         readonly IEventStreamAsync events;
         readonly ILogger<Twilio> logger;
-        readonly IStartupWorkflow workflow;
 
-        public Twilio(IEventStreamAsync events, IStartupWorkflow workflow, ILogger<Twilio> logger)
+        public Twilio(IEventStreamAsync events, ILogger<Twilio> logger)
         {
             this.events = events;
-            this.workflow = workflow;
             this.logger = logger;
         }
 
