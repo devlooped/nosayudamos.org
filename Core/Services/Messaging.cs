@@ -16,10 +16,15 @@ namespace NosAyudamos
         readonly Lazy<IMessaging> chatApi;
         readonly Lazy<IMessaging> log;
         readonly IEnvironment environment;
+        readonly IEntityRepository<PhoneSystem> phoneRepo;
 
-        public Messaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment, HttpClient httpClient, ISerializer serializer, ILogger<Messaging> logger)
+        public Messaging(
+            IReadOnlyPolicyRegistry<string> registry, IEnvironment environment, 
+            IEntityRepository<PhoneSystem> phoneRepo, HttpClient httpClient, 
+            ISerializer serializer, ILogger<Messaging> logger)
         {
             this.environment = environment;
+            this.phoneRepo = phoneRepo;
             twilio = new Lazy<IMessaging>(() => new TwilioMessaging(registry, environment));
             chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(environment, httpClient, serializer));
             log = new Lazy<IMessaging>(() => new LogMessaging(logger));
@@ -44,6 +49,18 @@ namespace NosAyudamos
 
             if (sendMessage)
             {
+                // Send to users from the same phone number they last used to communicate 
+                // with the system, if not provided.
+                if (string.IsNullOrEmpty(from))
+                {
+                    var map = await phoneRepo.GetAsync(to);
+                    if (map != null)
+                        from = map.SystemNumber;
+                }
+
+                // TODO: from domain events anywhere in the app, it's really not possible 
+                // to know/propagate the incoming phone number used by the initial user 
+                // interactions.
                 if (from == chatApiNumber.Value)
                     await chatApi.Value.SendTextAsync(from, body, to);
                 else
