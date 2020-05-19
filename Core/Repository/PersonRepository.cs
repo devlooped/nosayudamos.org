@@ -52,7 +52,7 @@ namespace NosAyudamos
             if (existing != null && existing.PhoneNumber != person.PhoneNumber)
             {
                 var mapEntity =
-                    await GetAsync<PhoneIdMapEntity>(existing.PhoneNumber).ConfigureAwait(false);
+                    await GetAsync<PhoneIdMap>(existing.PhoneNumber).ConfigureAwait(false);
 
                 if (mapEntity != null)
                 {
@@ -63,7 +63,7 @@ namespace NosAyudamos
 
             await table.ExecuteAsync(
                 TableOperation.InsertOrReplace(
-                    new PhoneIdMapEntity(person.PhoneNumber, person.Id!))).ConfigureAwait(false);
+                    new PhoneIdMap(person.PhoneNumber, person.Id!))).ConfigureAwait(false);
 
             var partition = new Partition(table, person.Id!);
             var result = await Stream.TryOpenAsync(partition);
@@ -106,7 +106,7 @@ namespace NosAyudamos
 
         public async Task<Person?> FindAsync(string phoneNumber, bool readOnly = true)
         {
-            var mapEntity = await GetAsync<PhoneIdMapEntity>(phoneNumber).ConfigureAwait(false);
+            var mapEntity = await GetAsync<PhoneIdMap>(phoneNumber).ConfigureAwait(false);
 
             return mapEntity == null ? default :
                 await GetAsync(mapEntity.NationalId, readOnly).ConfigureAwait(false);

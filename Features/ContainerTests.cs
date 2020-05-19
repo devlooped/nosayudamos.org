@@ -13,7 +13,7 @@ namespace NosAyudamos
             var container = new FeatureContainer();
             var repo = container.Resolve<IEntityRepository<Foo>>();
 
-            container.Resolve<IRepository<PhoneIdMapEntity>>();
+            container.Resolve<IRepository<PhoneIdMap>>();
 
             await repo.PutAsync(new Foo { Id = "Bar", Value = "Baz" });
         }
