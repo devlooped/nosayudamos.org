@@ -19,7 +19,13 @@ namespace NosAyudamos
     [Shared]
     class LanguageUnderstanding : ILanguageUnderstanding
     {
-        static readonly Dictionary<string, Intent> emptyIntents = new Dictionary<string, Intent>();
+        static readonly Prediction emptyPrediction = new Prediction
+        {
+            Entities = new Dictionary<string, object>(),
+            Intents = new Dictionary<string, Intent>(), 
+            Sentiment = new Sentiment()
+        };
+
 
         readonly IEnvironment enviroment;
         readonly IReadOnlyPolicyRegistry<string> registry;
@@ -29,36 +35,10 @@ namespace NosAyudamos
             (this.enviroment, this.registry, this.logger) = (enviroment, registry, logger);
 
         public async Task<IDictionary<string, Intent>> GetIntentsAsync(string? text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return emptyIntents;
+            => new Dictionary<string, Intent>((await PredictAsync(text)).Intents, StringComparer.OrdinalIgnoreCase);
 
-            using var luisClient = CreateLuisRuntimeClient();
-
-            var requestOptions = new PredictionRequestOptions
-            {
-                PreferExternalEntities = true,
-            };
-
-            var predictionRequest = new PredictionRequest
-            {
-                Query = text,
-                Options = requestOptions
-            };
-
-            var policy = registry.Get<IAsyncPolicy>("LuisPolicy");
-
-            var predictionResponse = await policy.ExecuteAsync(async () =>
-                await luisClient.Prediction.GetSlotPredictionAsync(
-                    Guid.Parse(enviroment.GetVariable("LuisAppId")),
-                    slotName: enviroment.GetVariable<string>("LuisAppSlot", "staging"),
-                    predictionRequest,
-                    verbose: true,
-                    showAllIntents: false,
-                    log: true).ConfigureAwait(false));
-
-            return predictionResponse.Prediction.Intents;
-        }
+        public async Task<IDictionary<string, object>> GetEntitiesAsync(string? text)
+            => new Dictionary<string, object>((await PredictAsync(text)).Entities, StringComparer.OrdinalIgnoreCase);
 
         public async Task AddUtteranceAsync(string? utterance, string? intent)
         {
@@ -97,7 +77,39 @@ namespace NosAyudamos
             }
         }
 
-        private Authoring.ILUISAuthoringClient CreateLuisAuthoringClient()
+        async Task<Prediction> PredictAsync(string? text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return emptyPrediction;
+
+            using var luisClient = CreateLuisRuntimeClient();
+
+            var requestOptions = new PredictionRequestOptions
+            {
+                PreferExternalEntities = true,
+            };
+
+            var predictionRequest = new PredictionRequest
+            {
+                Query = text,
+                Options = requestOptions
+            };
+
+            var policy = registry.Get<IAsyncPolicy>("LuisPolicy");
+
+            var predictionResponse = await policy.ExecuteAsync(async () =>
+                await luisClient.Prediction.GetSlotPredictionAsync(
+                    Guid.Parse(enviroment.GetVariable("LuisAppId")),
+                    slotName: enviroment.GetVariable("LuisAppSlot", "staging"),
+                    predictionRequest,
+                    verbose: true,
+                    showAllIntents: false,
+                    log: true).ConfigureAwait(false));
+
+            return predictionResponse.Prediction;
+        }
+
+        Authoring.ILUISAuthoringClient CreateLuisAuthoringClient()
         {
             var credentials = new Authoring.ApiKeyServiceClientCredentials(
                 enviroment.GetVariable("LuisAuthoringKey"));
@@ -108,7 +120,7 @@ namespace NosAyudamos
             };
         }
 
-        private Runtime.ILUISRuntimeClient CreateLuisRuntimeClient()
+        Runtime.ILUISRuntimeClient CreateLuisRuntimeClient()
         {
             var credentials = new Runtime.ApiKeyServiceClientCredentials(
                 enviroment.GetVariable("LuisSubscriptionKey"));
@@ -122,8 +134,8 @@ namespace NosAyudamos
 
     interface ILanguageUnderstanding
     {
+        Task<IDictionary<string, object>> GetEntitiesAsync(string? text);
         Task<IDictionary<string, Intent>> GetIntentsAsync(string? text);
         Task AddUtteranceAsync(string? utterance, string? intent);
     }
-
 }
