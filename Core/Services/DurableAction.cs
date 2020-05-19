@@ -7,23 +7,23 @@ using System.Threading.Tasks;
 namespace NosAyudamos
 {
     [Export]
-    class InteractiveAction
+    class DurableAction
     {
-        readonly IRepository<ActionRetryEntity> repository;
+        readonly IRepository<DurableActionEntity> repository;
         readonly IEnvironment environment;
 
-        public InteractiveAction(IRepository<ActionRetryEntity> repository, IEnvironment environment)
+        public DurableAction(IRepository<DurableActionEntity> repository, IEnvironment environment)
             => (this.repository, this.environment)
             = (repository, environment);
 
-        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Catching general exeception because if retry pattern")]
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Catching general exeception because of retry pattern")]
         public async Task<TResult> ExecuteAsync<TResult>(
             Func<Task<TResult>> action,
             Func<Task> onRetry,
             Func<Task> onCancel,
             [CallerMemberName] string actionName = "") where TResult : class
         {
-            var actionId = typeof(InteractiveAction).Name;
+            var actionId = typeof(DurableAction).Name;
             var actionRetry = await repository.GetAsync(actionId, actionName);
 
             if (actionRetry != null)
@@ -32,12 +32,12 @@ namespace NosAyudamos
             }
             else
             {
-                actionRetry = new ActionRetryEntity(actionId, actionName);
+                actionRetry = new DurableActionEntity(actionId, actionName);
             }
 
             try
             {
-                if (actionRetry.RetryCount < environment.GetVariable<int>("ResilientNumberOfRetries", 3))
+                if (actionRetry.RetryCount < environment.GetVariable("DurableActionRetries", 3))
                 {
                     TResult result = await action();
 
