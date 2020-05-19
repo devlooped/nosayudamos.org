@@ -4,12 +4,6 @@ namespace NosAyudamos
 {
     interface IWorkflow
     {
-        Task RunAsync(MessageEvent @event);
-    }
-
-    enum Workflow
-    {
-        Donor,
-        Donee
+        Task RunAsync(MessageEvent @event, Person? person);
     }
 }
