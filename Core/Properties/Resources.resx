@@ -135,6 +135,9 @@
   <data name="Startup_Starting" xml:space="preserve">
     <value>Iniciando</value>
   </data>
+  <data name="UI_Donee_RejectedWithEarnings" xml:space="preserve">
+    <value />
+  </data>
   <data name="UI_Donee_SendAmount" xml:space="preserve">
     <value>Necesitás ayuda? Por favor decinos cuánto necesitas.</value>
   </data>
@@ -146,5 +149,8 @@
   </data>
   <data name="UI_UnknownIntent" xml:space="preserve">
     <value>Gracias por tu mensaje! Comentanos si necesitas ayuda o estás interesando en ayudar a otros.</value>
+  </data>
+  <data name="UI_VerifyCaptcha" xml:space="preserve">
+    <value>Ayudanos a proteger el sistema verificando que sos un ser humano. Por favor respondé con el número que ves en esta imagen (hacé click para ver la imagen completa). Gracias!</value>
   </data>
 </root>

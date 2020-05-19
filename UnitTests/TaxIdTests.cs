@@ -1,8 +1,12 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace NosAyudamos
@@ -10,80 +14,42 @@ namespace NosAyudamos
     public class TaxIdTests
     {
         [Theory]
+        [InlineData("22611647", Sex.Female, "27226116473")]
         [InlineData("23696294", Sex.Male, "20236962947")]
+        [InlineData("20023377", Sex.Male, "20200233779")]
+        [InlineData("28162083", Sex.Male, "20281620836")]
         [InlineData("22718904", Sex.Female, "27227189040")]
+        [InlineData("30082615", Sex.Female, "27300826151")]
         public void CalculateTaxId(string personalId, Sex sex, string taxId) 
             => Assert.Equal(taxId, TaxId.FromNationalId(personalId, sex));
 
-        [Theory(Skip = "Requires manual validation of captchas")]
-        [InlineData("45234079", "Agustina Paula", "Cazzulino", Sex.Female, "")]
-        [InlineData("23696294", "Daniel Hector", "Cazzulino", Sex.Male, null)]
-        [InlineData("22718904", "Analia Viviana", "Carvallo", Sex.Female, "A")]
-        public async Task GetConstancia(string nationalId, string firstName, string lastName, Sex sex, string expectedCategory)
+        [Theory]
+        [InlineData("47165853", "", "", Sex.Female, null, TaxIdKind.None, null)]
+        [InlineData("45234079", "", "", Sex.Female, null, TaxIdKind.CUIL, null)]
+        [InlineData("23696294", "", "", Sex.Male, null, TaxIdKind.CUIT, true)]
+        [InlineData("22718904", "", "", Sex.Female, TaxCategory.A, TaxIdKind.CUIT, false)]
+        [InlineData("20189078", "", "", Sex.Male, TaxCategory.NotApplicable, TaxIdKind.CUIT, false)]
+        [InlineData("25188539", "", "", Sex.Male, TaxCategory.D, TaxIdKind.CUIT, null)]
+        
+        public async Task GetTaxStatus(
+            string nationalId, string firstName, string lastName, Sex sex, 
+            TaxCategory? category, TaxIdKind? kind, bool? hasIncomeTax)
         {
+            var env = new Environment();
             using var http = new HttpClient();
-            var recognizer = new TaxIdRecognizer(http);
-
-            var taxId = TaxId.FromNationalId(nationalId, sex);
-            var captcha = await recognizer.GetCaptchaAsync();
-
-            while (captcha == null)
-            {
-                captcha = await recognizer.GetCaptchaAsync();
-                Thread.Sleep(10000);
-            }
-
-            File.WriteAllBytes(Path.Combine(Path.GetTempPath(), "captcha.gif"), captcha.Image);
-            Process.Start(new ProcessStartInfo(Path.Combine(Path.GetTempPath(), "captcha.gif"))
-            {
-                UseShellExecute = true
-            });
-
-            var code = "REPLACE WITH CAPTCHA";
-            File.WriteAllText(Path.Combine(Path.GetTempPath(), "captcha.txt"), code);
-            Process.Start(new ProcessStartInfo(Path.Combine(Path.GetTempPath(), "captcha.txt"))
-            {
-                UseShellExecute = true
-            });
-
-            while (code == "REPLACE WITH CAPTCHA")
-            {
-                Thread.Sleep(1000);
-                code = File.ReadAllText(Path.Combine(Path.GetTempPath(), "captcha.txt"));
-            }
+            var recognizer = new TaxIdRecognizer(env, http, Mock.Of<ILogger<TaxIdRecognizer>>());
 
             var id = await recognizer.RecognizeAsync(
-                new Person(nationalId, firstName, lastName, "9112223333", sex: sex),
-                code,
-                captcha.Code);
+                new Person(nationalId, firstName, lastName, "9112223333", sex: sex));
 
-            Assert.Equal(expectedCategory, id.Category);
-        }
+            if (category != null)
+                Assert.Equal(category, id.Category);
 
-        [Fact]
-        public async Task RecognizeNonMatchingFullname()
-        {
-            using var http = new HttpClient();
-            var recognizer = new TaxIdRecognizer(http);
+            if (kind != null)
+                Assert.Equal(kind, id.Kind);
 
-            var id = await recognizer.RecognizeAsync(
-                new Person("23696294", "Foo", "Bar", "9112223333", sex: Sex.Male),
-                "1234", "1234");
-
-            Assert.Null(id);
-        }
-
-        [Fact]
-        public async Task RecognizeWithExpiredCaptcha()
-        {
-            using var http = new HttpClient();
-            var recognizer = new TaxIdRecognizer(http);
-
-            var id = await recognizer.RecognizeAsync(
-                new Person("23696294", "Daniel Hector", "Cazzulino", "9112223333", sex: Sex.Male),
-                "27985", "1589554273345");
-
-            Assert.Same(TaxId.Expired, id);
+            if (hasIncomeTax != null)
+                Assert.Equal(hasIncomeTax, id.HasIncomeTax);
         }
     }
 }

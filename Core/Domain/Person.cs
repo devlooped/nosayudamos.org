@@ -1,8 +1,8 @@
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. The pattern is intentional for an event-sourced domain object.
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NosAyudamos
 {
@@ -16,47 +16,60 @@ namespace NosAyudamos
             string firstName,
             string lastName,
             string phoneNumber,
+            Role role = Role.Donee,
             string? dateOfBirth = default,
             Sex? sex = default)
-            : this() =>
-            // TODO: validate args.
-            Raise(new PersonRegistered(id, firstName, lastName, phoneNumber, dateOfBirth, sex));
-
-        /// <summary>
-        /// Deserialization ctor for readonly quick loading from repository
-        /// </summary>
-        [JsonConstructor]
-        [SuppressMessage("Design", "IDE0051:Remove unused private members", Justification = "Deserialization constructor.")]
-        Person(
-            string id,
-            string firstName,
-            string lastName,
-            string phoneNumber,
-            int state,
-            string? dateOfBirth = default,
-            Sex? sex = default,
-            Role role = Role.Donee,
-            double donatedAmount = 0)
             : this()
-            => (Id, FirstName, LastName, PhoneNumber, State, DateOfBirth, Sex, Role, DonatedAmount, IsReadOnly)
-            = (id, firstName, lastName, phoneNumber, state, dateOfBirth, sex, role, donatedAmount, true);
+        {
+            IsReadOnly = false;
+            // TODO: validate args.
+            Raise(new PersonRegistered(id, firstName, lastName, phoneNumber, role, dateOfBirth, sex));
+        }
 
         Person()
         {
             Handles<PersonRegistered>(OnRegistered);
             Handles<Donated>(OnDonated);
             Handles<PhoneNumberUpdated>(OnPhoneNumberUpdated);
+            Handles<TaxStatusAccepted>(OnTaxStatusAccepted);
+            Handles<TaxStatusRejected>(OnTaxStatusRejected);
         }
 
-        public string Id { get; private set; }
-        public string FirstName { get; private set; }
-        public string LastName { get; private set; }
-        public string PhoneNumber { get; private set; }
-        public string? DateOfBirth { get; private set; }
-        public Sex? Sex { get; private set; }
-        public int State { get; private set; } = 0;
-        public Role Role { get; set; } = Role.Donee;
+        // NOTE: the [JsonProperty] attributes allow the deserialization from 
+        // JSON to be able to set the properties when loading from the last  
+        // saved known snapshot state.
 
+        [JsonProperty]
+        public string Id { get; private set; }
+        
+        [JsonProperty]
+        public string FirstName { get; private set; }
+        
+        [JsonProperty]
+        public string LastName { get; private set; }
+        
+        [JsonProperty]
+        public string PhoneNumber { get; private set; }
+        
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Role Role { get; set; } = Role.Donee;
+        
+        [JsonProperty]
+        public string? DateOfBirth { get; private set; }
+        
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Sex? Sex { get; private set; }
+        
+        [JsonProperty]
+        public int State { get; private set; } = 0;
+
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public TaxStatus TaxStatus { get; private set; } = TaxStatus.Unknown;
+
+        [JsonProperty]
         public double DonatedAmount { get; private set; }
 
         public void Donate(double amount)
@@ -78,12 +91,54 @@ namespace NosAyudamos
             Raise(new PhoneNumberUpdated(PhoneNumber, phoneNumber));
         }
 
+        public bool CanUpdateTaxStatus(TaxId taxId)
+            => taxId != TaxId.Unknown &&
+            (taxId.Kind == TaxIdKind.CUIL ||
+            taxId.HasIncomeTax == true ||
+            (taxId.Category != TaxCategory.Unknown && taxId.Category != TaxCategory.A));
+
+        /// <summary>
+        /// Tries to validate the tax status given the tax information.
+        /// Returns whether the information was sufficent to determine 
+        /// the final status.
+        /// </summary>
+        public void UpdateTaxStatus(TaxId taxId)
+        {
+            if (taxId == TaxId.Unknown)
+                return;
+
+            if (taxId == TaxId.None || taxId.Kind == TaxIdKind.CUIL)
+            {
+                // We just accept CUIL-based registrations, we can't know whether 
+                // they pay earnings or not :(
+                Raise(new TaxStatusAccepted(taxId.Id, TaxIdKind.CUIL));
+                return;
+            }
+
+            if (taxId.HasIncomeTax == true)
+            {
+                Raise(new TaxStatusRejected(Id, taxId.Id, TaxStatusRejectedReason.HasEarnings));
+                return;
+            }
+
+            if (taxId.Category != TaxCategory.Unknown && 
+                taxId.Category != TaxCategory.A)
+            {
+                Raise(new TaxStatusRejected(Id, taxId.Id, TaxStatusRejectedReason.HighCategory));
+                return;
+            }
+        }
+
         void OnRegistered(PersonRegistered e)
-            => (Id, FirstName, LastName, PhoneNumber, DateOfBirth, Sex)
-            = (e.Id, e.FirstName, e.LastName, e.PhoneNumber, e.DateOfBirth, e.Sex);
+            => (Id, FirstName, LastName, PhoneNumber, Role, DateOfBirth, Sex)
+            = (e.Id, e.FirstName, e.LastName, e.PhoneNumber, e.Role, e.DateOfBirth, e.Sex);
 
         void OnDonated(Donated e) => DonatedAmount += e.Amount;
 
         void OnPhoneNumberUpdated(PhoneNumberUpdated e) => PhoneNumber = e.NewNumber;
+
+        void OnTaxStatusAccepted(TaxStatusAccepted e) => TaxStatus = TaxStatus.Validated;
+        
+        void OnTaxStatusRejected(TaxStatusRejected e) => TaxStatus = TaxStatus.Rejected;
     }
 }

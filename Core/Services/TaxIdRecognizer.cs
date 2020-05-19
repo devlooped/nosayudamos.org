@@ -1,56 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Sgml;
 
 namespace NosAyudamos
 {
-    public class Captcha
-    {
-        public Captcha(string code, byte[] image)
-        {
-            Code = code;
-            Image = image;
-        }
-
-        public string Code { get; }
-        public byte[] Image { get; }
-    }
-
-    public partial class TaxId
-    {
-        /// <summary>
-        /// The code used to generate the captcha has expired. A new 
-        /// captcha must be regenerated and validated.
-        /// </summary>
-        public static TaxId Expired { get; } = new TaxId("", null);
-        /// <summary>
-        /// The person does not have a tax identification number.
-        /// </summary>
-        public static TaxId None { get; } = new TaxId("", "");
-        /// <summary>
-        /// The site to retrieve tax information is down.
-        /// </summary>
-        public static TaxId SiteDown { get; } = new TaxId("", null);
-
-        public TaxId(string id, string? category)
-        {
-            Id = id;
-            Category = category;
-        }
-
-        public string Id { get; }
-        public string? Category { get; }
-    }
-
-    class TaxIdRecognizer
+    class TaxIdRecognizer : ITaxIdRecognizer
     {
         static readonly Random random = new Random();
         const string LookupUrl = "https://www.cuitonline.com/search.php?q=";
@@ -58,11 +25,15 @@ namespace NosAyudamos
         const string ConstanciaUrl = AfipUrl + "/padron-puc-constancia-internet/jsp/Constancia.jsp";
         const string CaptchaUrl = AfipUrl + "/padron-puc-constancia-internet/images/CaptchaCode.gif?bar=";
 
+        readonly IEnvironment environment;
         readonly HttpClient http;
+        readonly ILogger<TaxIdRecognizer> logger;
 
-        public TaxIdRecognizer(HttpClient http)
+        public TaxIdRecognizer(IEnvironment environment, HttpClient http, ILogger<TaxIdRecognizer> logger)
         {
+            this.environment = environment;
             this.http = http;
+            this.logger = logger;
 
             http.DefaultRequestHeaders.Remove("User-Agent");
             http.DefaultRequestHeaders.Remove("Origin");
@@ -76,117 +47,315 @@ namespace NosAyudamos
         /// <summary>
         /// Gets a captcha to use for requests related to tax information.
         /// </summary>
-        /// <returns>A code and its associated captcha for verification, or <see langword="null"/>
+        /// <returns>A code and its associated captcha value for verification, or <see langword="null"/>
         /// if the site for tax information validation and retrieval is down.
         /// </returns>
-        public async Task<Captcha?> GetCaptchaAsync()
+        async Task<(string bar, string value)?> GetCaptchaAsync()
         {
-            var page = await http.GetStringAsync(ConstanciaUrl).ConfigureAwait(false);
+            string? value;
+            string? bar;
 
-            using var reader = new SgmlReader(new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore });
-            reader.InputStream = new StringReader("<page>" + page + "</page>");
-            var xml = XDocument.Load(reader);
+            do
+            {
+                var xml = await ReadXmlAsync(await http.GetAsync(ConstanciaUrl)).ConfigureAwait(false);
+                bar = (string)xml.CreateNavigator().Evaluate("string(//INPUT[@id='bar']/@value)");
+                // AFIP site is down, can't do anything
+                if (string.IsNullOrEmpty(bar))
+                    return default;
 
-            var bar = xml.Descendants("INPUT")
-                .Where(input => input.Attribute("id")?.Value == "bar")
-                .Select(input => input.Attribute("value")?.Value)
-                .FirstOrDefault();
+                var image = await http.GetByteArrayAsync(CaptchaUrl + bar + random.NextDouble());
+                value = await RecognizeCaptchaAsync(image);
 
-            if (string.IsNullOrEmpty(bar))
+                // We should have recognized at least a 5 digit captcha. It may 
+                // become longer/more complex, but never shorter, IMO.
+            } while (value != null && value.Length < 5);
+
+            if (bar == null || value == null)
                 return null;
 
-            var image = await http.GetByteArrayAsync(CaptchaUrl + bar + random.NextDouble());
-
-            return new Captcha(bar, image);
+            return (bar, value);
         }
 
-        public async Task<TaxId?> RecognizeAsync(Person person, string captcha, string code)
+        public async Task<TaxId?> RecognizeAsync(Person person)
         {
+            var tax = await LookupAsync(person.Id);
+
+            // If we got something from the quick lookup that can be sufficient to 
+            // approve/deny status quickly, shortcircuit.
+            if (person.CanUpdateTaxStatus(tax))
+                return tax;
+
+            // We can't continue since the next part is for CUITs only.
+            if (tax.Kind == TaxIdKind.CUIL)
+                return tax;
+
             var taxId = TaxId.FromNationalId(person.Id, person.Sex);
 
-            var page = await http.GetStringAsync(LookupUrl + taxId).ConfigureAwait(true);
-            XDocument xml;
-
-            using (var reader = new SgmlReader(new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore }))
-            {
-                reader.InputStream = new StringReader("<page>" + page + "</page>");
-                xml = XDocument.Load(reader);
-            }
-
-            var title = xml.Descendants("{http://www.w3.org/1999/xhtml}div")
-                .Where(div => div.Attribute("class")?.Value == "denominacion")
-                .Descendants("{http://www.w3.org/1999/xhtml}a")
-                .Select(d => d.Attribute("title")?.Value).FirstOrDefault();
-
-            if (string.IsNullOrEmpty(title))
-                return TaxId.None;
-
-            var contributorFullName = string.Join(' ', title
-                .Split(' ')
-                .Where(word => word.All(c => char.IsUpper(c)))
-                .Select(word => CultureInfo.CurrentCulture.TextInfo.ToTitleCase(word.ToLower(CultureInfo.CurrentCulture)))
-                .ToList());
-
-            // They should match. Is this an invalid scenario?
-            if (!contributorFullName.Equals(person.LastName + " " + person.FirstName, StringComparison.OrdinalIgnoreCase))
-                return null;
-
-            using var request = new HttpRequestMessage(
-                HttpMethod.Post,
-                "https://seti.afip.gob.ar/padron-puc-constancia-internet/ConstanciaAction.do?bar=" + code);
-
-            request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            var xml = await PostFormAsync(new Dictionary<string, string>
             {
                 { "cuit", taxId},
-                { "captchaField", captcha},
-                { "bar", code},
             });
 
-            var result = await http.SendAsync(request);
-            if (!result.IsSuccessStatusCode)
-                return TaxId.SiteDown;
+            // Site is down, can't get any content.
+            if (xml == null)
+                return null;
 
-            var body = await result.Content.ReadAsStringAsync();
+            var options = xml.CreateNavigator().Select("//select[@name='tipoCertificado']//option[@value!='']/@value")
+                .OfType<XPathItem>().Select(x => x.Value).ToArray();
 
+            // If there are multiple form choices, query them all and merge the results
+            if (options.Length > 0)
+            {
+                TaxId? mergedTaxId = default;
+                foreach (var option in options)
+                {
+                    xml = await PostFormAsync(new Dictionary<string, string>
+                    {
+                        { "cuit", taxId},
+                        { "tipoCertificado", option },
+                    });
+
+                    // Site went down
+                    if (xml == null)
+                        return null;
+
+                    mergedTaxId = ProcessCertificate(taxId, xml, mergedTaxId);
+                }
+
+                return mergedTaxId;
+            }
+            else
+            {
+                return ProcessCertificate(taxId, xml);
+            }
+        }
+
+        async Task<XDocument?> PostFormAsync(Dictionary<string, string> values)
+        {
+            XDocument? xml = default;
+
+            do
+            {
+                var captcha = await GetCaptchaAsync();
+                if (captcha == null)
+                    return null;
+
+                var (bar, value) = captcha.Value;
+                values["captchaField"] = value;
+                values["bar"] = bar;
+
+                using var request = new HttpRequestMessage(HttpMethod.Post,
+                    "https://seti.afip.gob.ar/padron-puc-constancia-internet/ConstanciaAction.do?bar=" + bar)
+                {
+                    Content = new FormUrlEncodedContent(values)
+                };
+
+                var result = await http.SendAsync(request);
+                if (!result.IsSuccessStatusCode)
+                    return null;
+
+                xml = await ReadXmlAsync(result);
+
+                // Check for site down, which results in an empty body response
+                if (xml.Root.Element("html")?.Element("body")?.Value.Trim().Length == 0)
+                    return null;
+
+            } while (xml != null && IsCaptchaExpired(xml));
+
+            return xml;
+        }
+
+        static bool IsCaptchaExpired(XDocument xml) => xml
+            .CreateNavigator()
+            .Select("//div[@class='alert' and @role='alert']/text()")
+            .OfType<XPathItem>().Select(x => x.Value)
+            .Any(x => x.Contains("El código de seguridad se ha vencido. Intente nuevamente.", StringComparison.OrdinalIgnoreCase));
+
+        static async Task<XDocument> ReadXmlAsync(HttpResponseMessage response)
+        {
+            var body = await response.Content.ReadAsStringAsync();
             using (var reader = new SgmlReader(new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore }))
             {
                 reader.InputStream = new StringReader("<page>" + body + "</page>");
-                xml = XDocument.Load(reader);
+                using (var nons = new NoNamespaceXmlReader(reader))
+                {
+                    return XDocument.Load(nons);
+                }
             }
+        }
 
-            // Check for site down, which results in an empty body response
-
+        TaxId? ProcessCertificate(string taxId, XDocument xml, TaxId? existing = default)
+        {
             // Check for non-registered person
             var none = xml.Root.Descendants("P").Where(p => p.Value.Trim() == "La clave ingresada no es una CUIT").Any();
             if (none)
                 return TaxId.None;
 
-            // Check for expired captcha
-            var expired = xml.Root.Descendants("div")
-                .Where(div =>
-                    div.Attribute("class").Value == "alert" &&
-                    div.Attribute("role").Value == "alert")
-                .Where(div => div.Value.Contains("El código de seguridad se ha vencido. Intente nuevamente.", StringComparison.OrdinalIgnoreCase))
-                .Any();
-
-            if (expired)
-                return TaxId.Expired;
-
             var pageTitle = xml.Root.Element("HTML")?.Element("HEAD")?.Element("TITLE")?.Value;
             var isMonotributo = pageTitle?.Contains("monotributo", StringComparison.OrdinalIgnoreCase);
 
+            TaxCategory? category = default;
             if (isMonotributo == true)
             {
-                var categoria = xml.Root.Descendants("FONT").Where(font =>
+                var catElement = xml.Root.Descendants("FONT").Where(font =>
                     font.Value.Contains("CATEGOR", StringComparison.OrdinalIgnoreCase) &&
                     "CATEGORÍA".Equals(WebUtility.HtmlDecode(font.Value.Trim()), StringComparison.Ordinal))
                     .FirstOrDefault();
 
-                if (categoria != null)
-                    return new TaxId(taxId, categoria.Parent.Elements().Last().Value.Trim());
+                if (catElement != null &&
+                    Enum.TryParse<TaxCategory>(catElement.Parent.Elements().Last().Value.Trim(), true, out var tc))
+                    category = tc;
+            }
+            else
+            {
+                category = TaxCategory.NotApplicable;
             }
 
-            return new TaxId(taxId, null);
+            var hasIncome = xml.CreateNavigator().Select("//TABLE/TR/TD/FONT/text()")
+                .OfType<XPathItem>()
+                .Select(x => x.Value.Trim())
+                .Any(x => x.StartsWith("GANANCIAS PERSONAS", StringComparison.OrdinalIgnoreCase));
+
+            if (existing != null)
+            {
+                if (category != null && category != TaxCategory.NotApplicable)
+                    existing.Category = category.Value;
+                if (hasIncome)
+                    existing.HasIncomeTax = hasIncome;
+
+                return existing;
+            }
+            else
+            {
+                return new TaxId(taxId, category, TaxIdKind.CUIT)
+                {
+                    HasIncomeTax = hasIncome
+                };
+            }
         }
+
+        async Task<string?> RecognizeCaptchaAsync(byte[] image)
+        {
+            var key = environment.GetVariable("ComputerVisionSubscriptionKey");
+            var url = environment.GetVariable("ComputerVisionEndpoint") + "vision/v3.0-preview/read/analyze?language=es";
+
+            using var postRequest = new HttpRequestMessage(HttpMethod.Post, url);
+            postRequest.Headers.Add("Ocp-Apim-Subscription-Key", key);
+
+            using var content = new ByteArrayContent(image);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+            postRequest.Content = content;
+
+            var response = await http.SendAsync(postRequest);
+            if (!response.IsSuccessStatusCode ||
+                !response.Headers.GetValues("Operation-Location").Any())
+            {
+                logger.LogError("Failed to process captcha using vision endpoint: {0}", response.ReasonPhrase);
+                return null;
+            }
+
+            var location = response.Headers.GetValues("Operation-Location").First();
+            string json;
+            int i = 0;
+            do
+            {
+                await Task.Delay(1000);
+                using var getRequest = new HttpRequestMessage(HttpMethod.Get, location);
+                getRequest.Headers.Add("Ocp-Apim-Subscription-Key", key);
+                response = await http.SendAsync(getRequest);
+                json = await response.Content.ReadAsStringAsync();
+                ++i;
+            }
+            while (i < 10 && json.IndexOf("\"status\":\"succeeded\"", StringComparison.Ordinal) == -1);
+
+            var result = JsonConvert.DeserializeObject<VisionResult>(json);
+            var challenge = result.AnalyzeResult.ReadResults
+                .SelectMany(r => r.Lines.SelectMany(l => l.Words))
+                .Select(w => w.Text)
+                .FirstOrDefault();
+
+            if (challenge == null)
+            {
+                logger.LogError("Could not get a recognized word from captcha :(");
+                return null;
+            }
+
+            return challenge;
+        }
+
+        /// <summary>
+        /// Attempts a quick lookup via the cuitonline.com site which is more reliable than the 
+        /// official AFIP site which is often down. This might not succeed for non-cached responses 
+        /// from previous CUIT lookups, so we cannot rely on it when it doesn't find a result, but 
+        /// we *can* rely on the data it *does* return.
+        /// </summary>
+        async Task<TaxId> LookupAsync(string nationalId)
+        {
+            var page = await http.GetStringAsync(LookupUrl + nationalId).ConfigureAwait(true);
+
+            XDocument xml;
+            using (var reader = new SgmlReader(new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore }))
+            {
+                reader.InputStream = new StringReader(page);
+                using (var nons = new NoNamespaceXmlReader(reader))
+                {
+                    xml = XDocument.Load(nons);
+                }
+            }
+
+            var nav = xml.CreateNavigator();
+            var hit = nav.SelectSingleNode("//div[@class='hit']");
+
+            if (hit == null)
+                return TaxId.Unknown;
+
+            var kindValue = hit
+                .Select("div[@class='doc-facets']/span[@class='linea-cuit-persona']/text()")
+                .OfType<XPathItem>()
+                .Select(x => WebUtility.HtmlDecode(x.Value).Trim().TrimEnd(':').Trim())
+                .Where(x => x.Length > 0)
+                .FirstOrDefault();
+
+            TaxIdKind? kind = null;
+            if (kindValue != null && Enum.TryParse<TaxIdKind>(kindValue, true, out var tik))
+                kind = tik;
+
+            var name = hit.Evaluate("string(div[@class='denominacion']//span[@class='denominacion']/text())");
+            var id = (string)hit.Evaluate("string(div[@class='doc-facets']/span[@class='linea-cuit-persona']/span[@class='cuit']/text())");
+            id = id.Replace("-", "", StringComparison.Ordinal);
+
+            TaxCategory? category = default;
+            var mono = hit.SelectSingleNode("div[@class='doc-facets']/span[@class='linea-monotributo-persona']");
+            if (mono != null)
+            {
+                var content = string.Join(" ", mono.Select("text()").OfType<XPathItem>()
+                    .Select(x => WebUtility.HtmlDecode(x.Value).Trim())).Trim();
+
+                if (Enum.TryParse<TaxCategory>(content.Split(' ').Last().Trim(), out var tc))
+                    category = tc;
+            }
+
+            var result = new TaxId(id, category, kind);
+
+            var facets = hit
+                .Select("div[@class='doc-facets']/text()")
+                .OfType<XPathItem>()
+                .Select(x => WebUtility.HtmlDecode(x.Value).Trim().TrimEnd('(', ')').Trim())
+                .Where(x => x.Length > 0);
+
+            if (facets.Any(x => x.StartsWith("ganancias", StringComparison.OrdinalIgnoreCase)))
+                // We don't just set it to false if we didn't find one, because 
+                // the person might still pay income taxes, but it didn't show up 
+                // in the quick lookup page.
+                result.HasIncomeTax = true;
+
+            return result;
+        }
+    }
+
+    interface ITaxIdRecognizer
+    {
+        Task<TaxId?> RecognizeAsync(Person person);
     }
 }

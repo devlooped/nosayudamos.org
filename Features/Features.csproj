@@ -28,18 +28,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="tests.settings.json" CopyToOutputDirectory="PreserveNewest" />
-    <None Update="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\Api\appsettings.json" Link="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\Api\local.settings.json" Link="local.settings.json" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\Api\secrets.settings.json" Condition="Exists('..\Api\secrets.settings.json')" Link="secrets.settings.json" CopyToOutputDirectory="PreserveNewest" />
-    <UpToDateCheckInput Include="@(Content);@(None)" />
+    <Content Include="..\Api\appsettings.json" Link="appsettings.json" />
+    <Content Include="..\Api\local.settings.json" Link="local.settings.json" />
+    <Content Include="..\Api\secrets.settings.json" Condition="Exists('..\Api\secrets.settings.json')" Link="secrets.settings.json" />
+    <SpecFlowFeatureFiles Update="@(SpecFlowFeatureFiles)" Visible="$(UsingMicrosoftNETSdk)" />
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowFeatureFiles Update="Inbox.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-    </SpecFlowFeatureFiles>
+    <None Update="@(None)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Update="@(Content)" CopyToOutputDirectory="PreserveNewest" />
+    <UpToDateCheckInput Include="@(Content);@(None)" />
   </ItemGroup>
 
 </Project>
