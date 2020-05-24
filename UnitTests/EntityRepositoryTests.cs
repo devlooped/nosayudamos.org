@@ -8,7 +8,7 @@ using Xunit;
 
 namespace NosAyudamos
 {
-    public class EntityRepositoryTests : IDisposable
+    public sealed class EntityRepositoryTests : IDisposable
     { 
         [Fact]
         public async Task CanSavePersonMessagingMap()
@@ -65,7 +65,7 @@ namespace NosAyudamos
 
         }
 
-        async Task<EntityRepository<T>> GetRepositoryAsync<T>([CallerMemberName] string? tableName = null)
+        async Task<EntityRepository<T>> GetRepositoryAsync<T>([CallerMemberName] string? tableName = null) where T : class
         {
             var tableClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference(tableName);

@@ -11,11 +11,11 @@ namespace NosAyudamos.Repository
             => (this.storageAccount, this.serializer)
             = (storageAccount, serializer);
 
-        public IEntityRepository<T> Create<T>() => new EntityRepository<T>(storageAccount, serializer);
+        public IEntityRepository<T> Create<T>() where T : class => new EntityRepository<T>(storageAccount, serializer);
     }
 
     interface IEntityRepositoryFactory
     {
-        IEntityRepository<T> Create<T>();
+        IEntityRepository<T> Create<T>() where T : class;
     }
 }

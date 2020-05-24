@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace NosAyudamos
 {
-    class EntityRepository<T> : IEntityRepository<T>
+    class EntityRepository<T> : IEntityRepository<T> where T : class
     {
         readonly CloudStorageAccount storageAccount;
         readonly ISerializer serializer;
@@ -33,7 +33,7 @@ namespace NosAyudamos
             var table = await this.table.GetValueAsync().ConfigureAwait(false);
 
             await table.ExecuteAsync(TableOperation.Delete(
-                new DynamicTableEntity(typeof(T).FullName!, key)))
+                new DynamicTableEntity(typeof(T).FullName!, key) { ETag = "*" }))
                 .ConfigureAwait(false);
         }
 
@@ -53,11 +53,14 @@ namespace NosAyudamos
             }
         }
 
-        public async Task<T> GetAsync(string key)
+        public async Task<T?> GetAsync(string key)
         {
             var table = await this.table.GetValueAsync().ConfigureAwait(false);
             var result = await table.ExecuteAsync(TableOperation.Retrieve(typeof(T).FullName!, key))
                 .ConfigureAwait(false);
+
+            if (result?.Result == null)
+                return default;
 
             return ToEntity((DynamicTableEntity)result.Result);
         }
@@ -139,10 +142,10 @@ namespace NosAyudamos
         }
     }
 
-    interface IEntityRepository<T>
+    interface IEntityRepository<T> where T: class
     {
         IAsyncEnumerable<T> GetAllAsync();
-        Task<T> GetAsync(string key);
+        Task<T?> GetAsync(string key);
         Task<T> PutAsync(T entity);
         Task DeleteAsync(T entity);
     }
