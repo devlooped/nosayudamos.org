@@ -3,7 +3,9 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true"
   },
+  "AzureWebJobsStorage": "UseDevelopmentStorage=true",
   "SendToGridInDevelopment": "false",
-  "SendToMessagingInDevelopment": "true",
-  "SendToSlackInDevelopment": "true"
+  "SendToMessagingInDevelopment": "false",
+  "SendToSlackInDevelopment": "true",
+  "SlackTestChannel": "C012C5W43U6"
 }
