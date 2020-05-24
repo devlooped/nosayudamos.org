@@ -8,6 +8,6 @@ namespace NosAyudamos
 
         public MessageSentHandler(IMessaging messaging) => this.messaging = messaging;
 
-        public Task HandleAsync(MessageSent e) => messaging.SendTextAsync(e.From, e.Body, e.To);
+        public Task HandleAsync(MessageSent e) => messaging.SendTextAsync(e.PhoneNumber, e.Body);
     }
 }

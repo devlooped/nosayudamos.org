@@ -6,7 +6,7 @@
     /// </summary>
     public class UnknownMessageReceived : MessageEvent
     {
-        public UnknownMessageReceived(string from, string to, string body) : base(from, to)
+        public UnknownMessageReceived(string from, string body) : base(from)
             => Body = body;
 
         public string Body { get; }

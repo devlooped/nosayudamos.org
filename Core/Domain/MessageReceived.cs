@@ -2,8 +2,11 @@
 {
     public class MessageReceived : MessageEvent
     {
-        public MessageReceived(string from, string to, string body) : base(from, to)
-            => Body = body;
+        public MessageReceived(string phoneNumber, string systemNumber, string body) : base(phoneNumber)
+            => (Body, SystemNumber)
+            = (body, systemNumber);
+
+        public string SystemNumber { get; }
 
         public string Body { get; }
     }

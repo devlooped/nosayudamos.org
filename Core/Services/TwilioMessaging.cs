@@ -13,10 +13,11 @@ namespace NosAyudamos
         readonly IEnvironment environment;
         readonly IReadOnlyPolicyRegistry<string> registry;
 
-        public TwilioMessaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment) => (this.registry, this.environment) = (registry, environment);
+        public TwilioMessaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment) 
+            => (this.registry, this.environment) 
+            = (registry, environment);
 
-
-        public async Task SendTextAsync(string from, string body, string to)
+        public async Task SendTextAsync(string body, string to)
         {
             if (!initialized)
             {
@@ -27,12 +28,11 @@ namespace NosAyudamos
                 initialized = true;
             }
 
-
             var policy = registry.Get<IAsyncPolicy>("TwilioPolicy");
 
             await policy.ExecuteAsync(async () =>
                 await MessageResource.CreateAsync(
-                   from: new Twilio.Types.PhoneNumber("whatsapp:+" + from),
+                   from: new Twilio.Types.PhoneNumber("whatsapp:" + environment.GetVariable("TwilioNumber")),
                    to: new Twilio.Types.PhoneNumber("whatsapp:+" + to),
                    body: body).ConfigureAwait(false));
         }
