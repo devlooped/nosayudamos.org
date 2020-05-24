@@ -11,9 +11,9 @@ namespace NosAyudamos
 
         public LogMessaging(ILogger<IMessaging> logger) => this.logger = logger;
 
-        public Task SendTextAsync(string from, string body, string to)
+        public Task SendTextAsync(string to, string body)
         {
-            logger.LogInformation($@"From:{from}|To:|{to}
+            logger.LogInformation($@"To:|{to}
 Body:{body}");
 
             return Task.CompletedTask;

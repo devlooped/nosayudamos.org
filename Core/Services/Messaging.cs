@@ -41,41 +41,36 @@ namespace NosAyudamos
                 td.Dispose();
         }
 
-        public Task HandleAsync(MessageSent e) => SendTextAsync(e.From, e.Body, e.To);
+        public Task HandleAsync(MessageSent e) => SendTextAsync(e.PhoneNumber, e.Body);
 
-        public async Task SendTextAsync(string from, string body, string to)
+        public async Task SendTextAsync(string to, string body)
         {
             var sendMessage = !environment.IsDevelopment() || environment.GetVariable("SendToMessagingInDevelopment", false);
 
             if (sendMessage)
             {
-                // Send to users from the same phone number they last used to communicate 
-                // with the system, if not provided.
-                if (string.IsNullOrEmpty(from))
+                var map = await phoneRepo.GetAsync(to);
+                if (map == null)
                 {
-                    var map = await phoneRepo.GetAsync(to);
-                    if (map != null)
-                        from = map.SystemNumber;
+                    // TODO: log error
+                    return;
                 }
 
-                // TODO: from domain events anywhere in the app, it's really not possible 
-                // to know/propagate the incoming phone number used by the initial user 
-                // interactions.
-                if (from == chatApiNumber.Value)
-                    await chatApi.Value.SendTextAsync(from, body, to);
+                if (map.SystemNumber == chatApiNumber.Value)
+                    await chatApi.Value.SendTextAsync(to, body);
                 else
-                    await twilio.Value.SendTextAsync(from, body, to);
+                    await twilio.Value.SendTextAsync(to, body);
             }
 
             if (environment.IsDevelopment())
             {
-                await log.Value.SendTextAsync(from, body, to);
+                await log.Value.SendTextAsync(to, body);
             }
         }
     }
 
     interface IMessaging
     {
-        Task SendTextAsync(string from, string body, string to);
+        Task SendTextAsync(string to, string body);
     }
 }

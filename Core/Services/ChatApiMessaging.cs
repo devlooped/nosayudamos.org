@@ -19,7 +19,7 @@ namespace NosAyudamos
             this.environment = environment;
         }
 
-        public async Task SendTextAsync(string from, string body, string to)
+        public async Task SendTextAsync(string to, string body)
         {
             var baseUrl = environment.GetVariable("ChatApiBaseUrl").TrimEnd('/');
             var token = environment.GetVariable("ChatApiToken");
@@ -27,7 +27,7 @@ namespace NosAyudamos
             // Markdown-like image format to allow for text + url
             if (body.StartsWith("![", StringComparison.Ordinal))
             {
-                var text = body.Substring(2, body.LastIndexOf(']') - 2);
+                var text = body[2..body.LastIndexOf(']')];
                 var url = body.Substring(body.LastIndexOf('(')).TrimStart('(').TrimEnd(')');
 
                 // Post as file.

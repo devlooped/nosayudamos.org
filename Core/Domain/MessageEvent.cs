@@ -4,11 +4,10 @@ namespace NosAyudamos
 {
     public abstract class MessageEvent
     {
-        protected MessageEvent(string from, string to)
-            => (From, To) = (from, to);
+        protected MessageEvent(string phoneNumber) => PhoneNumber = phoneNumber;
 
-        public string From { get; }
-        public string To { get; }
+        public string PhoneNumber { get; }
+
         public DateTimeOffset When { get; set; } = DateTimeOffset.UtcNow;
     }
 }
