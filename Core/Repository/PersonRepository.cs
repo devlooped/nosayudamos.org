@@ -46,7 +46,7 @@ namespace NosAyudamos
         public async Task<Person> PutAsync(Person person)
         {
             var table = await GetTableAsync();
-            var existing = await GetAsync(person.Id!, readOnly: true).ConfigureAwait(false);
+            var existing = await GetAsync(person.Id, readOnly: true).ConfigureAwait(false);
 
             // First check if the person changed phone numbers since our last interaction
             if (existing != null && existing.PhoneNumber != person.PhoneNumber)
@@ -81,6 +81,9 @@ namespace NosAyudamos
 
         public async Task<Person?> GetAsync(string id, bool readOnly = true)
         {
+            if (string.IsNullOrEmpty(id))
+                return default;
+
             if (readOnly)
             {
                 var header = await GetAsync<DataEntity>(id, typeof(Person).FullName!).ConfigureAwait(false);

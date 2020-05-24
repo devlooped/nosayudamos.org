@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
@@ -7,9 +8,9 @@ using System.Threading.Tasks;
 using Autofac;
 using NosAyudamos.Repository;
 
-namespace NosAyudamos.Core
+namespace NosAyudamos
 {
-    class FeatureEntityRepository<T> : IEntityRepository<T>
+    class FeatureEntityRepository<T> : IEntityRepository<T> where T : class
     {
         ConcurrentDictionary<string, T> values = new ConcurrentDictionary<string, T>();
 
@@ -17,6 +18,15 @@ namespace NosAyudamos.Core
         {
             values.TryRemove(GetKey(entity), out _);
             return Task.CompletedTask;
+        }
+
+        public async IAsyncEnumerable<T> GetAllAsync()
+        {
+            await Task.CompletedTask;
+            foreach (var item in values.Values)
+            {
+                yield return item;
+            }
         }
 
         public Task<T> GetAsync(string key)
@@ -59,6 +69,6 @@ namespace NosAyudamos.Core
 
         public FeatureEntityRepositoryFactory(IContainer container) => this.container = container;
 
-        public IEntityRepository<T> Create<T>() => container.Resolve<IEntityRepository<T>>();
+        public IEntityRepository<T> Create<T>() where T : class => container.Resolve<IEntityRepository<T>>();
     }
 }
