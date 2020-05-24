@@ -23,13 +23,18 @@ namespace NosAyudamos.Http
         readonly IEnvironment environment;
         readonly IEventStreamAsync events;
         readonly ILanguageUnderstanding language;
+        readonly IEntityRepository<PhoneSystem> phoneRepo;
         readonly HttpClient http;
         readonly ILogger<Slack> logger;
         readonly MessageReceivedHandler handler;
 
-        public Slack(ISerializer serializer, IEnvironment environment, IEventStreamAsync events, ILanguageUnderstanding language, HttpClient http, MessageReceivedHandler handler, ILogger<Slack> logger) 
-            => (this.serializer, this.environment, this.events, this.language, this.http, this.handler, this.logger) 
-            = (serializer, environment, events, language, http, handler, logger);
+        public Slack(
+            ISerializer serializer, IEnvironment environment, 
+            IEventStreamAsync events, ILanguageUnderstanding language,
+            IEntityRepository<PhoneSystem> phoneRepo,
+            HttpClient http, MessageReceivedHandler handler, ILogger<Slack> logger) 
+            => (this.serializer, this.environment, this.events, this.language, this.phoneRepo, this.http, this.handler, this.logger) 
+            = (serializer, environment, events, language, phoneRepo, http, handler, logger);
 
         [FunctionName("slack_interaction")]
         public async Task<IActionResult> InteractionAsync(
@@ -74,10 +79,13 @@ namespace NosAyudamos.Http
             if (intent == "retry")
             {
                 string? from = json.message?.blocks?[1]?.fields?[0]?.text;
-                string? to = json.message?.blocks?[1]?.fields?[1]?.text;
-
-                if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(to) && !string.IsNullOrEmpty(message))
-                    await handler.HandleAsync(new NosAyudamos.MessageReceived(from.Substring(from.LastIndexOf(':') + 1).Trim(), to.Substring(to.LastIndexOf(':') + 1).Trim(), message));
+                if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(message))
+                {
+                    from = from.Substring(from.LastIndexOf(':') + 1).Trim();
+                    var map = await phoneRepo.GetAsync(from);
+                    if (map != null)
+                        await handler.HandleAsync(new MessageReceived(from, map.SystemNumber, message));
+                }
             }
             else
             {
@@ -121,10 +129,9 @@ namespace NosAyudamos.Http
                 json = serializer.Deserialize<JObject>(body);
 
                 string? from = json.messages?[0]?.blocks?[1]?.fields?[0]?.text;
-                string? to = json.messages?[0]?.blocks?[1]?.fields?[1]?.text;
 
-                if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(to) && !string.IsNullOrEmpty(text))
-                    await events.PushAsync(new NosAyudamos.MessageSent(to.Substring(to.LastIndexOf(':') + 1).Trim(), from.Substring(from.LastIndexOf(':') + 1).Trim(), text));
+                if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(text))
+                    await events.PushAsync(new NosAyudamos.MessageSent(from.Substring(from.LastIndexOf(':') + 1).Trim(), text));
             }
 
             return new OkResult();
