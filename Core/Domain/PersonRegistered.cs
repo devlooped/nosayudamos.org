@@ -1,4 +1,6 @@
-﻿namespace NosAyudamos
+﻿using System;
+
+namespace NosAyudamos
 {
     public class PersonRegistered : DomainEvent
     {
@@ -8,7 +10,7 @@
             string lastName,
             string phoneNumber,
             Role role,
-            string? dateOfBirth,
+            DateTime? dateOfBirth,
             Sex? sex)
             => (Id, FirstName, LastName, PhoneNumber, Role, DateOfBirth, Sex)
             = (id, firstName, lastName, phoneNumber, role, dateOfBirth, sex);
@@ -17,7 +19,7 @@
         public string FirstName { get; }
         public string LastName { get; }
         public string PhoneNumber { get; }
-        public string? DateOfBirth { get; }
+        public DateTime? DateOfBirth { get; }
         public Role Role { get; }
         public Sex? Sex { get; }
     }

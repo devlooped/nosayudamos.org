@@ -17,7 +17,7 @@ namespace NosAyudamos
             string lastName,
             string phoneNumber,
             Role role = Role.Donee,
-            string? dateOfBirth = default,
+            DateTime? dateOfBirth = default,
             Sex? sex = default)
             : this()
         {
@@ -56,8 +56,12 @@ namespace NosAyudamos
         public Role Role { get; set; } = Role.Donee;
         
         [JsonProperty]
-        public string? DateOfBirth { get; private set; }
-        
+        [JsonConverter(typeof(DateOnlyConverter))]
+        public DateTime? DateOfBirth { get; private set; }
+
+        [JsonIgnore]
+        public int? Age => (DateTime.Now - DateOfBirth)?.Days / 365;
+
         [JsonProperty]
         [JsonConverter(typeof(StringEnumConverter))]
         public Sex? Sex { get; private set; }
@@ -111,22 +115,36 @@ namespace NosAyudamos
             {
                 // We just accept CUIL-based registrations, we can't know whether 
                 // they pay earnings or not :(
-                Raise(new TaxStatusAccepted(taxId.Id, TaxIdKind.CUIL));
+                Raise(new TaxStatusAccepted(taxId));
                 return;
             }
 
             if (taxId.HasIncomeTax == true)
             {
-                Raise(new TaxStatusRejected(Id, taxId.Id, TaxStatusRejectedReason.HasEarnings));
+                Raise(new TaxStatusRejected(taxId, TaxStatusRejectedReason.HasIncomeTax));
                 return;
             }
 
-            if (taxId.Category != TaxCategory.Unknown && 
-                taxId.Category != TaxCategory.A)
+            if (taxId.Category == TaxCategory.NotApplicable)
             {
-                Raise(new TaxStatusRejected(Id, taxId.Id, TaxStatusRejectedReason.HighCategory));
+                Raise(new TaxStatusRejected(taxId, TaxStatusRejectedReason.NotApplicable));
                 return;
             }
+
+            if (taxId.Category != TaxCategory.Unknown &&
+                taxId.Category != TaxCategory.A)
+            {
+                Raise(new TaxStatusRejected(taxId, TaxStatusRejectedReason.HighCategory));
+                return;
+            }
+
+            if (taxId.Category == TaxCategory.A)
+            {
+                Raise(new TaxStatusAccepted(taxId));
+                return;
+            }
+
+            // Other combinations might not be approved
         }
 
         void OnRegistered(PersonRegistered e)
