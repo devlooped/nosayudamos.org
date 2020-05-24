@@ -10,7 +10,7 @@ Antecedentes:
 
 Escenario: Contacto inicial de un donatario
 	Cuando Envia <mensaje>
-	Entonces Recibe mensaje
+	Entonces Recibe UI_Donee_SendIdentifier
 		"""
 		Gracias por tu mensaje! Por favor envianos una 
 		foto de tu DNI para registrarte para recibir ayuda.

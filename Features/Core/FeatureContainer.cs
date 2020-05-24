@@ -54,6 +54,7 @@ namespace NosAyudamos
             var testServices = new HashSet<Type>
             {
                 typeof(HttpClient),
+                typeof(IEnvironment),
             };
 
             new Startup().Configure(services, new Environment());
@@ -109,6 +110,7 @@ namespace NosAyudamos
 
             // For some reason, the built-in registrations we were providing via Startup for HttpClient weren't working.
             builder.RegisterType<HttpClient>().InstancePerDependency();
+            builder.RegisterType<FeatureEnvironment>().SingleInstance().AsSelf().AsImplementedInterfaces();
 
             return builder;
         }

@@ -131,7 +131,7 @@ this.FeatureBackground();
  testRunner.When(string.Format("Envia {0}", mensaje), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
 #line 13
- testRunner.Then("Recibe mensaje", "Gracias por tu mensaje! Por favor envianos una \r\nfoto de tu DNI para registrarte " +
+ testRunner.Then("Recibe UI_Donee_SendIdentifier", "Gracias por tu mensaje! Por favor envianos una \r\nfoto de tu DNI para registrarte " +
                         "para recibir ayuda.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }

@@ -115,11 +115,65 @@ namespace NosAyudamos {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Gracias {0} por tu mensaje. Actualmente estamos limitando la ayuda a personas que no tributan impuesto a las ganancias..
         /// </summary>
-        internal static string UI_Donee_RejectedWithEarnings {
+        internal static string UI_Donee_HasIncomeTax {
             get {
-                return ResourceManager.GetString("UI_Donee_RejectedWithEarnings", resourceCulture);
+                return ResourceManager.GetString("UI_Donee_HasIncomeTax", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gracias {0} por tu mensaje. Actualmente estamos limitando la ayuda a personas registradas en el régimen de Monotributo en la categoría A exclusivamente..
+        /// </summary>
+        internal static string UI_Donee_HighCategory {
+            get {
+                return ResourceManager.GetString("UI_Donee_HighCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gracias {0} por tu mensaje. Actualmente estamos limitando la ayuda a personas registradas en el régimen de Monotributo en la categoría A exclusivamente..
+        /// </summary>
+        internal static string UI_Donee_NotApplicable {
+            get {
+                return ResourceManager.GetString("UI_Donee_NotApplicable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lamento tener problemas para reconocer tu DNI. Ya avisé a los seres humanos que programaron esto para que me ayuden. Se van a contactar con vos a la brevedad. Perdón!.
+        /// </summary>
+        internal static string UI_Donee_RegistrationFailed {
+            get {
+                return ResourceManager.GetString("UI_Donee_RegistrationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gracias por tu mensaje! Lamentablemente, no pudimos verificar tu cuenta..
+        /// </summary>
+        internal static string UI_Donee_Rejected {
+            get {
+                return ResourceManager.GetString("UI_Donee_Rejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recibimos tu mensaje, pero no pudimos reconocer tus datos en la imagen. Podrías enviarnos una nueva foto del DNI, quizás con mejor iluminación o más de cerca? Es importante que se vea con claridad el código de barras de la esquina inferior derecha. Gracias por tu paciencia!.
+        /// </summary>
+        internal static string UI_Donee_ResendIdentifier1 {
+            get {
+                return ResourceManager.GetString("UI_Donee_ResendIdentifier1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eso tampoco funcionó :(. Hay mejores chances si la foto se saca con luz natural, de día. Es importante también que no esté fuera de foco. Gracias, y esperamos tu siguiente foto del DNI!.
+        /// </summary>
+        internal static string UI_Donee_ResendIdentifier2 {
+            get {
+                return ResourceManager.GetString("UI_Donee_ResendIdentifier2", resourceCulture);
             }
         }
         
@@ -142,6 +196,15 @@ namespace NosAyudamos {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos! INSTRUCCIONES.
+        /// </summary>
+        internal static string UI_Donee_Welcome {
+            get {
+                return ResourceManager.GetString("UI_Donee_Welcome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Gracias por tu mensaje! Cuánto querés donar?.
         /// </summary>
         internal static string UI_Donor_SendAmount {
@@ -156,15 +219,6 @@ namespace NosAyudamos {
         internal static string UI_UnknownIntent {
             get {
                 return ResourceManager.GetString("UI_UnknownIntent", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Ayudanos a proteger el sistema verificando que sos un ser humano. Por favor respondé con el número que ves en esta imagen (hacé click para ver la imagen completa). Gracias!.
-        /// </summary>
-        internal static string UI_VerifyCaptcha {
-            get {
-                return ResourceManager.GetString("UI_VerifyCaptcha", resourceCulture);
             }
         }
     }

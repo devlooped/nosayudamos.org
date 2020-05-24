@@ -25,6 +25,10 @@ namespace NosAyudamos
             await CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient()
                 .GetTableReference("Event")
                 .DeleteIfExistsAsync();
+
+            await CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient()
+                .GetTableReference("DurableAction")
+                .DeleteIfExistsAsync();
         }
     }
 }

@@ -169,7 +169,9 @@ namespace NosAyudamos
             .CreateNavigator()
             .Select("//div[@class='alert' and @role='alert']/text()")
             .OfType<XPathItem>().Select(x => x.Value)
-            .Any(x => x.Contains("El código de seguridad se ha vencido. Intente nuevamente.", StringComparison.OrdinalIgnoreCase));
+            .Any(x => 
+                x.Contains("El código de seguridad se ha vencido. Intente nuevamente.", StringComparison.OrdinalIgnoreCase) || 
+                x.Contains("Código de seguridad inválido.", StringComparison.OrdinalIgnoreCase));
 
         static async Task<XDocument> ReadXmlAsync(HttpResponseMessage response)
         {
@@ -187,7 +189,13 @@ namespace NosAyudamos
         TaxId? ProcessCertificate(string taxId, XDocument xml, TaxId? existing = default)
         {
             // Check for non-registered person
-            var none = xml.Root.Descendants("P").Where(p => p.Value.Trim() == "La clave ingresada no es una CUIT").Any();
+            var invalid = $"La CUIT {taxId} es invalida";
+            var none = xml.Root.Descendants("P").Any(p => p.Value.Trim() == "La clave ingresada no es una CUIT") ||
+                 xml.CreateNavigator()
+                    .Select("//div[@class='alert' and @role='alert']/text()")
+                    .OfType<XPathItem>().Select(x => x.Value)
+                    .Any(x => x.Trim().Contains(invalid, StringComparison.Ordinal));
+
             if (none)
                 return TaxId.None;
 

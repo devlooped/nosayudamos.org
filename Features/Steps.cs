@@ -5,6 +5,8 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
 using System.Linq;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace NosAyudamos.Steps
 {
@@ -30,6 +32,10 @@ namespace NosAyudamos.Steps
         }
 
         #region Given
+
+        [Given(@"(.*)\s?=\s?(.*)")]
+        public void GivenEnvironmentVariable(string name, string value)
+            => container.Resolve<FeatureEnvironment>().SetVariable(name, value);
 
         [Given(@"Un storage limpio")]
         public async Task GivenAClearStorage()
@@ -64,9 +70,20 @@ namespace NosAyudamos.Steps
 
         #region When
 
+        [When(@"Envia ID (.*)")]
+        public async Task WhenReceivedId(string id)
+        {
+            var file = id.Trim('\'').Trim('"');
+            Skip.IfNot(File.Exists(file), $"File '{id}' not found.");
+            await events.PushAsync(new MessageReceived(
+                Constants.Donee.PhoneNumber,
+                Constants.System.PhoneNumber,
+                new Uri(new FileInfo(file).FullName).ToString()));
+        }
+
         [When(@"Envia '(.*)'")]
         [When(@"Envia ""(.*)""")]
-        [When(@"Envia (.*)")]
+        [When(@"Envia (?!ID).*")]
         [When(@"Envia mensaje")]
         public async Task WhenMessageReceived(string message)
         {
@@ -86,12 +103,28 @@ namespace NosAyudamos.Steps
 
         [Then(@"Recibe '(.*)'")]
         [Then(@"Recibe ""(.*)""")]
-        [Then(@"Recibe (.*)")]
-        [Then(@"Recibe mensaje")]
-        public void ThenMessageSent(string message)
+        [Then(@"Recibe ([A-Z_]+)(\s.*)?")]
+        public void ThenMessageSent(string resource, string message = "")
         {
+            var value = Resources.ResourceManager.GetString(resource);
+
+            Assert.True(value.Equals(message.ToSingleLine()), $"Resource {resource} does not match the given message.");
             Assert.True(sent != null, "No message was sent.");
-            Assert.Equal(message.ToSingleLine(), sent.Body);
+
+            var format = Regex.Replace(value, "{\\d}", ".+");
+            var matches = Regex.IsMatch(sent.Body, format);
+
+            if (value.Contains('{'))
+            {
+                Assert.True(matches, @$"Sent message:
+{sent.Body}
+does not match:
+{format}");
+            }
+            else
+            {
+                Assert.Equal(message.ToSingleLine(), sent.Body);
+            }
         }
 
         #endregion

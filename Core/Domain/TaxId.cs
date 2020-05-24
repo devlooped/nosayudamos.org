@@ -4,7 +4,46 @@ using System.Linq;
 
 namespace NosAyudamos
 {
-    class TaxId : IEquatable<TaxId>
+    public enum TaxCategory
+    {
+        /// <summary>
+        /// We don't know the tax category the person has, if any.
+        /// </summary>
+        Unknown,
+        /// <summary>
+        /// The person is registered to a tax regime that does not 
+        /// have simplified categories (aka 'Monotributo').
+        /// </summary>
+        NotApplicable,
+        A,
+        B,
+        C,
+        D,
+    }
+
+    public enum TaxIdKind
+    {
+        /// <summary>
+        /// We don't know what kind of tax registration the person has.
+        /// </summary>
+        Unknown,
+        /// <summary>
+        /// We determined the person does not have a tax registration at all, 
+        /// of any kind (CUIT nor CUIL).
+        /// </summary>
+        None,
+        /// <summary>
+        /// Person has a CUIT.
+        /// </summary>
+        CUIT,
+        /// <summary>
+        /// Person has a CUIL.
+        /// </summary>
+        CUIL,
+    }
+
+
+    public class TaxId : IEquatable<TaxId>
     {
         static readonly int[] multiplier = new[] { 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 };
 
@@ -23,7 +62,7 @@ namespace NosAyudamos
             var taxId = (sex == Sex.Male ? "20" : "27") + nationalId;
 
             // Se multiplica XY 12345678 por un número de forma separada:
-            var sum = taxId.Select((c, i) => 
+            var sum = taxId.Where(c => char.IsDigit(c)).Select((c, i) => 
                 int.Parse(c.ToString(), CultureInfo.InvariantCulture) * multiplier[i]).Sum();
 
             // Se suman dichos resultados. El resultado obtenido se divide por 11. 
@@ -68,6 +107,7 @@ namespace NosAyudamos
         public bool? HasIncomeTax { get; set; }
 
         public bool Equals(TaxId other) =>
+            other != null &&
             Id == other.Id &&
             Category == other.Category &&
             Kind == other.Kind &&
@@ -83,5 +123,20 @@ namespace NosAyudamos
         }
 
         public override int GetHashCode() => HashCode.Combine(Id, Category, Kind, HasIncomeTax);
+
+        public override string ToString()
+        {
+            if (Category != TaxCategory.Unknown && Category != TaxCategory.NotApplicable)
+                return $"Monotributo {Category}";
+
+            var result = Kind.ToString();
+            if (HasIncomeTax == true)
+                result += " + Ganancias";
+
+            if (Kind == TaxIdKind.CUIT && Category == TaxCategory.NotApplicable)
+                result += " (no Monotributo)";
+
+            return result;
+        }
     }
 }
