@@ -19,9 +19,7 @@ namespace NosAyudamos
             var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
 
             if (!await containerClient.ExistsAsync())
-            {
                 return EmptyMetadata;
-            }
 
             var blobClient = containerClient.GetBlobClient(blobName);
 
@@ -31,6 +29,22 @@ namespace NosAyudamos
             return new Dictionary<string, string>(
                 (await blobClient.GetPropertiesAsync()).Value.Metadata,
                 StringComparer.OrdinalIgnoreCase);
+        }
+
+        public async Task<Uri?> GetUriAsync(string containerName, string blobName)
+        {
+            var blobServiceClient = CreateBlobServiceClient();
+            var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+            if (!await containerClient.ExistsAsync())
+                return default;
+
+            var blobClient = containerClient.GetBlobClient(blobName);
+
+            if (!await blobClient.ExistsAsync())
+                return default;
+
+            return blobClient.Uri;
         }
 
         public async Task SetMetadataAsync(string containerName, string blobName, IDictionary<string, string> blobMetadata)
@@ -75,6 +89,7 @@ namespace NosAyudamos
     interface IBlobStorage
     {
         Task<IDictionary<string, string>> GetMetadataAsync(string containerName, string blobName);
+        Task<Uri?> GetUriAsync(string containerName, string blobName);
         Task SetMetadataAsync(string containerName, string blobName, IDictionary<string, string> blobMetadata);
         Task<Uri> UploadAsync(byte[] bytes, string containerName, string blobName, IDictionary<string, string>? blobMetadata = null);
     }
