@@ -1,7 +1,11 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
 using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
@@ -48,62 +52,98 @@ namespace NosAyudamos
             // to become a donee.
             if (Uri.TryCreate(message.Body, UriKind.Absolute, out var imageUri))
             {
-                await RegisterDoneeAsync(message, imageUri);
+                await RegisterDoneeAsync(message, imageUri).ConfigureAwait(false);
                 return;
             }
 
-            var intents = await language.GetIntentsAsync(message.Body);
-            if (intents.TryGetValue("Help", out var helpIntent) &&
+            var intents = await language.GetIntentsAsync(message.Body).ConfigureAwait(false);
+            Intent helpIntent;
+            if ((intents.TryGetValue("Utilities.Help", out helpIntent) ||
+                intents.TryGetValue("Help", out helpIntent)) &&
                 helpIntent.Score >= 0.85)
             {
                 // User wants to be a donee, we need the ID
-                await events.PushAsync(new MessageSent(message.To, message.From, Strings.UI.Donee.SendIdentifier));
+                await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donee.SendIdentifier)).ConfigureAwait(false);
             }
             else if (intents.TryGetValue("Donate", out var donateIntent) &&
                 donateIntent.Score >= 0.85)
             {
-                await events.PushAsync(new MessageSent(message.To, message.From, Strings.UI.Donor.SendAmount));
+                await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donor.SendAmount)).ConfigureAwait(false);
             }
             else
             {
                 // Can't figure out intent, or score is too low.
-                await events.PushAsync(new UnknownMessageReceived(message.From, message.To, message.Body) { When = message.When });
-                await events.PushAsync(new MessageSent(message.To, message.From, Strings.UI.UnknownIntent));
+                await events.PushAsync(new UnknownMessageReceived(message.PhoneNumber, message.Body) { When = message.When }).ConfigureAwait(false);
+                await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.UnknownIntent)).ConfigureAwait(false);
             }
         }
 
         private async Task RegisterDoneeAsync(MessageReceived message, Uri imageUri)
         {
+            var image = imageUri.Scheme == "file" ?
+                await File.ReadAllBytesAsync(imageUri.AbsolutePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)) :
+                await http.GetByteArrayAsync(imageUri);
+
 #pragma warning disable CS8634 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'class' constraint.
             var id = await durableAction.ExecuteAsync(
 #pragma warning restore CS8634 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'class' constraint.
-                () => idRecognizer.RecognizeAsync(imageUri),
-                () => messaging.SendTextAsync(message.To, "Dni invalido, intente de nuevo.", message.From),
-                () => messaging.SendTextAsync(message.To, "No pudimos procesar su dni. Nos contactaremos en breve.",
-                message.From));
+                async (attempt) =>
+                {
+                    await blobStorage.UploadAsync(
+                        image, environment.GetVariable("AttachmentsContainerName"), $"cel_{message.PhoneNumber}_{attempt}.png")
+                        .ConfigureAwait(false);
+                    return await idRecognizer.RecognizeAsync(image).ConfigureAwait(false);
+                },
+                attempt =>
+                {
+                    var value = Resources.ResourceManager.GetString("UI_Donee_ResendIdentifier" + attempt, CultureInfo.CurrentCulture) 
+                        ?? Strings.UI.Donee.RegistrationFailed;
+                    return events.PushAsync(new MessageSent(message.PhoneNumber, value));
+                },
+                async (attemps) =>
+                {
+                    // TODO: should this be done by the RegistrationFailedHandler instead?
+                    await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donee.RegistrationFailed)).ConfigureAwait(false);
+
+                    var images = new List<Uri>();
+                    for (int i = 1; i <= attemps; i++)
+                    {
+                        var uri = await blobStorage.GetUriAsync(
+                            environment.GetVariable("AttachmentsContainerName"),
+                            $"cel_{message.PhoneNumber}_{i}.png")
+                        .ConfigureAwait(false);
+
+                        if (uri != null)
+                            images.Add(uri);
+                    }
+
+                    // We register the failure at the end of all attempts, to follow-up personally via Slack.
+                    await events.PushAsync(new RegistrationFailed(message.PhoneNumber, images.ToArray())).ConfigureAwait(false);
+                },
+                nameof(RegisterDoneeAsync) + message.PhoneNumber);
 
             if (id != null)
             {
-                var image = await http.GetByteArrayAsync(message.Body);
-
                 await blobStorage.UploadAsync(
-                    image, environment.GetVariable("AttachmentsContainerName"), $"dni_{id.NationalId}.png");
+                        image, 
+                        environment.GetVariable("AttachmentsContainerName"), $"dni_{id.NationalId}.png")
+                    .ConfigureAwait(false);
 
-                var person = await personRepository.GetAsync(id.NationalId, readOnly: false);
+                var person = await personRepository.GetAsync(id.NationalId, readOnly: false).ConfigureAwait(false);
                 if (person == null)
                 {
-                    person = new Person(id.NationalId, id.FirstName, id.LastName, message.From, Role.Donee, id.DateOfBirth, id.Sex);
+                    person = new Person(id.NationalId, id.FirstName, id.LastName, message.PhoneNumber, Role.Donee, id.DateOfBirth, id.Sex);
 
-                    var tax = await taxRecognizer.RecognizeAsync(person);
+                    var tax = await taxRecognizer.RecognizeAsync(person).ConfigureAwait(false);
                     if (tax != null)
                         person.UpdateTaxStatus(tax);
 
-                    await personRepository.PutAsync(person);
+                    await personRepository.PutAsync(person).ConfigureAwait(false);
                 }
                 else
                 {
-                    person.UpdatePhoneNumber(message.From);
-                    await personRepository.PutAsync(person);
+                    person.UpdatePhoneNumber(message.PhoneNumber);
+                    await personRepository.PutAsync(person).ConfigureAwait(false);
                 }
             }
         }
