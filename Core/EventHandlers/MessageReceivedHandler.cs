@@ -39,6 +39,10 @@ namespace NosAyudamos
                 await phoneRepo.PutAsync(phoneSystem);
             }
 
+            // If automation has been paused for this user, don't perform any subsequent processing.
+            if (phoneSystem?.AutomationPaused == true)
+                return;
+
             // If phone is disabled for automation, forward to slack
 
             // Performs minimal discovery of existing person id (if any)

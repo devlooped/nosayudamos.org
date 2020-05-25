@@ -170,6 +170,8 @@ namespace NosAyudamos
                 new EntityRepository<PhoneThread>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer()),
                 http);
 
+            await handler.HandleAsync(new SlackMessageSent(Constants.Donee.PhoneNumber, "{ \"text\": \"Got it!\" }"));
+
             await handler.HandleAsync(new SlackMessageSent(Constants.Donee.PhoneNumber, message.AsJson()));
             // Subsequent one replies to the prior one.
             await handler.HandleAsync(new SlackMessageSent(Constants.Donee.PhoneNumber, "{ \"text\": \"Got it!\" }"));
