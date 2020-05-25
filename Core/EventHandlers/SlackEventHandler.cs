@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Humanizer;
+using Newtonsoft.Json;
 using Slack.Webhooks;
 using Slack.Webhooks.Blocks;
 using Slack.Webhooks.Elements;
@@ -14,7 +15,8 @@ namespace NosAyudamos
     class SlackEventHandler : 
         IEventHandler<TaxStatusRejected>, 
         IEventHandler<TaxStatusAccepted>, 
-        IEventHandler<UnknownMessageReceived>
+        IEventHandler<UnknownMessageReceived>,
+        IEventHandler<MessageReceived>
     {
         readonly IEnvironment environment;
         readonly IPersonRepository repository;
@@ -83,6 +85,7 @@ namespace NosAyudamos
                     },
                     new Actions
                     {
+                        BlockId = "actions",
                         Elements = new List<IActionElement>
                         {
                             new Button
@@ -150,6 +153,7 @@ namespace NosAyudamos
                     },
                     new Actions
                     {
+                        BlockId = "actions",
                         Elements = new List<IActionElement>
                         {
                             new Button
@@ -207,6 +211,7 @@ namespace NosAyudamos
                     },
                     new Actions
                     {
+                        BlockId = "actions",
                         Elements = new List<IActionElement>
                         {
                             new Button
@@ -225,6 +230,26 @@ namespace NosAyudamos
             };
 
             await events.PushAsync(new SlackMessageSent(person.PhoneNumber, message.AsJson()));
+        }
+
+        /// <summary>
+        /// When automation is disabled for the user, we forward all messages to slack
+        /// so interaction can be taken over manually.
+        /// </summary>
+        public async Task HandleAsync(MessageReceived e)
+        {
+            var map = await phoneRepo.GetAsync(e.PhoneNumber);
+            // We only foward for paused phones.
+            if (map == null || map.AutomationPaused != true)
+                return;
+
+            await events.PushAsync(new SlackMessageSent(
+                e.PhoneNumber,
+                JsonConvert.SerializeObject(new
+                {
+                    text = e.Body
+                })))
+                .ConfigureAwait(false);
         }
     }
 }

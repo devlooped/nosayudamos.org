@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using Merq;
@@ -10,7 +9,6 @@ using Microsoft.VisualStudio.Threading;
 
 namespace NosAyudamos
 {
-    [Shared]
     class EventGridStream : EventStream, IEventStreamAsync, IDisposable
     {
         readonly ThreadLocal<bool?> asyncCall = new ThreadLocal<bool?>();
