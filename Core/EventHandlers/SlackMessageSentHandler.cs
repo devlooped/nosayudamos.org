@@ -56,10 +56,108 @@ namespace NosAyudamos
                     broadcast = true;
             }
 
-            if (threadId != null)
-                payload["thread_ts"] = threadId;
             if (broadcast != null)
                 payload["reply_broadcast"] = broadcast.Value;
+
+            if (threadId != null)
+            {
+                payload["thread_ts"] = threadId;
+            }
+            else
+            {
+                // Ensure thread header always has the sender phone block
+                if (payload.SelectToken("$.blocks[?(@.block_id == 'sender')]") == null)
+                {
+                    if (payload["blocks"] == null)
+                    {
+                        payload["blocks"] = new JArray
+                        {
+                            new JObject
+                            {
+                                { "type", "divider" },
+                            },
+                            new JObject
+                            {
+                                { "block_id", "body" },
+                                { "type", "section" },
+                                { "text", new JObject
+                                    {
+                                        { "type", "plain_text" },
+                                        { "text", payload["text"] },
+                                        { "emoji", true },
+                                    }
+                                }
+                            }
+                        };
+                    }
+
+                    payload["blocks"]!.First!.AddAfterSelf(new JObject
+                    {
+                        { "block_id", "sender" },
+                        { "type", "section" },
+                        {
+                            "fields", new JArray
+                            {
+                                new JObject
+                                {
+                                    { "type", "plain_text" },
+                                    { "text", ":point_right: " + e.PhoneNumber },
+                                    { "emoji", true },
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Ensure top of thread actions 
+                var actions = payload.SelectToken("$.blocks[?(@.type == 'actions')]");
+                if (actions == null)
+                {
+                    actions = new JObject
+                    {
+                        { "block_id", "actions" },
+                        { "type", "actions" },
+                        { "elements", new JArray() }
+                    };
+                    ((JArray)payload["blocks"]!).Add(actions);
+                }
+
+                var elements = (JArray)actions["elements"]!;
+
+                // Ensure 'pause' action
+                if (payload.SelectToken("$.blocks[?(@.type == 'actions')].elements[?(@.value == 'pause')]") == null)
+                {
+                    elements.Add(new JObject
+                    {
+                        { "type", "button" },
+                        { "text", new JObject
+                            {
+                                { "type", "plain_text" },
+                                { "text", "Pause :automation_pause:" },
+                                { "emoji", true },
+                            }
+                        },
+                        { "value", "pause" },
+                    });
+                }
+
+                // Ensure 'resume' action
+                if (payload.SelectToken("$.blocks[?(@.type == 'actions')].elements[?(@.value == 'resume')]") == null)
+                {
+                    elements.Add(new JObject
+                    {
+                        { "type", "button" },
+                        { "text", new JObject
+                            {
+                                { "type", "plain_text" },
+                                { "text", "Resume :automation_resume:" },
+                                { "emoji", true },
+                            }
+                        },
+                        { "value", "resume" }
+                    });
+                }
+            }
 
             using var content = new StringContent(payload.ToString(), Encoding.UTF8, "application/json");
             using var request = new HttpRequestMessage(HttpMethod.Post, "https://slack.com/api/chat.postMessage")

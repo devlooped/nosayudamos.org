@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventGrid.Models;
@@ -34,8 +34,14 @@ namespace NosAyudamos.EventGrid
         [FunctionName("person-registered")]
         public Task PersonRegisteredAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<PersonRegistered>(serializer));
 
+        [FunctionName("language-trained")]
+        public Task LanguageTrainedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<LanguageTrained>(serializer));
+
         [FunctionName("slack-message-sent")]
         public Task SlackMessageSentAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<SlackMessageSent>(serializer));
+
+        [FunctionName("slack-event-received")]
+        public Task SlackEventReceivedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<SlackEventReceived>(serializer));
 
         async Task HandleAsync<TEvent>(TEvent e)
         {
