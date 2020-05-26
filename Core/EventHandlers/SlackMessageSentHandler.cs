@@ -101,7 +101,7 @@ namespace NosAyudamos
                                 new JObject
                                 {
                                     { "type", "plain_text" },
-                                    { "text", ":point_right: " + e.PhoneNumber },
+                                    { "text", ":message: " + e.PhoneNumber },
                                     { "emoji", true },
                                 }
                             }

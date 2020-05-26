@@ -142,7 +142,7 @@ namespace NosAyudamos {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Lamento tener problemas para reconocer tu DNI. Ya avisé a los seres humanos que programaron esto para que me ayuden. Se van a contactar con vos a la brevedad. Perdón!.
+        ///   Looks up a localized string similar to Lamento tener problemas para reconocer tu DNI. Ya avisé a los seres humanos que programaron esto para que me ayuden. Se van a contactar con vos a la brevedad. Perdón y gracias de nuevo por tu paciencia!.
         /// </summary>
         internal static string UI_Donee_RegistrationFailed {
             get {
@@ -160,7 +160,7 @@ namespace NosAyudamos {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Recibimos tu mensaje, pero no pudimos reconocer tus datos en la imagen. Podrías enviarnos una nueva foto del DNI, quizás con mejor iluminación o más de cerca? Es importante que se vea con claridad el código de barras de la esquina inferior derecha. Gracias por tu paciencia!.
+        ///   Looks up a localized string similar to Recibimos tu mensaje, pero no pudimos reconocer tus datos en la imagen. Podrías enviarnos una nueva foto del DNI, quizás con mejor iluminación o más de cerca? Es importante que cuando tomes la foto, el DNI ocupe la totalidad de la pantalla de tu celular. Gracias por tu paciencia!.
         /// </summary>
         internal static string UI_Donee_ResendIdentifier1 {
             get {
@@ -169,7 +169,7 @@ namespace NosAyudamos {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Eso tampoco funcionó :(. Hay mejores chances si la foto se saca con luz natural, de día. Es importante también que no esté fuera de foco. Gracias, y esperamos tu siguiente foto del DNI!.
+        ///   Looks up a localized string similar to Sigo sin poder reconocer tus datos :(. Intentemos una última vez antes de involucrar a las personas de soporte técnico, que siempre aprecian que agotemos nuestras posibilidades primero. Buscá si es posible un lugar sin sombra y con luz natural (cuanta más, mejor!), y recordá que el DNI debería ocupar toda la pantalla de tu aplicación de cámara de fotos. Vamos que la tercera es la vencida!.
         /// </summary>
         internal static string UI_Donee_ResendIdentifier2 {
             get {

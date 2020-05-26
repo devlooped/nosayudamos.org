@@ -2,7 +2,7 @@
 
 namespace NosAyudamos
 {
-    class RegistrationFailed
+    public class RegistrationFailed
     {
         public RegistrationFailed(string phoneNumber, Uri[] images)
             => (PhoneNumber, Images)

@@ -24,38 +24,37 @@ namespace NosAyudamos
             [CallerMemberName] string actionName = "") where TResult : class
         {
             var actionId = typeof(DurableAction).Name;
-            var actionRetry = await repository.GetAsync(actionId, actionName);
+            var actionAttempt = await repository.GetAsync(actionId, actionName);
 
-            if (actionRetry != null)
+            if (actionAttempt != null)
             {
-                await repository.DeleteAsync(actionRetry);
+                await repository.DeleteAsync(actionAttempt);
             }
             else
             {
-                actionRetry = new DurableActionEntity(actionId, actionName);
+                actionAttempt = new DurableActionEntity(actionId, actionName);
             }
 
             try
             {
-                if (actionRetry.RetryCount < environment.GetVariable("DurableActionRetries", 3))
+                if (actionAttempt.Attempts < environment.GetVariable("DurableActionAttempts", 3))
                 {
-                    TResult result = await action(actionRetry.RetryCount + 1);
+                    TResult result = await action(actionAttempt.Attempts + 1);
                     // Consider a null/default return value as a failure too.
                     if (result == default(TResult))
                         throw new InvalidOperationException();
 
                     return result;
                 }
-                else
-                {
-                    await notifyCancel(environment.GetVariable("DurableActionRetries", 3));
-                }
             }
             catch (Exception)
             {
-                actionRetry.RetryCount += 1;
-                await repository.PutAsync(actionRetry);
-                await notifyRetry(actionRetry.RetryCount);
+                actionAttempt.Attempts += 1;
+                await repository.PutAsync(actionAttempt);
+                if (actionAttempt.Attempts == environment.GetVariable("DurableActionAttempts", 3))
+                    await notifyCancel(actionAttempt.Attempts);
+                else
+                    await notifyRetry(actionAttempt.Attempts);
             }
 
 #pragma warning disable CS8603 // Possible null reference return.

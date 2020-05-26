@@ -8,15 +8,15 @@ namespace NosAyudamos
 
         public string Action => RowKey;
 
-        public int RetryCount { get; set; } = 1;
+        public int Attempts { get; set; } = 1;
 
         public DurableActionEntity() { }
 
-        public DurableActionEntity(string id, string action, int retryCount = 0)
+        public DurableActionEntity(string id, string action, int attempts = 0)
         {
             PartitionKey = id;
             RowKey = action;
-            RetryCount = retryCount;
+            Attempts = attempts;
         }
     }
 }

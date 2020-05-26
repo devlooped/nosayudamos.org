@@ -108,10 +108,10 @@ namespace NosAyudamos.Steps
         {
             var value = Resources.ResourceManager.GetString(resource);
 
-            Assert.True(value.Equals(message.ToSingleLine()), $"Resource {resource} does not match the given message.");
+            Assert.Equal(message.ToSingleLine(), value);
             Assert.True(sent != null, "No message was sent.");
 
-            var format = Regex.Replace(value, "{\\d}", ".+");
+            var format = Regex.Replace(value, "{\\d}", ".+").Replace("(", "\\(").Replace(")", "\\)");
             var matches = Regex.IsMatch(sent.Body, format);
 
             if (value.Contains('{'))
