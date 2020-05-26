@@ -36,15 +36,15 @@ namespace NosAyudamos.Slack
             var response = await http.SendAsync(request);
 
             dynamic user = JObject.Parse(await response.Content.ReadAsStringAsync());
-            userId = (string?)user.user.real_name;
+            var realName = (string?)user.user.real_name;
 
             if (action == "pause")
             {
-                await events.PushAsync(new AutomationPaused(sender, userId));
+                await events.PushAsync(new AutomationPaused(sender, realName ?? userId));
             }
             else if (action == "resume")
             {
-                await events.PushAsync(new AutomationResumed(sender, userId));
+                await events.PushAsync(new AutomationResumed(sender, realName ?? userId));
             }
         }
     }
