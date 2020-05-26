@@ -21,11 +21,12 @@ namespace NosAyudamos
             => (this.enviroment, this.commands, this.language, this.recognizer, this.storage, this.logger)
             = (enviroment, commands, language, recognizer, blobStorage, logger);
 
-        public async Task RunAsync(MessageEvent @event, Person? person)
+        public Task RunAsync(MessageEvent @event, Person? person)
         {
             if (person == null || !(@event is MessageReceived message))
-                return;
+                return Task.CompletedTask;
 
+            return Task.CompletedTask;
         }
     }
 }
