@@ -40,7 +40,7 @@
     <PackageReference Include="System.Composition" Version="1.4.0" />
 
     <PackageReference Include="StreamStone" Version="2.3.0" />
-    <PackageReference Include="Humanizer" Version="2.8.11" />
+    <PackageReference Include="Humanizer.Core.es" Version="2.8.11" />
     <PackageReference Include="Merq.Core" Version="1.2.*" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.*" />
     <PackageReference Include="Polly" Version="7.2.0" />
@@ -69,6 +69,10 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
     </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Slack\RegisterDonee.json" />
   </ItemGroup>
 
   <ItemGroup>

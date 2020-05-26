@@ -145,16 +145,16 @@
     <value>Gracias {0} por tu mensaje. Actualmente estamos limitando la ayuda a personas registradas en el régimen de Monotributo en la categoría A exclusivamente.</value>
   </data>
   <data name="UI_Donee_RegistrationFailed" xml:space="preserve">
-    <value>Lamento tener problemas para reconocer tu DNI. Ya avisé a los seres humanos que programaron esto para que me ayuden. Se van a contactar con vos a la brevedad. Perdón!</value>
+    <value>Lamento tener problemas para reconocer tu DNI. Ya avisé a los seres humanos que programaron esto para que me ayuden. Se van a contactar con vos a la brevedad. Perdón y gracias de nuevo por tu paciencia!</value>
   </data>
   <data name="UI_Donee_Rejected" xml:space="preserve">
     <value>Gracias por tu mensaje! Lamentablemente, no pudimos verificar tu cuenta.</value>
   </data>
   <data name="UI_Donee_ResendIdentifier1" xml:space="preserve">
-    <value>Recibimos tu mensaje, pero no pudimos reconocer tus datos en la imagen. Podrías enviarnos una nueva foto del DNI, quizás con mejor iluminación o más de cerca? Es importante que se vea con claridad el código de barras de la esquina inferior derecha. Gracias por tu paciencia!</value>
+    <value>Recibimos tu mensaje, pero no pudimos reconocer tus datos en la imagen. Podrías enviarnos una nueva foto del DNI, quizás con mejor iluminación o más de cerca? Es importante que cuando tomes la foto, el DNI ocupe la totalidad de la pantalla de tu celular. Gracias por tu paciencia!</value>
   </data>
   <data name="UI_Donee_ResendIdentifier2" xml:space="preserve">
-    <value>Eso tampoco funcionó :(. Hay mejores chances si la foto se saca con luz natural, de día. Es importante también que no esté fuera de foco. Gracias, y esperamos tu siguiente foto del DNI!</value>
+    <value>Sigo sin poder reconocer tus datos :(. Intentemos una última vez antes de involucrar a las personas de soporte técnico, que siempre aprecian que agotemos nuestras posibilidades primero. Buscá si es posible un lugar sin sombra y con luz natural (cuanta más, mejor!), y recordá que el DNI debería ocupar toda la pantalla de tu aplicación de cámara de fotos. Vamos que la tercera es la vencida!</value>
   </data>
   <data name="UI_Donee_SendAmount" xml:space="preserve">
     <value>Necesitás ayuda? Por favor decinos cuánto necesitas.</value>

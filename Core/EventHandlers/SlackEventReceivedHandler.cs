@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NosAyudamos.Slack;
 
 namespace NosAyudamos
 {
@@ -42,7 +43,7 @@ namespace NosAyudamos
                 var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var json = JsonConvert.DeserializeObject<JObject>(body);
 
-                string? from = (string?)json.SelectToken("$.messages[0].blocks[?(@.block_id == 'sender')].fields[0].text");
+                string? from = json.SelectString("$.messages[0].blocks[?(@.block_id == 'sender')].fields[0].text");
 
                 if (!string.IsNullOrEmpty(from) && !string.IsNullOrEmpty(e.Text))
                     await events.PushAsync(new MessageSent(from.Substring(from.LastIndexOf(':') + 1).Trim(), e.Text));

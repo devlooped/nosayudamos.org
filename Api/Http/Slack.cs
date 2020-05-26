@@ -4,99 +4,43 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
-using System.Net.Http;
 using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
 using System.Globalization;
-using System.Net.Http.Headers;
-
+using NosAyudamos.Slack;
+using System.Collections.Generic;
 
 namespace NosAyudamos.Http
 {
     class Slack
     {
-        const string ApiUrl = "https://slack.com/api/";
-        const string UserInfoUrl = ApiUrl + "users.info?user=";
-
+        readonly IServiceProvider services;
         readonly ISerializer serializer;
         readonly IEnvironment environment;
-        readonly IEventStreamAsync events;
-        readonly ILanguageUnderstanding language;
-        readonly IEntityRepository<PhoneSystem> phoneRepo;
-        readonly HttpClient http;
-        readonly ILogger<Slack> logger;
-        readonly MessageReceivedHandler handler;
 
-        public Slack(
-            ISerializer serializer, IEnvironment environment,
-            IEventStreamAsync events, ILanguageUnderstanding language,
-            IEntityRepository<PhoneSystem> phoneRepo,
-            HttpClient http, MessageReceivedHandler handler, ILogger<Slack> logger)
-            => (this.serializer, this.environment, this.events, this.language, this.phoneRepo, this.http, this.handler, this.logger)
-            = (serializer, environment, events, language, phoneRepo, http, handler, logger);
+        public Slack(IServiceProvider services, ISerializer serializer, IEnvironment environment)
+            => (this.services, this.serializer, this.environment)
+            = (services, serializer, environment);
 
         [FunctionName("slack-interaction")]
         public async Task<IActionResult> InteractionAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "slack/interaction")] HttpRequest req)
         {
             var payload = await GetValidatedPayloadAsync(req);
+            var json = serializer.Deserialize<JObject>(System.Net.WebUtility.UrlDecode(payload.Substring(8)));
 
-            dynamic json = serializer.Deserialize<JObject>(System.Net.WebUtility.UrlDecode(payload.Substring(8)));
+            if (json["challenge"] != null)
+                return new OkObjectResult((string)json["challenge"]!);
 
-            if (json.challenge != null)
+            foreach (var processor in services
+                .GetRequiredService<IEnumerable<ISlackPayloadProcessor>>()
+                .Where(x => x.AppliesTo(json)))
             {
-                return new OkObjectResult(json.challenge);
-            }
-
-            string? action = json.actions?[0]?.value;
-            string? message = json.message?.blocks?[2]?.text?.text;
-            if (message != null && message.Trim().StartsWith("&gt;", StringComparison.Ordinal))
-                message = message.Trim().Substring(4);
-
-            if (message != null)
-                message = message.Trim();
-
-            if (action == "donate" || action == "help")
-            {
-                if (message != null)
-                    await events.PushAsync(new LanguageTrained(action, message));
-
-                return new OkResult();
-            }
-
-            string? from = json.message?.blocks?[1]?.fields?[0]?.text;
-            if (string.IsNullOrEmpty(from))
-                return new OkResult();
-
-            from = from.Substring(from.LastIndexOf(':') + 1).Trim();
-
-            if (action == "retry")
-            {
-                var map = await phoneRepo.GetAsync(from);
-                if (map != null && message != null)
-                    await events.PushAsync(new MessageReceived(from, map.SystemNumber, message));
-
-                return new OkResult();
-            }
-
-            var userId = (string)json.user.id;
-            using var request = new HttpRequestMessage(HttpMethod.Get, UserInfoUrl + userId);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", environment.GetVariable("SlackToken"));
-            var response = await http.SendAsync(request);
-
-            json = JObject.Parse(await response.Content.ReadAsStringAsync());
-            userId = (string)json.user.real_name;
-            if (action == "pause")
-            {
-                await events.PushAsync(new AutomationPaused(from, userId));
-            }
-            else if (action == "resume")
-            {
-                await events.PushAsync(new AutomationResumed(from, userId));
+                await processor.ProcessAsync(json);
             }
 
             return new OkResult();
@@ -107,21 +51,17 @@ namespace NosAyudamos.Http
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "slack/message")] HttpRequest req)
         {
             var payload = await GetValidatedPayloadAsync(req);
-            dynamic json = serializer.Deserialize<JObject>(payload);
+            var json = serializer.Deserialize<JObject>(payload);
 
-            if (json.challenge != null)
+            if (json["challenge"] != null)
+                return new OkObjectResult((string)json["challenge"]!);
+
+            foreach (var processor in services
+                .GetRequiredService<IEnumerable<ISlackPayloadProcessor>>()
+                .Where(x => x.AppliesTo(json)))
             {
-                return new OkObjectResult(json.challenge);
+                await processor.ProcessAsync(json);
             }
-
-            string channelId = json["event"].channel;
-            string eventId = json["event"].event_ts;
-            string threadId = json["event"].thread_ts;
-            string text = json["event"].text;
-
-            // We only process thread replies
-            if (!string.IsNullOrEmpty(threadId) && !string.IsNullOrEmpty(text))
-                await events.PushAsync(new SlackEventReceived(channelId, eventId, threadId, text, payload));
 
             return new OkResult();
         }

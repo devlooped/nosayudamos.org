@@ -1,0 +1,125 @@
+{
+  "type": "modal",
+  "title": {
+    "type": "plain_text",
+    "text": "Register Donee",
+    "emoji": true
+  },
+  "submit": {
+    "type": "plain_text",
+    "text": "Submit",
+    "emoji": true
+  },
+  "close": {
+    "type": "plain_text",
+    "text": "Cancel",
+    "emoji": true
+  },
+  "blocks": [
+    {
+      "type": "section",
+      "block_id": "sender",
+      "text": {
+        "type": "plain_text",
+        "text": ":message: $sender$",
+        "emoji": true
+      }
+    },
+    {
+      "type": "input",
+      "block_id": "nationalId",
+      "element": {
+        "type": "plain_text_input",
+        "action_id": "nationalId"
+      },
+      "label": {
+        "type": "plain_text",
+        "text": "National ID"
+      }
+    },
+    {
+      "type": "input",
+      "block_id": "lastName",
+      "element": {
+        "type": "plain_text_input",
+        "action_id": "lastName"
+      },
+      "label": {
+        "type": "plain_text",
+        "text": "Last Name"
+      }
+    },
+    {
+      "type": "input",
+      "block_id": "firstName",
+      "element": {
+        "type": "plain_text_input",
+        "action_id": "firstName"
+      },
+      "label": {
+        "type": "plain_text",
+        "text": "First Name"
+      }
+    },
+    {
+      "type": "input",
+      "block_id": "dateOfBirth",
+      "element": {
+        "type": "datepicker",
+        "action_id": "dateOfBirth",
+        "initial_date": "1986-10-26",
+        "placeholder": {
+          "type": "plain_text",
+          "text": "Select a date",
+          "emoji": true
+        }
+      },
+      "label": {
+        "type": "plain_text",
+        "text": "Date of Birth",
+        "emoji": true
+      }
+    },
+    {
+      "type": "input",
+      "block_id": "sex",
+      "element": {
+        "type": "static_select",
+        "action_id": "sex",
+        "initial_option": {
+          "text": {
+            "type": "plain_text",
+            "text": "Female"
+          },
+          "value": "F"
+        },
+        "placeholder": {
+          "type": "plain_text",
+          "text": "Select sex",
+          "emoji": true
+        },
+        "options": [
+          {
+            "text": {
+              "type": "plain_text",
+              "text": "Female"
+            },
+            "value": "F"
+          },
+          {
+            "text": {
+              "type": "plain_text",
+              "text": "Male"
+            },
+            "value": "M"
+          }
+        ]
+      },
+      "label": {
+        "type": "plain_text",
+        "text": "Sex",
+        "emoji": true
+      }
+    }
+  ]
+}

@@ -19,7 +19,7 @@ namespace NosAyudamos
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.1.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class VerificacionDeDonatariosFeature : object, Xunit.IClassFixture<VerificacionDeDonatariosFeature.FixtureData>, System.IDisposable
+    public partial class RegistracionDeDonatariosFeature : object, Xunit.IClassFixture<RegistracionDeDonatariosFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace NosAyudamos
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "DoneeTaxVerification.feature"
+#line 1 "DoneeRegistration.feature"
 #line hidden
         
-        public VerificacionDeDonatariosFeature(VerificacionDeDonatariosFeature.FixtureData fixtureData, NosAyudamos_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public RegistracionDeDonatariosFeature(RegistracionDeDonatariosFeature.FixtureData fixtureData, NosAyudamos_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace NosAyudamos
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("es-ES"), "Verificacion de donatarios", null, ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("es-ES"), "Registracion de donatarios", null, ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -82,10 +82,10 @@ namespace NosAyudamos
 #line 5
     testRunner.Given("Un storage limpio", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Dado ");
 #line hidden
-#line 6
-    testRunner.And("SendToSlackInDevelopment=true", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
-#line hidden
 #line 7
+    testRunner.And("SendToSlackInDevelopment=false", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
+#line hidden
+#line 9
     testRunner.And("SendToMessagingInDevelopment=false", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
 #line hidden
         }
@@ -95,54 +95,14 @@ namespace NosAyudamos
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="DNI con CUIL es aprobado")]
-        [Xunit.TraitAttribute("FeatureTitle", "Verificacion de donatarios")]
-        [Xunit.TraitAttribute("Description", "DNI con CUIL es aprobado")]
-        public virtual void DNIConCUILEsAprobado()
+        [Xunit.SkippableFactAttribute(DisplayName="DNI legible")]
+        [Xunit.TraitAttribute("FeatureTitle", "Registracion de donatarios")]
+        [Xunit.TraitAttribute("Description", "DNI legible")]
+        public virtual void DNILegible()
         {
             string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI con CUIL es aprobado", null, ((string[])(null)));
-#line 9
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 4
-this.FeatureBackground();
-#line hidden
-#line 10
-    testRunner.When("Envia ID Content\\CUIL2.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
-#line hidden
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI legible", null, ((string[])(null)));
 #line 11
-    testRunner.Then("Recibe \'UI_Donee_Welcome\'", "Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos! INSTRUCCIONES", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="DNI con Monotributo Categoría A es aprobado")]
-        [Xunit.TraitAttribute("FeatureTitle", "Verificacion de donatarios")]
-        [Xunit.TraitAttribute("Description", "DNI con Monotributo Categoría A es aprobado")]
-        public virtual void DNIConMonotributoCategoriaAEsAprobado()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI con Monotributo Categoría A es aprobado", null, ((string[])(null)));
-#line 16
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -165,24 +125,24 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 17
-    testRunner.When("Envia ID Content\\CUIT+MonotributoA.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
+#line 12
+    testRunner.When("Envia ID Content\\CUIL.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
+#line 13
+    testRunner.Then("Recibe \'UI_Donee_Welcome\'", "Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos! INSTRUCCIONES", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="DNI sin código de barras solicita reintentar")]
+        [Xunit.TraitAttribute("FeatureTitle", "Registracion de donatarios")]
+        [Xunit.TraitAttribute("Description", "DNI sin código de barras solicita reintentar")]
+        public virtual void DNISinCodigoDeBarrasSolicitaReintentar()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI sin código de barras solicita reintentar", null, ((string[])(null)));
 #line 18
-    testRunner.Then("Recibe \'UI_Donee_Welcome\'", "Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos! INSTRUCCIONES", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="DNI con CUIT sin Monotributo es rechazado")]
-        [Xunit.TraitAttribute("FeatureTitle", "Verificacion de donatarios")]
-        [Xunit.TraitAttribute("Description", "DNI con CUIT sin Monotributo es rechazado")]
-        public virtual void DNIConCUITSinMonotributoEsRechazado()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI con CUIT sin Monotributo es rechazado", null, ((string[])(null)));
-#line 23
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -205,66 +165,75 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 24
-    testRunner.When("Envia ID Content\\CUIT-Monotributo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
+#line 19
+    testRunner.When("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 25
-    testRunner.Then("Recibe \'UI_Donee_NotApplicable\'", "Gracias {0} por tu mensaje. Actualmente estamos limitando la ayuda a personas \r\nr" +
-                        "egistradas en el régimen de Monotributo en la categoría A exclusivamente.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
+#line 20
+    testRunner.Then("Recibe \'UI_Donee_ResendIdentifier1\'", @"Recibimos tu mensaje, pero no pudimos reconocer tus datos en la imagen. 
+Podrías enviarnos una nueva foto del DNI, quizás con mejor iluminación o más 
+de cerca? Es importante que cuando tomes la foto, el DNI ocupe la totalidad 
+de la pantalla de tu celular. Gracias por tu paciencia!", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="DNI con Monotributo Categoria Alta es rechazado")]
-        [Xunit.TraitAttribute("FeatureTitle", "Verificacion de donatarios")]
-        [Xunit.TraitAttribute("Description", "DNI con Monotributo Categoria Alta es rechazado")]
-        public virtual void DNIConMonotributoCategoriaAltaEsRechazado()
+        [Xunit.SkippableFactAttribute(DisplayName="DNI sin código de barras por segunda vez solicita reintentar")]
+        [Xunit.TraitAttribute("FeatureTitle", "Registracion de donatarios")]
+        [Xunit.TraitAttribute("Description", "DNI sin código de barras por segunda vez solicita reintentar")]
+        public virtual void DNISinCodigoDeBarrasPorSegundaVezSolicitaReintentar()
         {
             string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI con Monotributo Categoria Alta es rechazado", null, ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI sin código de barras por segunda vez solicita reintentar", null, ((string[])(null)));
+#line 28
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 4
+this.FeatureBackground();
+#line hidden
+#line 29
+    testRunner.When("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
+#line hidden
+#line 30
+    testRunner.And("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
+#line hidden
 #line 31
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 4
-this.FeatureBackground();
-#line hidden
-#line 32
-    testRunner.When("Envia ID Content\\CUIT+Monotributo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
-#line hidden
-#line 33
-    testRunner.Then("Recibe \'UI_Donee_HighCategory\'", "Gracias {0} por tu mensaje. Actualmente estamos limitando la ayuda a personas \r\nr" +
-                        "egistradas en el régimen de Monotributo en la categoría A exclusivamente.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
+    testRunner.Then("Recibe \'UI_Donee_ResendIdentifier2\'", @"Sigo sin poder reconocer tus datos :(. Intentemos una última vez antes 
+de involucrar a las personas de soporte técnico, que siempre aprecian 
+que agotemos nuestras posibilidades primero. Buscá si es posible un lugar 
+sin sombra y con luz natural (cuanta más, mejor!), y recordá que el DNI 
+debería ocupar toda la pantalla de tu aplicación de cámara de fotos. 
+Vamos que la tercera es la vencida!", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="DNI con CUIT que paga Ganancias es rechazado")]
-        [Xunit.TraitAttribute("FeatureTitle", "Verificacion de donatarios")]
-        [Xunit.TraitAttribute("Description", "DNI con CUIT que paga Ganancias es rechazado")]
-        public virtual void DNIConCUITQuePagaGananciasEsRechazado()
+        [Xunit.SkippableFactAttribute(DisplayName="DNI sin código de barras por tercera vez avisa a humanos")]
+        [Xunit.TraitAttribute("FeatureTitle", "Registracion de donatarios")]
+        [Xunit.TraitAttribute("Description", "DNI sin código de barras por tercera vez avisa a humanos")]
+        public virtual void DNISinCodigoDeBarrasPorTerceraVezAvisaAHumanos()
         {
             string[] tagsOfScenario = ((string[])(null));
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI con CUIT que paga Ganancias es rechazado", null, ((string[])(null)));
-#line 39
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI sin código de barras por tercera vez avisa a humanos", null, ((string[])(null)));
+#line 41
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -287,12 +256,19 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 40
-    testRunner.When("Envia ID Content\\CUIT+Ganancias.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
+#line 42
+    testRunner.When("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 41
-    testRunner.Then("Recibe \'UI_Donee_HasIncomeTax\'", "Gracias {0} por tu mensaje. Actualmente estamos limitando la ayuda a personas \r\nq" +
-                        "ue no tributan impuesto a las ganancias.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
+#line 43
+    testRunner.And("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
+#line hidden
+#line 44
+    testRunner.And("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
+#line hidden
+#line 45
+    testRunner.Then("Recibe \'UI_Donee_RegistrationFailed\'", "Lamento tener problemas para reconocer tu DNI. Ya avisé a los seres \r\nhumanos que" +
+                        " programaron esto para que me ayuden. Se van a contactar \r\ncon vos a la brevedad" +
+                        ". Perdón y gracias de nuevo por tu paciencia!", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -305,12 +281,12 @@ this.FeatureBackground();
             
             public FixtureData()
             {
-                VerificacionDeDonatariosFeature.FeatureSetup();
+                RegistracionDeDonatariosFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                VerificacionDeDonatariosFeature.FeatureTearDown();
+                RegistracionDeDonatariosFeature.FeatureTearDown();
             }
         }
     }
