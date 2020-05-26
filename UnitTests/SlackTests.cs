@@ -32,12 +32,24 @@ namespace NosAyudamos
                         Fields = new List<TextObject>
                         {
                             new TextObject($":rejected: 5491159278282") { Emoji = true },
-                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/20251885398|CUIT sin Monotributo>") 
-                            { 
-                                Type = TextObject.TextType.Markdown 
+                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/20251885398|CUIT sin Monotributo>")
+                            {
+                                Type = TextObject.TextType.Markdown
                             },
                         }
                     },
+                    new Actions
+                    {
+                        BlockId = "actions",
+                        Elements = new List<IActionElement>
+                        {
+                            new Button
+                            {
+                                Text = new TextObject("Register :register_donee:") { Emoji = true },
+                                Value = "register"
+                            },
+                        }
+                    }
                 },
             });
 
