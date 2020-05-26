@@ -13,8 +13,8 @@ namespace NosAyudamos
         readonly IEnvironment environment;
         readonly IReadOnlyPolicyRegistry<string> registry;
 
-        public TwilioMessaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment) 
-            => (this.registry, this.environment) 
+        public TwilioMessaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment)
+            => (this.registry, this.environment)
             = (registry, environment);
 
         public async Task SendTextAsync(string body, string to)

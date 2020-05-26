@@ -17,7 +17,7 @@ namespace NosAyudamos
         readonly HttpClient http;
 
         public SlackEventReceivedHandler(
-            IEnvironment environment, IEventStreamAsync events, 
+            IEnvironment environment, IEventStreamAsync events,
             IEntityRepository<SlackEventReceived> repository, HttpClient http)
             => (this.environment, this.events, this.repository, this.http)
             = (environment, events, repository, http);

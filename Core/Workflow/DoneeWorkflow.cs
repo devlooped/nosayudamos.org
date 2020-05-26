@@ -17,7 +17,7 @@ namespace NosAyudamos
         public DoneeWorkflow(
             IEnvironment enviroment, ICommandBus commands,
             ILanguageUnderstanding language,
-            ITaxIdRecognizer recognizer, IBlobStorage blobStorage, ILogger<DoneeWorkflow> logger) 
+            ITaxIdRecognizer recognizer, IBlobStorage blobStorage, ILogger<DoneeWorkflow> logger)
             => (this.enviroment, this.commands, this.language, this.recognizer, this.storage, this.logger)
             = (enviroment, commands, language, recognizer, blobStorage, logger);
 

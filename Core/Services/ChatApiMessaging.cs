@@ -45,10 +45,10 @@ namespace NosAyudamos
             }
             else
             {
-                var msg = new 
-                { 
-                    phone = to.TrimStart('+'), 
-                    body 
+                var msg = new
+                {
+                    phone = to.TrimStart('+'),
+                    body
                 };
 
                 using var content = new StringContent(serializer.Serialize(msg), Encoding.UTF8, "application/json");

@@ -13,7 +13,7 @@ namespace NosAyudamos.Slack
         readonly IEventStreamAsync events;
         readonly HttpClient http;
 
-        public AutomationActionProcessor(IEnvironment environment, IEventStreamAsync events, HttpClient http) 
+        public AutomationActionProcessor(IEnvironment environment, IEventStreamAsync events, HttpClient http)
             => (this.environment, this.events, this.http)
             = (environment, events, http);
 

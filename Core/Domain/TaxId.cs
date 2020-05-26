@@ -62,7 +62,7 @@ namespace NosAyudamos
             var taxId = (sex == Sex.Male ? "20" : "27") + nationalId;
 
             // Se multiplica XY 12345678 por un número de forma separada:
-            var sum = taxId.Where(c => char.IsDigit(c)).Select((c, i) => 
+            var sum = taxId.Where(c => char.IsDigit(c)).Select((c, i) =>
                 int.Parse(c.ToString(), CultureInfo.InvariantCulture) * multiplier[i]).Sum();
 
             // Se suman dichos resultados. El resultado obtenido se divide por 11. 

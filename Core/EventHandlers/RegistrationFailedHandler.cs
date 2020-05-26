@@ -37,8 +37,8 @@ namespace NosAyudamos
                 },
             };
 
-            message.Blocks.AddRange(e.Images.Select((uri, i) => new global::Slack.Webhooks.Blocks.Image 
-            { 
+            message.Blocks.AddRange(e.Images.Select((uri, i) => new global::Slack.Webhooks.Blocks.Image
+            {
                 ImageUrl = uri.OriginalString,
                 Title = new TextObject($"Attempt #" + i),
                 AltText = Path.GetFileName(uri.AbsolutePath),

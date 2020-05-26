@@ -9,7 +9,7 @@ using Xunit;
 namespace NosAyudamos
 {
     public sealed class EntityRepositoryTests : IDisposable
-    { 
+    {
         [Fact]
         public async Task CanSavePersonMessagingMap()
         {

@@ -23,10 +23,10 @@ namespace NosAyudamos.Slack
             dynamic json = payload;
 
             await events.PushAsync(new SlackEventReceived(
-                (string)json["event"].channel, 
-                (string)json["event"].event_ts, 
-                (string)json["event"].thread_ts, 
-                (string)json["event"].text, 
+                (string)json["event"].channel,
+                (string)json["event"].event_ts,
+                (string)json["event"].thread_ts,
+                (string)json["event"].text,
                 payload.ToString()));
         }
     }

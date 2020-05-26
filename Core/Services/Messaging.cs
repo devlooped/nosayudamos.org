@@ -19,8 +19,8 @@ namespace NosAyudamos
         readonly IEntityRepository<PhoneSystem> phoneRepo;
 
         public Messaging(
-            IReadOnlyPolicyRegistry<string> registry, IEnvironment environment, 
-            IEntityRepository<PhoneSystem> phoneRepo, HttpClient httpClient, 
+            IReadOnlyPolicyRegistry<string> registry, IEnvironment environment,
+            IEntityRepository<PhoneSystem> phoneRepo, HttpClient httpClient,
             ISerializer serializer, ILogger<Messaging> logger)
         {
             this.environment = environment;

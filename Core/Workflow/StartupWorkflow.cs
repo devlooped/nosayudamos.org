@@ -35,7 +35,7 @@ namespace NosAyudamos
             DurableAction durableAction,
             IMessaging messaging,
             HttpClient http,
-            IBlobStorage blobStorage, 
+            IBlobStorage blobStorage,
             IPersonRepository personRepository,
             ILogger<StartupWorkflow> logger)
             => (this.environment, this.events, this.language, this.idRecognizer, this.taxRecognizer, this.durableAction, this.messaging, this.http, this.blobStorage, this.personRepository, this.logger)
@@ -95,7 +95,7 @@ namespace NosAyudamos
                 },
                 attempt =>
                 {
-                    var value = Resources.ResourceManager.GetString("UI_Donee_ResendIdentifier" + attempt, CultureInfo.CurrentCulture) 
+                    var value = Resources.ResourceManager.GetString("UI_Donee_ResendIdentifier" + attempt, CultureInfo.CurrentCulture)
                         ?? Strings.UI.Donee.RegistrationFailed;
                     return events.PushAsync(new MessageSent(message.PhoneNumber, value));
                 },
@@ -124,7 +124,7 @@ namespace NosAyudamos
             if (id != null)
             {
                 await blobStorage.UploadAsync(
-                        image, 
+                        image,
                         environment.GetVariable("AttachmentsContainerName"), $"dni_{id.NationalId}.png")
                     .ConfigureAwait(false);
 

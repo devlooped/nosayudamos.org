@@ -53,7 +53,7 @@ namespace Merq
             }
         }
 
-        public bool CanHandle<TCommand>() where TCommand : IExecutable 
+        public bool CanHandle<TCommand>() where TCommand : IExecutable
             => services.GetService(typeof(ICanExecute<TCommand>)) != null;
 
         public void Execute(ICommand command)

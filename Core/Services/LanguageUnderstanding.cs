@@ -22,7 +22,7 @@ namespace NosAyudamos
         static readonly Prediction emptyPrediction = new Prediction
         {
             Entities = new Dictionary<string, object>(),
-            Intents = new Dictionary<string, Intent>(), 
+            Intents = new Dictionary<string, Intent>(),
             Sentiment = new Sentiment()
         };
 

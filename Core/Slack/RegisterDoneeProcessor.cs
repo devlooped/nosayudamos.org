@@ -17,7 +17,7 @@ namespace NosAyudamos.Slack
         readonly IEntityRepository<PhoneSystem> repository;
 
         public RegisterDoneeProcessor(
-            IEnvironment environment, IEventStreamAsync events, 
+            IEnvironment environment, IEventStreamAsync events,
             IBlobStorage storage, IEntityRepository<PhoneSystem> repository)
             => (this.environment, this.events, this.storage, this.repository)
             = (environment, events, storage, repository);
@@ -40,7 +40,7 @@ namespace NosAyudamos.Slack
             var nationalId = payload.SelectString("$.view.state.values.nationalId.nationalId.value")!;
             var sex = payload.SelectString("$.view.state.values.sex.sex.selected_option.value")!;
             var bdate = DateTime.Parse(
-                payload.SelectString("$.view.state.values.dateOfBirth.dateOfBirth.selected_date")!, 
+                payload.SelectString("$.view.state.values.dateOfBirth.dateOfBirth.selected_date")!,
                 CultureInfo.CurrentCulture);
 
             //00000000000@LASTNAME@FIRSTNAME@SEX@ID@A@DATEOFBIRTH@DATEOFISSUE
@@ -55,13 +55,13 @@ namespace NosAyudamos.Slack
                     Margin = 10
                 }
             };
-            
+
             using var bitmap = writer.WriteAsBitmap(data);
             using var mem = new MemoryStream();
             bitmap.Save(mem, ImageFormat.Png);
             mem.Position = 0;
 
-            var uri = await storage.UploadAsync(mem.ToArray(), 
+            var uri = await storage.UploadAsync(mem.ToArray(),
                 environment.GetVariable("AttachmentsContainerName"), $"cel_{sender}.png")
                 .ConfigureAwait(false);
 
