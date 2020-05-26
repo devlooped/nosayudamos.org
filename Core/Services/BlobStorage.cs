@@ -70,6 +70,7 @@ namespace NosAyudamos
             if (!await containerClient.ExistsAsync())
             {
                 containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName).ConfigureAwait(false);
+                await containerClient.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
             }
 
             var blobClient = containerClient.GetBlobClient(blobName);
