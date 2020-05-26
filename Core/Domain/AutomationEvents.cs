@@ -2,7 +2,7 @@
 {
     public class AutomationPaused
     {
-        public AutomationPaused(string phoneNumber, string by) 
+        public AutomationPaused(string phoneNumber, string by)
             => (PhoneNumber, By)
             = (phoneNumber, by);
 

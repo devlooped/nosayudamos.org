@@ -12,9 +12,9 @@ using Slack.Webhooks.Interfaces;
 
 namespace NosAyudamos
 {
-    class SlackEventHandler : 
-        IEventHandler<TaxStatusRejected>, 
-        IEventHandler<TaxStatusAccepted>, 
+    class SlackEventHandler :
+        IEventHandler<TaxStatusRejected>,
+        IEventHandler<TaxStatusAccepted>,
         IEventHandler<UnknownMessageReceived>,
         IEventHandler<MessageReceived>
     {
@@ -26,7 +26,7 @@ namespace NosAyudamos
 
         public SlackEventHandler(
             IEnvironment environment, IPersonRepository repository,
-            IEntityRepository<PhoneSystem> phoneRepo, IEventStreamAsync events, 
+            IEntityRepository<PhoneSystem> phoneRepo, IEventStreamAsync events,
             ILanguageUnderstanding language)
             => (this.environment, this.repository, this.phoneRepo, this.events, this.language)
             = (environment, repository, phoneRepo, events, language);
@@ -129,7 +129,7 @@ namespace NosAyudamos
                 return;
 
             await events.PushAsync(new MessageSent(
-                person.PhoneNumber, 
+                person.PhoneNumber,
                 Strings.UI.Donee.Welcome(person.FirstName.Split(' ').First(), person.Sex == Sex.Male ? "o" : "a")))
                 .ConfigureAwait(false);
 
@@ -190,7 +190,7 @@ namespace NosAyudamos
             };
 
             await events.PushAsync(new MessageSent(person.PhoneNumber, body));
-            
+
             var message = new SlackMessage
             {
                 Username = "nosayudamos",

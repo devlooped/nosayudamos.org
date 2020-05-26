@@ -41,20 +41,20 @@ namespace NosAyudamos
 
         [JsonProperty]
         public string Id { get; private set; }
-        
+
         [JsonProperty]
         public string FirstName { get; private set; }
-        
+
         [JsonProperty]
         public string LastName { get; private set; }
-        
+
         [JsonProperty]
         public string PhoneNumber { get; private set; }
-        
+
         [JsonProperty]
         [JsonConverter(typeof(StringEnumConverter))]
         public Role Role { get; set; } = Role.Donee;
-        
+
         [JsonProperty]
         [JsonConverter(typeof(DateOnlyConverter))]
         public DateTime? DateOfBirth { get; private set; }
@@ -65,7 +65,7 @@ namespace NosAyudamos
         [JsonProperty]
         [JsonConverter(typeof(StringEnumConverter))]
         public Sex? Sex { get; private set; }
-        
+
         [JsonProperty]
         public int State { get; private set; } = 0;
 
@@ -80,7 +80,7 @@ namespace NosAyudamos
         {
             if (amount < 0)
                 throw new ArgumentException("Can only donate positive amounts.");
-            
+
             Raise(new Donated(amount));
         }
 
@@ -156,7 +156,7 @@ namespace NosAyudamos
         void OnPhoneNumberUpdated(PhoneNumberUpdated e) => PhoneNumber = e.NewNumber;
 
         void OnTaxStatusAccepted(TaxStatusAccepted e) => TaxStatus = TaxStatus.Validated;
-        
+
         void OnTaxStatusRejected(TaxStatusRejected e) => TaxStatus = TaxStatus.Rejected;
     }
 }

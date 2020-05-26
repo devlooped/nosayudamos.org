@@ -167,8 +167,8 @@ namespace NosAyudamos
             .CreateNavigator()
             .Select("//div[@class='alert' and @role='alert']/text()")
             .OfType<XPathItem>().Select(x => x.Value)
-            .Any(x => 
-                x.Contains("El código de seguridad se ha vencido. Intente nuevamente.", StringComparison.OrdinalIgnoreCase) || 
+            .Any(x =>
+                x.Contains("El código de seguridad se ha vencido. Intente nuevamente.", StringComparison.OrdinalIgnoreCase) ||
                 x.Contains("Código de seguridad inválido.", StringComparison.OrdinalIgnoreCase));
 
         static async Task<XDocument> ReadXmlAsync(HttpResponseMessage response)

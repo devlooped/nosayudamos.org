@@ -12,7 +12,7 @@ namespace NosAyudamos.Slack
         public bool AppliesTo(JObject payload) =>
             (string?)payload["type"] == "block_actions" &&
             (payload.SelectString("$.actions[0].value") == "donate" ||
-             payload.SelectString("$.actions[0].value") == "help") && 
+             payload.SelectString("$.actions[0].value") == "help") &&
             payload.SelectString("$.message.blocks[?(@.block_id == 'body')].text.text") != null;
 
         public async Task ProcessAsync(JObject payload)

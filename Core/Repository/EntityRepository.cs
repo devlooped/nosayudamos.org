@@ -142,7 +142,7 @@ namespace NosAyudamos
         }
     }
 
-    interface IEntityRepository<T> where T: class
+    interface IEntityRepository<T> where T : class
     {
         IAsyncEnumerable<T> GetAllAsync();
         Task<T?> GetAsync(string key);

@@ -16,7 +16,7 @@ namespace NosAyudamos
         readonly IWorkflowSelector selector;
 
         public MessageReceivedHandler(
-            ILogger log, 
+            ILogger log,
             IPersonRepository personRepo, IEntityRepository<PhoneSystem> phoneRepo,
             IWorkflowSelector selector)
             => (this.log, this.personRepo, this.phoneRepo, this.selector)
