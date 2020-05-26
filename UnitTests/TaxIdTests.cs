@@ -15,7 +15,7 @@ namespace NosAyudamos
         [InlineData("28162083", Sex.Male, "20281620836")]
         [InlineData("22718904", Sex.Female, "27227189040")]
         [InlineData("30082615", Sex.Female, "27300826151")]
-        public void CalculateTaxId(string personalId, Sex sex, string taxId) 
+        public void CalculateTaxId(string personalId, Sex sex, string taxId)
             => Assert.Equal(taxId, TaxId.FromNationalId(personalId, sex));
 
         [Theory]
@@ -25,9 +25,9 @@ namespace NosAyudamos
         [InlineData("22718904", "", "", Sex.Female, TaxCategory.A, TaxIdKind.CUIT, false)]
         [InlineData("20189078", "", "", Sex.Male, TaxCategory.NotApplicable, TaxIdKind.CUIT, false)]
         [InlineData("25188539", "", "", Sex.Male, TaxCategory.D, TaxIdKind.CUIT, null)]
-        
+
         public async Task GetTaxStatus(
-            string nationalId, string firstName, string lastName, Sex sex, 
+            string nationalId, string firstName, string lastName, Sex sex,
             TaxCategory? category, TaxIdKind? kind, bool? hasIncomeTax)
         {
             var env = new Environment();
