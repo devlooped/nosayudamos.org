@@ -47,8 +47,28 @@ namespace NosAyudamos.Http
         }
 
         [FunctionName("slack-message")]
-        public async Task<IActionResult> ReceiveAsync(
+        public async Task<IActionResult> MessageAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "slack/message")] HttpRequest req)
+        {
+            var payload = await GetValidatedPayloadAsync(req);
+            var json = serializer.Deserialize<JObject>(payload);
+
+            if (json["challenge"] != null)
+                return new OkObjectResult((string)json["challenge"]!);
+
+            foreach (var processor in services
+                .GetRequiredService<IEnumerable<ISlackPayloadProcessor>>()
+                .Where(x => x.AppliesTo(json)))
+            {
+                await processor.ProcessAsync(json);
+            }
+
+            return new OkResult();
+        }
+
+        [FunctionName("slack-command")]
+        public async Task<IActionResult> CommandAsync(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "slack/command")] HttpRequest req)
         {
             var payload = await GetValidatedPayloadAsync(req);
             var json = serializer.Deserialize<JObject>(payload);

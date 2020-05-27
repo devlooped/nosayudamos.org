@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace NosAyudamos
 {
-    class FeatureEnvironment : IEnvironment
+    class TestEnvironment : IEnvironment
     {
         Dictionary<string, string> values = new Dictionary<string, string>();
         Environment environment = new Environment();

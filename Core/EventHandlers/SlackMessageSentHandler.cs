@@ -49,8 +49,11 @@ namespace NosAyudamos
 
             if (thread != null)
             {
-                if ((DateTime.Now - thread.LastUpdated).Days < 30)
-                    threadId = thread.ThreadId;
+                // Maybe we shouldn't reuse older threads?
+                // Makes sense to keep it because it's the full context 
+                // of all past interactions with a user... 
+                //if ((DateTime.Now - thread.LastUpdated).Days < 30)
+                threadId = thread.ThreadId;
 
                 if ((DateTime.Now - thread.LastUpdated).Days > 7)
                     broadcast = true;
@@ -91,7 +94,7 @@ namespace NosAyudamos
                         };
                     }
 
-                    payload["blocks"]!.First!.AddAfterSelf(new JObject
+                    payload["blocks"]!.First!.AddBeforeSelf(new JObject
                     {
                         { "block_id", "sender" },
                         { "type", "section" },

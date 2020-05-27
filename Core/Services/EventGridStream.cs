@@ -91,10 +91,13 @@ namespace NosAyudamos
             if (environment.IsDevelopment())
             {
                 var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
-
-                foreach (var handler in handlers)
+                
+                if (handlers != null)
                 {
-                    await handler.HandleAsync(args);
+                    foreach (var handler in handlers)
+                    {
+                        await handler.HandleAsync(args);
+                    }
                 }
 
                 var type = args!.GetType().BaseType;
@@ -103,9 +106,12 @@ namespace NosAyudamos
                     var serviceType = typeof(IEnumerable<>).MakeGenericType(typeof(IEventHandler<>).MakeGenericType(type));
                     var baseHandlers = (IEnumerable<dynamic>)services.GetService(serviceType);
 
-                    foreach (var handler in baseHandlers)
+                    if (baseHandlers != null)
                     {
-                        await handler.HandleAsync((dynamic)args);
+                        foreach (var handler in baseHandlers)
+                        {
+                            await handler.HandleAsync((dynamic)args);
+                        }
                     }
 
                     type = type.BaseType;

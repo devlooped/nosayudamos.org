@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
 using Microsoft.Azure.Cosmos.Table;
+using Microsoft.VisualStudio.Threading;
+using Moq;
 using Slack.Webhooks;
 using Slack.Webhooks.Blocks;
 using Slack.Webhooks.Elements;
@@ -12,9 +16,9 @@ namespace NosAyudamos
 {
     public class SlackTests
     {
-        IEnvironment environment;
+        TestEnvironment environment;
 
-        public SlackTests() => environment = new Environment();
+        public SlackTests() => environment = new TestEnvironment();
 
         [Fact]
         public async Task SendRejected()
@@ -173,6 +177,53 @@ namespace NosAyudamos
                     }
                 },
             });
+        }
+
+        [Fact]
+        public async Task SendAddsAutomationActions()
+        {
+            using var http = new HttpClient();
+            using var jtc = new JoinableTaskContext();
+            using var events = new EventGridStream(
+                Mock.Of<IServiceProvider>(), 
+                environment, 
+                new Serializer(),
+                jtc.Factory);
+
+            var people = new TestPersonRepository();
+            var phoneSystems = new TestEntityRepository<PhoneSystem>();
+            var phoneThreads = new TestEntityRepository<PhoneThread>();
+            var slackHandler = new SlackMessageSentHandler(environment, phoneThreads, http);
+
+            await phoneSystems.PutAsync(new PhoneSystem(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber)
+            {
+                AutomationPaused = true
+            });
+
+            var handler = new SlackEventHandler(environment, people, phoneSystems, events,
+                Mock.Of<ILanguageUnderstanding>(x => x.GetIntentsAsync(It.IsAny<string>()) ==
+                    Task.FromResult<IDictionary<string, Intent>>(new Dictionary<string, Intent>
+                    {
+                        { "Help", new Intent { Score = 0.55 } },
+                        { "Donate", new Intent { Score = 0.25 } },
+                    })));
+
+            SlackMessageSent sent = default;
+            events.Of<SlackMessageSent>().Subscribe(e => sent = e);
+
+            await handler.HandleAsync(new MessageReceived(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber, "Hey"));
+            await slackHandler.HandleAsync(sent);
+
+            await handler.HandleAsync(new MessageReceived(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber, "Threaded, Resume only."));
+            await slackHandler.HandleAsync(sent);
+
+            await phoneSystems.PutAsync(new PhoneSystem(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber)
+            {
+                AutomationPaused = false
+            });
+
+            await handler.HandleAsync(new UnknownMessageReceived(Constants.Donee.PhoneNumber, "Threaded, Pause only."));
+            await slackHandler.HandleAsync(sent);
         }
 
         async Task SendMessageAsync(SlackMessage message)
