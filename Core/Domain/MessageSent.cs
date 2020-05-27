@@ -2,7 +2,7 @@
 {
     public class MessageSent : MessageEvent
     {
-        public MessageSent(string to, string body) : base(to)
+        public MessageSent(string phoneNumber, string body) : base(phoneNumber)
             => Body = body;
 
         public string Body { get; }
