@@ -5,7 +5,7 @@
   },
   "AzureWebJobsStorage": "UseDevelopmentStorage=true",
   "SendToGridInDevelopment": "false",
-  "SendToMessagingInDevelopment": "true",
-  "SendToSlackInDevelopment": "true",
+  "SendToMessagingInDevelopment": "false",
+  "SendToSlackInDevelopment": "false",
   "SlackTestChannel": "C012C5W43U6"
 }
