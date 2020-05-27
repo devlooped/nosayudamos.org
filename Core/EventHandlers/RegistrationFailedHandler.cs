@@ -38,7 +38,7 @@ namespace NosAyudamos
             message.Blocks.AddRange(e.Images.Select((uri, i) => new global::Slack.Webhooks.Blocks.Image
             {
                 ImageUrl = uri.OriginalString,
-                Title = new TextObject($"Attempt #" + i),
+                Title = new TextObject($"Attempt #" + (i + 1)),
                 AltText = Path.GetFileName(uri.AbsolutePath),
             }));
 
