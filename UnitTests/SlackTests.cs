@@ -185,8 +185,8 @@ namespace NosAyudamos
             using var http = new HttpClient();
             using var jtc = new JoinableTaskContext();
             using var events = new EventGridStream(
-                Mock.Of<IServiceProvider>(), 
-                environment, 
+                Mock.Of<IServiceProvider>(),
+                environment,
                 new Serializer(),
                 jtc.Factory);
 

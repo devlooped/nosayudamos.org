@@ -116,6 +116,8 @@ namespace NosAyudamos
                             images.Add(uri);
                     }
 
+                    // Since we'll be following up personally via slack, pause further automation for this number.
+                    await events.PushAsync(new AutomationPaused(message.PhoneNumber, nameof(StartupWorkflow))).ConfigureAwait(false);
                     // We register the failure at the end of all attempts, to follow-up personally via Slack.
                     await events.PushAsync(new RegistrationFailed(message.PhoneNumber, images.ToArray())).ConfigureAwait(false);
                 },
