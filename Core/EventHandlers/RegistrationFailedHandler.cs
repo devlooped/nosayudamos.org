@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Humanizer;
 using Slack.Webhooks;
 using Slack.Webhooks.Blocks;
 using Slack.Webhooks.Elements;

@@ -34,6 +34,9 @@ namespace NosAyudamos.EventGrid
         [FunctionName("person-registered")]
         public Task PersonRegisteredAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<PersonRegistered>(serializer));
 
+        [FunctionName("registration-failed")]
+        public Task RegistrationFailedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<RegistrationFailed>(serializer));
+
         [FunctionName("automation-paused")]
         public Task AutomationPausedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<AutomationPaused>(serializer));
 
