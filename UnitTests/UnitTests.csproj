@@ -12,7 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Features\Constants.cs" Link="Constants.cs" />
+    <Compile Include="..\Features\Constants.cs" Link="Core\Constants.cs" />
+    <Compile Include="..\Features\Core\TestEntityRepository.cs" Link="Core\TestEntityRepository.cs" />
+    <Compile Include="..\Features\Core\TestEnvironment.cs" Link="Core\TestEnvironment.cs" />
+    <Compile Include="..\Features\Core\TestPersonRepository.cs" Link="Core\TestPersonRepository.cs" />
+    <Compile Include="..\Features\Core\TestRepository.cs" Link="Core\TestRepository.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +26,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="5.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.*" />
+    <PackageReference Include="RxFree" Version="1.0.0-rc.*" />
     <PackageReference Include="Moq" Version="4.14.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
@@ -45,6 +50,10 @@
     <None Update="@(None)" CopyToOutputDirectory="PreserveNewest" />
     <Content Update="@(Content)" CopyToOutputDirectory="PreserveNewest" />
     <UpToDateCheckInput Include="@(Content);@(None)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Core\" />
   </ItemGroup>
   
 </Project>

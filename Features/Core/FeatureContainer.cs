@@ -110,7 +110,7 @@ namespace NosAyudamos
 
             // For some reason, the built-in registrations we were providing via Startup for HttpClient weren't working.
             builder.RegisterType<HttpClient>().InstancePerDependency();
-            builder.RegisterType<FeatureEnvironment>().SingleInstance().AsSelf().AsImplementedInterfaces();
+            builder.RegisterType<TestEnvironment>().SingleInstance().AsSelf().AsImplementedInterfaces();
 
             return builder;
         }

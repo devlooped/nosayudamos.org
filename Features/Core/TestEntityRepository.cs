@@ -5,12 +5,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Autofac;
 using NosAyudamos.Repository;
 
 namespace NosAyudamos
 {
-    class FeatureEntityRepository<T> : IEntityRepository<T> where T : class
+    class TestEntityRepository<T> : IEntityRepository<T> where T : class
     {
         ConcurrentDictionary<string, T> values = new ConcurrentDictionary<string, T>();
 
@@ -61,14 +60,5 @@ namespace NosAyudamos
 
             return id;
         }
-    }
-
-    class FeatureEntityRepositoryFactory : IEntityRepositoryFactory
-    {
-        readonly IContainer container;
-
-        public FeatureEntityRepositoryFactory(IContainer container) => this.container = container;
-
-        public IEntityRepository<T> Create<T>() where T : class => container.Resolve<IEntityRepository<T>>();
     }
 }

@@ -35,7 +35,7 @@ namespace NosAyudamos.Steps
 
         [Given(@"(.*)\s?=\s?(.*)")]
         public void GivenEnvironmentVariable(string name, string value)
-            => container.Resolve<FeatureEnvironment>().SetVariable(name, value);
+            => container.Resolve<TestEnvironment>().SetVariable(name, value);
 
         [Given(@"Un storage limpio")]
         public async Task GivenAClearStorage()

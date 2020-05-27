@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -36,15 +37,7 @@ namespace NosAyudamos
             if (environment.IsDevelopment() && !environment.GetVariable("SendToSlackInDevelopment", false))
                 return;
 
-            var from = "Unknown";
-            if (e.PersonId != null &&
-                await repository.GetAsync(e.PersonId) is Person person &&
-                person != null)
-            {
-                from = person.FirstName + " " + person.LastName;
-            }
-
-            var intents = await language.GetIntentsAsync(e.Body);
+            var intents = await language.GetIntentsAsync(e.Body).ConfigureAwait(false);
             var context = new StringBuilder();
             if (intents.TryGetValue("Help", out var help))
                 context = context.Append(":pray: ").Append(help.Score?.ToString("0.##", CultureInfo.CurrentCulture));
@@ -52,9 +45,8 @@ namespace NosAyudamos
             if (intents.TryGetValue("Donate", out var donate))
                 context = context.Append(":money_with_wings: ").Append(donate.Score?.ToString("0.##", CultureInfo.CurrentCulture));
 
-            context = context.Append(" by ").Append(from).Append(", ").Append(e.When.Humanize());
             var toEmoji = e.PhoneNumber == environment.GetVariable("ChatApiNumber").TrimStart('+') ? ":whatsapp:" : ":twilio:";
-            var map = await phoneRepo.GetAsync(e.PhoneNumber);
+            var phoneSystem = await phoneRepo.GetAsync(e.PhoneNumber).ConfigureAwait(false);
 
             var message = new SlackMessage
             {
@@ -68,7 +60,7 @@ namespace NosAyudamos
                         Fields = new List<TextObject>
                         {
                             new TextObject($":unknown: {e.PhoneNumber}") { Emoji = true },
-                            new TextObject($"{toEmoji} {map?.SystemNumber}") { Emoji = true },
+                            new TextObject($"{toEmoji} {phoneSystem?.SystemNumber}") { Emoji = true },
                         }
                     },
                     new Section
@@ -104,27 +96,17 @@ namespace NosAyudamos
                                 Text = new TextObject("Retry :repeat:") { Emoji = true },
                                 Value = "retry"
                             },
-                            new Button
-                            {
-                                Text = new TextObject("Pause :automation_pause:") { Emoji = true },
-                                Value = "pause"
-                            },
-                            new Button
-                            {
-                                Text = new TextObject("Resume :automation_resume:") { Emoji = true },
-                                Value = "resume"
-                            },
                         }
                     }
                 },
             };
 
-            await events.PushAsync(new SlackMessageSent(e.PhoneNumber, message.AsJson())).ConfigureAwait(false);
+            await SendAsync(e.PhoneNumber, message, phoneSystem).ConfigureAwait(false);
         }
 
         public async Task HandleAsync(TaxStatusAccepted e)
         {
-            var person = await repository.GetAsync(e.SourceId!);
+            var person = await repository.GetAsync(e.SourceId!).ConfigureAwait(false);
             if (person == null)
                 return;
 
@@ -171,12 +153,12 @@ namespace NosAyudamos
                 },
             };
 
-            await events.PushAsync(new SlackMessageSent(person.PhoneNumber, message.AsJson()));
+            await SendAsync(person.PhoneNumber, message).ConfigureAwait(false);
         }
 
         public async Task HandleAsync(TaxStatusRejected e)
         {
-            var person = await repository.GetAsync(e.SourceId!);
+            var person = await repository.GetAsync(e.SourceId!).ConfigureAwait(false);
             if (person == null)
                 return;
 
@@ -189,7 +171,7 @@ namespace NosAyudamos
                 _ => Strings.UI.Donee.Rejected,
             };
 
-            await events.PushAsync(new MessageSent(person.PhoneNumber, body));
+            await events.PushAsync(new MessageSent(person.PhoneNumber, body)).ConfigureAwait(false);
 
             var message = new SlackMessage
             {
@@ -229,7 +211,7 @@ namespace NosAyudamos
                 },
             };
 
-            await events.PushAsync(new SlackMessageSent(person.PhoneNumber, message.AsJson()));
+            await SendAsync(person.PhoneNumber, message).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -238,18 +220,63 @@ namespace NosAyudamos
         /// </summary>
         public async Task HandleAsync(MessageReceived e)
         {
-            var map = await phoneRepo.GetAsync(e.PhoneNumber);
+            var map = await phoneRepo.GetAsync(e.PhoneNumber).ConfigureAwait(false);
             // We only foward for paused phones.
             if (map == null || map.AutomationPaused != true)
                 return;
 
-            await events.PushAsync(new SlackMessageSent(
-                e.PhoneNumber,
-                JsonConvert.SerializeObject(new
+            await SendAsync(e.PhoneNumber, new SlackMessage { Text = e.Body }).ConfigureAwait(false);
+        }
+
+        async Task SendAsync(string phoneNumber, SlackMessage message, PhoneSystem? phoneSystem = default)
+        {
+            if (phoneSystem == null)
+                phoneSystem = await phoneRepo.GetAsync(phoneNumber).ConfigureAwait(false);
+
+            if (phoneSystem == null)
+                return;
+
+            if (message.Blocks == null)
+            {
+                // It's a simple Text message, we need to turn it into a block-based one
+                message.Blocks = new List<Block>
                 {
-                    text = e.Body
-                })))
-                .ConfigureAwait(false);
+                    new Section
+                    {
+                        Text = new TextObject(message.Text) { Type = TextObject.TextType.PlainText, Emoji = true}
+                    }
+                };
+            }
+
+            var context = message.Blocks.OfType<Context>().FirstOrDefault();
+            if (context == null)
+            {
+                context = new Context { Elements = new List<IContextElement>() };
+                var actions = message.Blocks.OfType<Actions>().FirstOrDefault();
+                if (actions == null)
+                    message.Blocks.Add(context);
+                else
+                    message.Blocks.Insert(message.Blocks.IndexOf(actions), context);
+            }
+            var footer = context.Elements.OfType<TextObject>().FirstOrDefault();
+            if (footer == null)
+            {
+                footer = new TextObject();
+                context.Elements.Add(footer);
+            }
+
+            var by = "+" + phoneNumber;
+            var person = await repository.FindAsync(phoneNumber, readOnly: true).ConfigureAwait(false);
+            if (person != null)
+            {
+                by = person.FirstName + " " + person.LastName;
+            }
+
+            footer.Emoji = true;
+            footer.Text += " by " + by;
+            footer.Text += phoneSystem.AutomationPaused == true ? " :automation_paused:" : " :automation_enabled:";
+
+            await events.PushAsync(new SlackMessageSent(phoneNumber, message.AsJson())).ConfigureAwait(false);
         }
     }
 }

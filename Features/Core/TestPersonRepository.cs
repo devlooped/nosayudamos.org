@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace NosAyudamos
 {
-    class FeaturePersonRepository : IPersonRepository
+    class TestPersonRepository : IPersonRepository
     {
         Dictionary<string, string> phoneIdMap = new Dictionary<string, string>();
         Dictionary<string, Person> people = new Dictionary<string, Person>();
