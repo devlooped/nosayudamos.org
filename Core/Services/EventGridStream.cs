@@ -91,7 +91,7 @@ namespace NosAyudamos
             if (environment.IsDevelopment())
             {
                 var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
-                
+
                 if (handlers != null)
                 {
                     foreach (var handler in handlers)
