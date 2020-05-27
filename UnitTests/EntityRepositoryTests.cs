@@ -11,22 +11,6 @@ namespace NosAyudamos
     public sealed class EntityRepositoryTests : IDisposable
     {
         [Fact]
-        public async Task CanSavePersonMessagingMap()
-        {
-            var expected = new PersonMessagingMap("23696294", "123", "987");
-
-            var repository = await GetRepositoryAsync<PersonMessagingMap>();
-
-            await repository.PutAsync(expected);
-
-            var actual = await repository.GetAsync(expected.PersonId);
-
-            Assert.Equal(expected.PersonId, actual.PersonId);
-            Assert.Equal(expected.PhoneNumber, actual.PhoneNumber);
-            Assert.Equal(expected.SystemNumber, actual.SystemNumber);
-        }
-
-        [Fact]
         public async Task CanGetAll()
         {
             var repository = await GetRepositoryAsync<NestedType>();
@@ -65,7 +49,7 @@ namespace NosAyudamos
 
         }
 
-        async Task<EntityRepository<T>> GetRepositoryAsync<T>([CallerMemberName] string? tableName = null) where T : class
+        async Task<EntityRepository<T>> GetRepositoryAsync<T>([CallerMemberName] string tableName = null) where T : class
         {
             var tableClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference(tableName);
