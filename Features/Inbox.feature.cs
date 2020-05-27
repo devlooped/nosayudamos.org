@@ -128,10 +128,10 @@ this.ScenarioInitialize(scenarioInfo);
 this.FeatureBackground();
 #line hidden
 #line 12
- testRunner.When(string.Format("Envia {0}", mensaje), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
+ testRunner.When(string.Format("Envia \'{0}\'", mensaje), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
 #line 13
- testRunner.Then("Recibe UI_Donee_SendIdentifier", "Gracias por tu mensaje! Por favor envianos una \r\nfoto de tu DNI para registrarte " +
+ testRunner.Then("Recibe \'UI_Donee_SendIdentifier\'", "Gracias por tu mensaje! Por favor envianos una \r\nfoto de tu DNI para registrarte " +
                         "para recibir ayuda.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }
@@ -172,7 +172,7 @@ this.FeatureBackground();
  testRunner.When("Envia mensaje", "Foo", ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
 #line 31
- testRunner.Then("Recibe mensaje", "Gracias por tu mensaje! Comentanos si necesitas \r\nayuda o estás interesando en ay" +
+ testRunner.Then("Recibe \'UI_UnknownIntent\'", "Gracias por tu mensaje! Comentanos si necesitas \r\nayuda o estás interesando en ay" +
                         "udar a otros.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }
@@ -213,7 +213,7 @@ this.FeatureBackground();
  testRunner.When("Envia mensaje", "Quiero ayudar", ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
 #line 42
- testRunner.Then("Recibe mensaje", "Gracias por tu mensaje! Cuánto querés donar?", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
+ testRunner.Then("Recibe \'UI_Donor_SendAmount\'", "Gracias por tu mensaje! Cuánto querés donar?", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }
             this.ScenarioCleanup();

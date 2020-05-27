@@ -83,7 +83,7 @@ namespace NosAyudamos.Steps
 
         [When(@"Envia '(.*)'")]
         [When(@"Envia ""(.*)""")]
-        [When(@"Envia (?!ID).*")]
+        [When(@"Envia (?!ID\s).*")]
         [When(@"Envia mensaje")]
         public async Task WhenMessageReceived(string message)
         {
