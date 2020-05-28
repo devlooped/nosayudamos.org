@@ -14,7 +14,7 @@ namespace NosAyudamos
     [Workflow]
     class StartupWorkflow : IWorkflow
     {
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
         readonly IEventStreamAsync events;
         readonly ILanguageUnderstanding language;
         readonly IPersonalIdRecognizer idRecognizer;
@@ -23,11 +23,11 @@ namespace NosAyudamos
         readonly IMessaging messaging;
         readonly HttpClient http;
         readonly IBlobStorage blobStorage;
-        readonly IPersonRepository personRepository;
+        readonly IPersonRepository peopleRepo;
         readonly ILogger<StartupWorkflow> logger;
 
         public StartupWorkflow(
-            IEnvironment environment,
+            IEnvironment env,
             IEventStreamAsync events,
             ILanguageUnderstanding language,
             IPersonalIdRecognizer idRecognizer,
@@ -36,10 +36,10 @@ namespace NosAyudamos
             IMessaging messaging,
             HttpClient http,
             IBlobStorage blobStorage,
-            IPersonRepository personRepository,
+            IPersonRepository peopleRepo,
             ILogger<StartupWorkflow> logger)
-            => (this.environment, this.events, this.language, this.idRecognizer, this.taxRecognizer, this.durableAction, this.messaging, this.http, this.blobStorage, this.personRepository, this.logger)
-            = (environment, events, language, idRecognizer, taxRecognizer, durableAction, messaging, http, blobStorage, personRepository, logger);
+            => (this.env, this.events, this.language, this.idRecognizer, this.taxRecognizer, this.durableAction, this.messaging, this.http, this.blobStorage, this.peopleRepo, this.logger)
+            = (env, events, language, idRecognizer, taxRecognizer, durableAction, messaging, http, blobStorage, peopleRepo, logger);
 
         public async Task RunAsync(MessageEvent @event, Person? person)
         {
@@ -89,7 +89,7 @@ namespace NosAyudamos
                 async (attempt) =>
                 {
                     await blobStorage.UploadAsync(
-                        image, environment.GetVariable("AttachmentsContainerName"), $"cel_{message.PhoneNumber}_{attempt}.png")
+                        image, env.GetVariable("AttachmentsContainerName"), $"cel_{message.PhoneNumber}_{attempt}.png")
                         .ConfigureAwait(false);
                     return await idRecognizer.RecognizeAsync(image).ConfigureAwait(false);
                 },
@@ -108,7 +108,7 @@ namespace NosAyudamos
                     for (int i = 1; i <= attemps; i++)
                     {
                         var uri = await blobStorage.GetUriAsync(
-                            environment.GetVariable("AttachmentsContainerName"),
+                            env.GetVariable("AttachmentsContainerName"),
                             $"cel_{message.PhoneNumber}_{i}.png")
                         .ConfigureAwait(false);
 
@@ -127,10 +127,10 @@ namespace NosAyudamos
             {
                 await blobStorage.UploadAsync(
                         image,
-                        environment.GetVariable("AttachmentsContainerName"), $"dni_{id.NationalId}.png")
+                        env.GetVariable("AttachmentsContainerName"), $"dni_{id.NationalId}.png")
                     .ConfigureAwait(false);
 
-                var person = await personRepository.GetAsync(id.NationalId, readOnly: false).ConfigureAwait(false);
+                var person = await peopleRepo.GetAsync(id.NationalId, readOnly: false).ConfigureAwait(false);
                 if (person == null)
                 {
                     person = new Person(id.NationalId, id.FirstName, id.LastName, message.PhoneNumber, Role.Donee, id.DateOfBirth, id.Sex);
@@ -139,12 +139,12 @@ namespace NosAyudamos
                     if (tax != null)
                         person.UpdateTaxStatus(tax);
 
-                    await personRepository.PutAsync(person).ConfigureAwait(false);
+                    await peopleRepo.PutAsync(person).ConfigureAwait(false);
                 }
                 else
                 {
                     person.UpdatePhoneNumber(message.PhoneNumber);
-                    await personRepository.PutAsync(person).ConfigureAwait(false);
+                    await peopleRepo.PutAsync(person).ConfigureAwait(false);
                 }
             }
         }

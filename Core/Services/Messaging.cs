@@ -15,21 +15,21 @@ namespace NosAyudamos
         readonly Lazy<IMessaging> twilio;
         readonly Lazy<IMessaging> chatApi;
         readonly Lazy<IMessaging> log;
-        readonly IEnvironment environment;
-        readonly IEntityRepository<PhoneSystem> phoneRepo;
+        readonly IEnvironment env;
+        readonly IEntityRepository<PhoneSystem> phoneDir;
 
         public Messaging(
-            IReadOnlyPolicyRegistry<string> registry, IEnvironment environment,
-            IEntityRepository<PhoneSystem> phoneRepo, HttpClient httpClient,
+            IReadOnlyPolicyRegistry<string> registry, IEnvironment env,
+            IEntityRepository<PhoneSystem> phoneDir, HttpClient http,
             ISerializer serializer, ILogger<Messaging> logger)
         {
-            this.environment = environment;
-            this.phoneRepo = phoneRepo;
-            twilio = new Lazy<IMessaging>(() => new TwilioMessaging(registry, environment));
-            chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(environment, httpClient, serializer));
+            this.env = env;
+            this.phoneDir = phoneDir;
+            twilio = new Lazy<IMessaging>(() => new TwilioMessaging(registry, env));
+            chatApi = new Lazy<IMessaging>(() => new ChatApiMessaging(env, http, serializer));
             log = new Lazy<IMessaging>(() => new LogMessaging(logger));
 
-            chatApiNumber = new Lazy<string>(() => environment.GetVariable("ChatApiNumber").TrimStart('+'));
+            chatApiNumber = new Lazy<string>(() => env.GetVariable("ChatApiNumber").TrimStart('+'));
         }
 
         public void Dispose()
@@ -45,11 +45,11 @@ namespace NosAyudamos
 
         public async Task SendTextAsync(string to, string body)
         {
-            var sendMessage = !environment.IsDevelopment() || environment.GetVariable("SendToMessagingInDevelopment", false);
+            var sendMessage = !env.IsDevelopment() || env.GetVariable("SendToMessagingInDevelopment", false);
 
             if (sendMessage)
             {
-                var map = await phoneRepo.GetAsync(to);
+                var map = await phoneDir.GetAsync(to);
                 if (map == null)
                 {
                     // TODO: log error
@@ -62,7 +62,7 @@ namespace NosAyudamos
                     await twilio.Value.SendTextAsync(to, body);
             }
 
-            if (environment.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 await log.Value.SendTextAsync(to, body);
             }

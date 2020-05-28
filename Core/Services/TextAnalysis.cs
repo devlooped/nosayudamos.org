@@ -12,10 +12,10 @@ namespace NosAyudamos
     [Shared]
     class TextAnalysis : ITextAnalysis
     {
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
         readonly IReadOnlyPolicyRegistry<string> registry;
 
-        public TextAnalysis(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment) => (this.registry, this.environment) = (registry, environment);
+        public TextAnalysis(IReadOnlyPolicyRegistry<string> registry, IEnvironment env) => (this.registry, this.env) = (registry, env);
 
         public async Task<IEnumerable<string>> GetKeyPhrasesAsync(string? text)
         {
@@ -47,10 +47,10 @@ namespace NosAyudamos
         private TextAnalyticsClient CreateAnalyticsClient()
         {
             var credentials = new AzureKeyCredential(
-                environment.GetVariable("TextAnalysisSubscriptionKey"));
+                env.GetVariable("TextAnalysisSubscriptionKey"));
 
             return new TextAnalyticsClient(
-                new Uri(environment.GetVariable("TextAnalysisEndpoint")), credentials);
+                new Uri(env.GetVariable("TextAnalysisEndpoint")), credentials);
         }
     }
 

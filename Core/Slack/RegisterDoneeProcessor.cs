@@ -11,16 +11,16 @@ namespace NosAyudamos.Slack
 {
     class RegisterDoneeProcessor : ISlackPayloadProcessor
     {
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
         readonly IEventStreamAsync events;
         readonly IBlobStorage storage;
-        readonly IEntityRepository<PhoneSystem> repository;
+        readonly IEntityRepository<PhoneSystem> phoneDir;
 
         public RegisterDoneeProcessor(
-            IEnvironment environment, IEventStreamAsync events,
-            IBlobStorage storage, IEntityRepository<PhoneSystem> repository)
-            => (this.environment, this.events, this.storage, this.repository)
-            = (environment, events, storage, repository);
+            IEnvironment env, IEventStreamAsync events,
+            IBlobStorage storage, IEntityRepository<PhoneSystem> phoneDir)
+            => (this.env, this.events, this.storage, this.phoneDir)
+            = (env, events, storage, phoneDir);
 
         public bool AppliesTo(JObject payload) =>
             (string?)payload["type"] == "view_submission";
@@ -31,7 +31,7 @@ namespace NosAyudamos.Slack
             if (sender == null)
                 return;
 
-            var map = await repository.GetAsync(sender);
+            var map = await phoneDir.GetAsync(sender);
             if (map == null)
                 return;
 
@@ -62,7 +62,7 @@ namespace NosAyudamos.Slack
             mem.Position = 0;
 
             var uri = await storage.UploadAsync(mem.ToArray(),
-                environment.GetVariable("AttachmentsContainerName"), $"cel_{sender}.png")
+                env.GetVariable("AttachmentsContainerName"), $"cel_{sender}.png")
                 .ConfigureAwait(false);
 
             // Before pushing the message, remove the pause on the user, so regular processing can happen 
@@ -70,7 +70,7 @@ namespace NosAyudamos.Slack
             if (map.AutomationPaused == true)
             {
                 map.AutomationPaused = false;
-                await repository.PutAsync(map);
+                await phoneDir.PutAsync(map);
             }
 
             await events.PushAsync(new MessageReceived(sender, map.SystemNumber, uri.OriginalString));

@@ -11,16 +11,16 @@ namespace NosAyudamos
     {
         const string ApiUrl = "https://slack.com/api/";
 
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
         readonly IEventStreamAsync events;
         readonly IEntityRepository<SlackEventReceived> repository;
         readonly HttpClient http;
 
         public SlackEventReceivedHandler(
-            IEnvironment environment, IEventStreamAsync events,
+            IEnvironment env, IEventStreamAsync events,
             IEntityRepository<SlackEventReceived> repository, HttpClient http)
-            => (this.environment, this.events, this.repository, this.http)
-            = (environment, events, repository, http);
+            => (this.env, this.events, this.repository, this.http)
+            = (env, events, repository, http);
 
         public async Task HandleAsync(SlackEventReceived e)
         {
@@ -37,7 +37,7 @@ namespace NosAyudamos
 
 
                 using var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiUrl}/conversations.replies?channel={e.ChannelId}&ts={e.ThreadId}");
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", environment.GetVariable("SlackToken"));
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", env.GetVariable("SlackToken"));
                 var response = await http.SendAsync(request).ConfigureAwait(false);
 
                 var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

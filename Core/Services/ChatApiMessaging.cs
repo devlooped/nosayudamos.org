@@ -8,21 +8,21 @@ namespace NosAyudamos
     [NoExport]
     class ChatApiMessaging : IMessaging
     {
-        readonly HttpClient httpClient;
+        readonly HttpClient http;
         readonly ISerializer serializer;
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
 
-        public ChatApiMessaging(IEnvironment environment, HttpClient httpClient, ISerializer serializer)
+        public ChatApiMessaging(IEnvironment env, HttpClient http, ISerializer serializer)
         {
-            this.httpClient = httpClient;
+            this.http = http;
             this.serializer = serializer;
-            this.environment = environment;
+            this.env = env;
         }
 
         public async Task SendTextAsync(string to, string body)
         {
-            var baseUrl = environment.GetVariable("ChatApiBaseUrl").TrimEnd('/');
-            var token = environment.GetVariable("ChatApiToken");
+            var baseUrl = env.GetVariable("ChatApiBaseUrl").TrimEnd('/');
+            var token = env.GetVariable("ChatApiToken");
 
             // Markdown-like image format to allow for text + url
             if (body.StartsWith("![", StringComparison.Ordinal))
@@ -31,7 +31,7 @@ namespace NosAyudamos
                 var url = body.Substring(body.LastIndexOf('(')).TrimStart('(').TrimEnd(')');
 
                 // Post as file.
-                var bytes = await httpClient.GetByteArrayAsync(url);
+                var bytes = await http.GetByteArrayAsync(url);
                 var msg = new
                 {
                     phone = to.TrimStart('+'),
@@ -41,7 +41,7 @@ namespace NosAyudamos
                 };
 
                 using var content = new StringContent(serializer.Serialize(msg), Encoding.UTF8, "application/json");
-                await httpClient.PostAsync($"{baseUrl}/sendFile?token={token}", content).ConfigureAwait(false);
+                await http.PostAsync($"{baseUrl}/sendFile?token={token}", content).ConfigureAwait(false);
             }
             else
             {
@@ -52,7 +52,7 @@ namespace NosAyudamos
                 };
 
                 using var content = new StringContent(serializer.Serialize(msg), Encoding.UTF8, "application/json");
-                await httpClient.PostAsync($"{baseUrl}/sendMessage?token={token}", content).ConfigureAwait(false);
+                await http.PostAsync($"{baseUrl}/sendMessage?token={token}", content).ConfigureAwait(false);
             }
         }
     }

@@ -10,11 +10,11 @@ namespace NosAyudamos
     class DurableAction
     {
         readonly IRepository<DurableActionEntity> repository;
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
 
-        public DurableAction(IRepository<DurableActionEntity> repository, IEnvironment environment)
-            => (this.repository, this.environment)
-            = (repository, environment);
+        public DurableAction(IRepository<DurableActionEntity> repository, IEnvironment env)
+            => (this.repository, this.env)
+            = (repository, env);
 
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Catching general exeception because of retry pattern")]
         public async Task<TResult> ExecuteAsync<TResult>(
@@ -37,7 +37,7 @@ namespace NosAyudamos
 
             try
             {
-                if (actionAttempt.Attempts < environment.GetVariable("DurableActionAttempts", 3))
+                if (actionAttempt.Attempts < env.GetVariable("DurableActionAttempts", 3))
                 {
                     TResult result = await action(actionAttempt.Attempts + 1);
                     // Consider a null/default return value as a failure too.
@@ -51,7 +51,7 @@ namespace NosAyudamos
             {
                 actionAttempt.Attempts += 1;
                 await repository.PutAsync(actionAttempt);
-                if (actionAttempt.Attempts == environment.GetVariable("DurableActionAttempts", 3))
+                if (actionAttempt.Attempts == env.GetVariable("DurableActionAttempts", 3))
                     await notifyCancel(actionAttempt.Attempts);
                 else
                     await notifyRetry(actionAttempt.Attempts);

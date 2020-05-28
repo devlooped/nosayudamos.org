@@ -22,30 +22,30 @@ namespace NosAyudamos
 
     class SlackMessageSentHandler : IEventHandler<SlackMessageSent>
     {
-        readonly IEnvironment environment;
-        readonly IEntityRepository<PhoneThread> repository;
+        readonly IEnvironment env;
+        readonly IEntityRepository<PhoneThread> threads;
         readonly HttpClient http;
 
-        public SlackMessageSentHandler(IEnvironment environment, IEntityRepository<PhoneThread> repository, HttpClient http)
-            => (this.environment, this.repository, this.http)
-            = (environment, repository, http);
+        public SlackMessageSentHandler(IEnvironment env, IEntityRepository<PhoneThread> threads, HttpClient http)
+            => (this.env, this.threads, this.http)
+            = (env, threads, http);
 
         public async Task HandleAsync(SlackMessageSent e)
         {
-            if (environment.IsDevelopment() && !environment.GetVariable("SendToSlackInDevelopment", false))
+            if (env.IsDevelopment() && !env.GetVariable("SendToSlackInDevelopment", false))
                 return;
 
             var payload = JObject.Parse(e.MessageJson);
             if (payload.Property("channel", StringComparison.OrdinalIgnoreCase) == null)
             {
-                payload["channel"] = environment.IsDevelopment() ?
-                    environment.GetVariable("SlackTestChannel") :
-                    environment.GetVariable("SlackUsersChannel");
+                payload["channel"] = env.IsDevelopment() ?
+                    env.GetVariable("SlackTestChannel") :
+                    env.GetVariable("SlackUsersChannel");
             }
 
             string? threadId = default;
             bool? broadcast = default;
-            var thread = await repository.GetAsync(e.PhoneNumber);
+            var thread = await threads.GetAsync(e.PhoneNumber);
 
             if (thread != null)
             {
@@ -168,7 +168,7 @@ namespace NosAyudamos
                 Content = content
             };
 
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", environment.GetVariable("SlackToken"));
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", env.GetVariable("SlackToken"));
             var response = await http.SendAsync(request);
 
             response.EnsureSuccessStatusCode();
@@ -183,7 +183,7 @@ namespace NosAyudamos
                 threadId = json["ts"]?.ToString();
 
             if (threadId != null)
-                await repository.PutAsync(new PhoneThread(e.PhoneNumber, threadId, DateTime.Now));
+                await threads.PutAsync(new PhoneThread(e.PhoneNumber, threadId, DateTime.Now));
         }
     }
 }

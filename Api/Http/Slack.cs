@@ -20,11 +20,11 @@ namespace NosAyudamos.Http
     {
         readonly IServiceProvider services;
         readonly ISerializer serializer;
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
 
-        public Slack(IServiceProvider services, ISerializer serializer, IEnvironment environment)
-            => (this.services, this.serializer, this.environment)
-            = (services, serializer, environment);
+        public Slack(IServiceProvider services, ISerializer serializer, IEnvironment env)
+            => (this.services, this.serializer, this.env)
+            = (services, serializer, env);
 
         [FunctionName("slack-interaction")]
         public async Task<IActionResult> InteractionAsync(
@@ -100,7 +100,7 @@ namespace NosAyudamos.Http
 
             var expectedSignature = values[0];
             var signedData = Encoding.UTF8.GetBytes("v0:" + timestamps[0] + ":" + payload);
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(environment.GetVariable("SlackSigningSecret")));
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(env.GetVariable("SlackSigningSecret")));
             var signature = "v0=" + hmac.ComputeHash(signedData).Aggregate("", (s, b) => s + b.ToString("x2", CultureInfo.CurrentCulture));
 
             if (!expectedSignature.Equals(signature, StringComparison.OrdinalIgnoreCase))
