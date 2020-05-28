@@ -65,6 +65,14 @@ namespace NosAyudamos.Slack
                 environment.GetVariable("AttachmentsContainerName"), $"cel_{sender}.png")
                 .ConfigureAwait(false);
 
+            // Before pushing the message, remove the pause on the user, so regular processing can happen 
+            // as if the image came from them.
+            if (map.AutomationPaused == true)
+            {
+                map.AutomationPaused = false;
+                await repository.PutAsync(map);
+            }
+
             await events.PushAsync(new MessageReceived(sender, map.SystemNumber, uri.OriginalString));
         }
     }
