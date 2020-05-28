@@ -33,7 +33,7 @@ namespace NosAyudamos
 #pragma warning restore CA2000 // Dispose objects before losing scope
         }
 
-        internal void Configure(IServiceCollection services, IEnvironment environment)
+        internal void Configure(IServiceCollection services, IEnvironment env)
         {
             CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(Assembly.GetExecutingAssembly().GetCustomAttribute<NeutralResourcesLanguageAttribute>()!.CultureName);
             CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture;
@@ -50,11 +50,11 @@ namespace NosAyudamos
                 .Enrich.FromLogContext()
                 .WriteTo.Console();
 
-            var seqUrl = environment.GetVariable("SeqUrl", default(string));
+            var seqUrl = env.GetVariable("SeqUrl", default(string));
             if (!string.IsNullOrEmpty(seqUrl))
                 config.WriteTo.Seq(seqUrl);
 
-            if (environment.IsTesting())
+            if (env.IsTesting())
             {
                 if (File.Exists("log.txt"))
                 {
@@ -69,13 +69,13 @@ namespace NosAyudamos
                     .WriteTo.File("log.txt");
             }
 
-            if (!environment.IsTesting())
+            if (!env.IsTesting())
             {
                 config.WriteTo.Logger(lc => lc.Filter
                      .ByIncludingOnly(e => e.Properties.ContainsKey("Category"))
                      .WriteTo.Slack(new SlackSinkOptions
                      {
-                         WebHookUrl = environment.GetVariable("SlackLogWebHook"),
+                         WebHookUrl = env.GetVariable("SlackLogWebHook"),
                          CustomChannel = "#api",
                          ShowDefaultAttachments = false,
                          ShowPropertyAttachments = false,
@@ -89,7 +89,7 @@ namespace NosAyudamos
 
             services.AddSingleton<ILogger>(logger);
             services.AddLogging(lb => lb.AddSerilog(logger));
-            services.AddSingleton(environment);
+            services.AddSingleton(env);
 
             // DI conventions are:
             // 1. Candidates: types that implement at least one interface
@@ -125,10 +125,10 @@ namespace NosAyudamos
                     services.AddScoped(implementationType);
             }
 
-            var registry = new Resiliency(environment).GetRegistry();
+            var registry = new Resiliency(env).GetRegistry();
             var policy = registry.Get<IAsyncPolicy<HttpResponseMessage>>("HttpClientPolicy");
 
-            if (!environment.IsTesting())
+            if (!env.IsTesting())
             {
                 services.AddHttpClient<IMessaging, Messaging>().AddPolicyHandler(policy);
                 services.AddHttpClient<IPersonalIdRecognizer, PersonalIdRecognizer>().AddPolicyHandler(policy);
@@ -137,10 +137,10 @@ namespace NosAyudamos
                 services.AddHttpClient<ChatApiMessaging>().AddPolicyHandler(policy);
             }
 
-            if (environment.IsDevelopment())
+            if (env.IsDevelopment())
                 services.AddSingleton(CloudStorageAccount.DevelopmentStorageAccount);
             else
-                services.AddSingleton(CloudStorageAccount.Parse(environment.GetVariable("StorageConnectionString")));
+                services.AddSingleton(CloudStorageAccount.Parse(env.GetVariable("StorageConnectionString")));
 
             services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

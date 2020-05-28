@@ -11,9 +11,9 @@ namespace NosAyudamos
 {
     class Resiliency
     {
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
 
-        public Resiliency(IEnvironment environment) => this.environment = environment;
+        public Resiliency(IEnvironment env) => this.env = env;
 
         public PolicyRegistry GetRegistry()
         {
@@ -24,7 +24,7 @@ namespace NosAyudamos
                 HttpPolicyExtensions
                     .HandleTransientHttpError() // >= 500 || HttpStatusCode.RequestTimeout
                     .WaitAndRetryAsync(
-                        environment.GetVariable<int>("ResilientNumberOfRetries", 3),
+                        env.GetVariable<int>("ResilientNumberOfRetries", 3),
                         retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
             registry.Add(
@@ -32,7 +32,7 @@ namespace NosAyudamos
                 Policy
                     .Handle<ErrorException>()
                     .WaitAndRetryAsync(
-                        environment.GetVariable<int>("ResilientNumberOfRetries", 3),
+                        env.GetVariable<int>("ResilientNumberOfRetries", 3),
                         retryAttempt => TimeSpan.FromSeconds(0.25 * Math.Pow(2, retryAttempt))));
 
             registry.Add(
@@ -40,7 +40,7 @@ namespace NosAyudamos
                 Policy
                     .Handle<RequestFailedException>()
                     .WaitAndRetryAsync(
-                        environment.GetVariable<int>("ResilientNumberOfRetries", 3),
+                        env.GetVariable<int>("ResilientNumberOfRetries", 3),
                         retryAttempt => TimeSpan.FromSeconds(0.25 * Math.Pow(2, retryAttempt))));
 
             registry.Add(
@@ -49,7 +49,7 @@ namespace NosAyudamos
                     .Handle<ApiConnectionException>()
                     .Or<ApiException>()
                     .WaitAndRetryAsync(
-                        environment.GetVariable<int>("ResilientNumberOfRetries", 3),
+                        env.GetVariable<int>("ResilientNumberOfRetries", 3),
                         retryAttempt => TimeSpan.FromSeconds(0.25 * Math.Pow(2, retryAttempt))));
 
             return registry;

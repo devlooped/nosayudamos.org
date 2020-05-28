@@ -11,7 +11,7 @@ namespace NosAyudamos.Slack
 {
     class ShowRegisterUIProcessor : ISlackPayloadProcessor
     {
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
         readonly HttpClient http;
 
         static string RegisterUI { get; }
@@ -23,9 +23,9 @@ namespace NosAyudamos.Slack
             RegisterUI = reader.ReadToEnd();
         }
 
-        public ShowRegisterUIProcessor(IEnvironment environment, HttpClient http)
-            => (this.environment, this.http)
-            = (environment, http);
+        public ShowRegisterUIProcessor(IEnvironment env, HttpClient http)
+            => (this.env, this.http)
+            = (env, http);
 
         public bool AppliesTo(JObject payload) =>
             (string?)payload["type"] == "block_actions" &&
@@ -34,7 +34,7 @@ namespace NosAyudamos.Slack
         public async Task ProcessAsync(JObject payload)
         {
             using var uirequest = new HttpRequestMessage(HttpMethod.Post, "https://slack.com/api/views.open");
-            uirequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", environment.GetVariable("SlackToken"));
+            uirequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", env.GetVariable("SlackToken"));
 
             var ui = new JObject
             {

@@ -10,20 +10,20 @@ namespace NosAyudamos
     class TwilioMessaging : IMessaging
     {
         static bool initialized;
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
         readonly IReadOnlyPolicyRegistry<string> registry;
 
-        public TwilioMessaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment environment)
-            => (this.registry, this.environment)
-            = (registry, environment);
+        public TwilioMessaging(IReadOnlyPolicyRegistry<string> registry, IEnvironment env)
+            => (this.registry, this.env)
+            = (registry, env);
 
         public async Task SendTextAsync(string body, string to)
         {
             if (!initialized)
             {
                 TwilioClient.Init(
-                    environment.GetVariable("TwilioAccountSid"),
-                    environment.GetVariable("TwilioAuthToken"));
+                    env.GetVariable("TwilioAccountSid"),
+                    env.GetVariable("TwilioAuthToken"));
 
                 initialized = true;
             }
@@ -32,7 +32,7 @@ namespace NosAyudamos
 
             await policy.ExecuteAsync(async () =>
                 await MessageResource.CreateAsync(
-                   from: new Twilio.Types.PhoneNumber("whatsapp:" + environment.GetVariable("TwilioNumber")),
+                   from: new Twilio.Types.PhoneNumber("whatsapp:" + env.GetVariable("TwilioNumber")),
                    to: new Twilio.Types.PhoneNumber("whatsapp:+" + to),
                    body: body).ConfigureAwait(false));
         }

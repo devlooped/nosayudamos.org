@@ -23,13 +23,13 @@ namespace NosAyudamos
         const string ConstanciaUrl = AfipUrl + "/padron-puc-constancia-internet/jsp/Constancia.jsp";
         const string CaptchaUrl = AfipUrl + "/padron-puc-constancia-internet/images/CaptchaCode.gif?bar=";
 
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
         readonly HttpClient http;
         readonly ILogger<TaxIdRecognizer> logger;
 
-        public TaxIdRecognizer(IEnvironment environment, HttpClient http, ILogger<TaxIdRecognizer> logger)
+        public TaxIdRecognizer(IEnvironment env, HttpClient http, ILogger<TaxIdRecognizer> logger)
         {
-            this.environment = environment;
+            this.env = env;
             this.http = http;
             this.logger = logger;
 
@@ -242,8 +242,8 @@ namespace NosAyudamos
 
         async Task<string?> RecognizeCaptchaAsync(byte[] image)
         {
-            var key = environment.GetVariable("ComputerVisionSubscriptionKey");
-            var url = environment.GetVariable("ComputerVisionEndpoint") + "vision/v3.0-preview/read/analyze?language=es";
+            var key = env.GetVariable("ComputerVisionSubscriptionKey");
+            var url = env.GetVariable("ComputerVisionEndpoint") + "vision/v3.0-preview/read/analyze?language=es";
 
             using var postRequest = new HttpRequestMessage(HttpMethod.Post, url);
             postRequest.Headers.Add("Ocp-Apim-Subscription-Key", key);

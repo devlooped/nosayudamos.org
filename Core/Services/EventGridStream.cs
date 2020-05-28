@@ -15,18 +15,18 @@ namespace NosAyudamos
         readonly Lazy<Uri> gridUri;
         readonly Lazy<string> apiKey;
         readonly IServiceProvider services;
-        readonly IEnvironment environment;
+        readonly IEnvironment env;
         readonly ISerializer serializer;
         readonly JoinableTaskFactory taskFactory;
 
-        public EventGridStream(IServiceProvider services, IEnvironment environment, ISerializer serializer, JoinableTaskFactory taskFactory)
+        public EventGridStream(IServiceProvider services, IEnvironment env, ISerializer serializer, JoinableTaskFactory taskFactory)
         {
             this.services = services;
-            this.environment = environment;
+            this.env = env;
             this.serializer = serializer;
             this.taskFactory = taskFactory;
-            gridUri = new Lazy<Uri>(() => new Uri(environment.GetVariable("EventGridUrl")));
-            apiKey = new Lazy<string>(() => environment.GetVariable("EventGridAccessKey"));
+            gridUri = new Lazy<Uri>(() => new Uri(env.GetVariable("EventGridUrl")));
+            apiKey = new Lazy<string>(() => env.GetVariable("EventGridAccessKey"));
         }
 
         public async Task PushAsync<TEvent>(TEvent args)
@@ -58,7 +58,7 @@ namespace NosAyudamos
 
             // TODO: bring the code from EventStream into this project, 
             // and remove the synchronous method entirely?
-            if (!environment.IsDevelopment() && asyncCall.Value != true)
+            if (!env.IsDevelopment() && asyncCall.Value != true)
                 throw new InvalidOperationException("In production, the PushAsync method should be used exclusively.");
 
             if (asyncCall.Value != true)
@@ -73,7 +73,7 @@ namespace NosAyudamos
 
         async Task SendToGridAsync<TEvent>(TEvent args)
         {
-            if (!environment.IsDevelopment() || environment.GetVariable("SendToGridInDevelopment", false))
+            if (!env.IsDevelopment() || env.GetVariable("SendToGridInDevelopment", false))
             {
                 var credentials = new TopicCredentials(apiKey.Value);
                 var domain = gridUri.Value.Host;
@@ -88,7 +88,7 @@ namespace NosAyudamos
             // All of this is development time only, so it looks a bit hacky, 
             // but it's fine: it allows us to test end-to-end from acceptance 
 
-            if (environment.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
 
