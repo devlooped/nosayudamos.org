@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Merq;
+using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
 using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
@@ -7,26 +8,22 @@ namespace NosAyudamos
     [Workflow(nameof(Role.Donee))]
     class DoneeWorkflow : IWorkflow
     {
-        readonly IEnvironment enviroment;
-        readonly ICommandBus commands;
-        readonly ILanguageUnderstanding language;
-        readonly ILogger<DoneeWorkflow> logger;
-        readonly ITaxIdRecognizer recognizer;
-        readonly IBlobStorage storage;
+        readonly IEventStreamAsync events;
 
-        public DoneeWorkflow(
-            IEnvironment enviroment, ICommandBus commands,
-            ILanguageUnderstanding language,
-            ITaxIdRecognizer recognizer, IBlobStorage blobStorage, ILogger<DoneeWorkflow> logger)
-            => (this.enviroment, this.commands, this.language, this.recognizer, this.storage, this.logger)
-            = (enviroment, commands, language, recognizer, blobStorage, logger);
+        public DoneeWorkflow(IEventStreamAsync events) => this.events = events;
 
-        public Task RunAsync(MessageEvent @event, Person? person)
+        public async Task RunAsync(MessageReceived message, Prediction prediction, Person? person)
         {
-            if (person == null || !(@event is MessageReceived message))
-                return Task.CompletedTask;
+            if (person == null)
+                return;
 
-            return Task.CompletedTask;
+            if (prediction.TopIntent == Intents.Instructions && 
+                prediction.Intents.TryGetValue(Intents.Instructions, out var intent) && 
+                intent.Score >= 0.85)
+            {
+                await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donee.Instructions));
+                return;
+            }
         }
     }
 }

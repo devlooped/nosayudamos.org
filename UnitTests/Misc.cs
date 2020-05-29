@@ -34,9 +34,9 @@ namespace NosAyudamos
                 new Resiliency(env).GetRegistry(),
                 Mock.Of<ILogger<LanguageUnderstanding>>());
 
-            var entities = await language.GetEntitiesAsync("creo q es 54223");
+            var prediction = await language.PredictAsync("creo q es 54223");
 
-            var numbers = JsonConvert.DeserializeObject<int[]>(entities["number"].ToString());
+            var numbers = JsonConvert.DeserializeObject<int[]>(prediction.Entities["number"].ToString());
 
             Assert.Single(numbers);
             Assert.Equal(54223, numbers[0]);

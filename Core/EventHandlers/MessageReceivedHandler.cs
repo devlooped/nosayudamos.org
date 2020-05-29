@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Serilog;
 
 namespace NosAyudamos
@@ -12,15 +13,18 @@ namespace NosAyudamos
     {
         readonly ILogger log;
         readonly IPersonRepository peopleRepo;
+        readonly ILanguageUnderstanding language;
         readonly IEntityRepository<PhoneSystem> phoneDir;
         readonly IWorkflowSelector selector;
 
         public MessageReceivedHandler(
             ILogger log,
-            IPersonRepository peopleRepo, IEntityRepository<PhoneSystem> phoneDir,
+            IPersonRepository peopleRepo, 
+            ILanguageUnderstanding language,
+            IEntityRepository<PhoneSystem> phoneDir,
             IWorkflowSelector selector)
-            => (this.log, this.peopleRepo, this.phoneDir, this.selector)
-            = (log, peopleRepo, phoneDir, selector);
+            => (this.log, this.peopleRepo, this.language, this.phoneDir, this.selector)
+            = (log, peopleRepo, language, phoneDir, selector);
 
         public async Task HandleAsync(MessageReceived message)
         {
@@ -43,16 +47,12 @@ namespace NosAyudamos
             if (phoneSystem?.AutomationPaused == true)
                 return;
 
-            // If phone is disabled for automation, forward to slack
-
-            // Performs minimal discovery of existing person id (if any)
-            // and whether it's a text or image message.
+            // Performs minimal discovery of existing person id (if any) and intents
             var person = await peopleRepo.FindAsync(message.PhoneNumber).ConfigureAwait(false);
             var workflow = selector.Select(person?.Role);
+            var prediction = await language.PredictAsync(message.Body);
 
-            await workflow.RunAsync(message, person).ConfigureAwait(false);
-
-            return;
+            await workflow.RunAsync(message, prediction, person).ConfigureAwait(false);
         }
     }
 }

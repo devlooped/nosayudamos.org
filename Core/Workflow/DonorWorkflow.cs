@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
 using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
@@ -6,20 +7,22 @@ namespace NosAyudamos
     [Workflow(nameof(Role.Donor))]
     class DonorWorkflow : IWorkflow
     {
-        readonly IEnvironment enviroment;
-        readonly ITextAnalysis textAnalysis;
-        readonly ILogger<DonorWorkflow> logger;
-        readonly IMessaging messaging;
-        readonly IRepositoryFactory repositoryFactory;
+        readonly IEventStreamAsync events;
 
-        public DonorWorkflow(IEnvironment enviroment,
-                            ITextAnalysis textAnalysis,
-                            IMessaging messaging,
-                            IRepositoryFactory repositoryFactory,
-                            ILogger<DonorWorkflow> logger) =>
-                            (this.enviroment, this.textAnalysis, this.messaging, this.repositoryFactory, this.logger) =
-                                (enviroment, textAnalysis, messaging, repositoryFactory, logger);
+        public DonorWorkflow(IEventStreamAsync events) => this.events = events;
 
-        public Task RunAsync(MessageEvent message, Person? person) => Task.CompletedTask;
+        public async Task RunAsync(MessageReceived message, Prediction prediction, Person? person)
+        {
+            if (person == null)
+                return;
+
+            if (prediction.TopIntent == Intents.Instructions &&
+                prediction.Intents.TryGetValue(Intents.Instructions, out var intent) &&
+                intent.Score >= 0.85)
+            {
+                await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donor.Instructions));
+                return;
+            }
+        }
     }
 }

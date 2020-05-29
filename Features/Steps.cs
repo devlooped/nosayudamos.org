@@ -7,6 +7,7 @@ using Microsoft.Azure.Cosmos.Table;
 using System.Linq;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace NosAyudamos.Steps
 {
@@ -16,7 +17,7 @@ namespace NosAyudamos.Steps
         IContainer container;
         ScenarioContext context;
         IEventStreamAsync events;
-        MessageSent sent;
+        List<MessageSent> messages = new List<MessageSent>();
 
         public Steps(FeatureContainer container, ScenarioContext context)
         {
@@ -28,7 +29,7 @@ namespace NosAyudamos.Steps
             events = container.Resolve<IEventStreamAsync>();
             events
                 .Of<MessageSent>()
-                .Subscribe(e => sent = e);
+                .Subscribe(e => messages.Add(e));
         }
 
         #region Given
@@ -109,21 +110,27 @@ namespace NosAyudamos.Steps
             var value = Resources.ResourceManager.GetString(resource);
 
             Assert.Equal(message.ToSingleLine(), value);
-            Assert.True(sent != null, "No message was sent.");
+            Assert.True(messages.Any(), "No message was sent.");
 
             var format = Regex.Replace(value, "{\\d}", ".+").Replace("(", "\\(").Replace(")", "\\)");
-            var matches = Regex.IsMatch(sent.Body, format);
+            var matches = messages.Any(x => Regex.IsMatch(x.Body, format));
 
             if (value.Contains('{'))
             {
-                Assert.True(matches, @$"Sent message:
-{sent.Body}
-does not match:
-{format}");
+                Assert.True(matches, @$"Expected a match with:
+""""""
+{format}
+""""""
+but none found in:
+{messages.Select(x => $@"
+""""""
+{x.Body}
+""""""
+")}");
             }
             else
             {
-                Assert.Equal(message.ToSingleLine(), sent.Body);
+                Assert.Contains(messages, x => message.ToSingleLine() == x.Body);
             }
         }
 

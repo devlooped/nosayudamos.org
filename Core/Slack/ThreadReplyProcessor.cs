@@ -3,6 +3,10 @@ using Newtonsoft.Json.Linq;
 
 namespace NosAyudamos.Slack
 {
+    /// <summary>
+    /// Processes replies to messages from within a thread in Slack, typically to 
+    /// conduct direct conversations with users.
+    /// </summary>
     class ThreadReplyProcessor : ISlackPayloadProcessor
     {
         readonly IEventStreamAsync events;

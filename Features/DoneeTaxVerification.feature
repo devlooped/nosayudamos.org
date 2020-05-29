@@ -4,20 +4,21 @@ Característica: Verificacion de donatarios
 Antecedentes:
     Dado Un storage limpio
     Y SendToSlackInDevelopment=true
+    # Porque utilizamos test phone #s
     Y SendToMessagingInDevelopment=false
 
 Escenario: DNI con CUIL es aprobado
     Cuando Envia ID Content\CUIL2.jpg
     Entonces Recibe 'UI_Donee_Welcome'
     """
-    Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos! INSTRUCCIONES
+    Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos!
     """
 
 Escenario: DNI con Monotributo Categoría A es aprobado
     Cuando Envia ID Content\CUIT+MonotributoA.jpg
     Entonces Recibe 'UI_Donee_Welcome'
     """
-    Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos! INSTRUCCIONES
+    Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos!
     """
 
 Escenario: DNI con CUIT sin Monotributo es rechazado
