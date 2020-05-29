@@ -1,9 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
+using System.Reflection;
 
 namespace NosAyudamos.EventGrid
 {
@@ -15,7 +17,6 @@ namespace NosAyudamos.EventGrid
         public EventHandlers(ISerializer serializer, IServiceProvider services)
             => (this.serializer, this.services)
             = (serializer, services);
-
 
         /// <summary>
         /// Initial handler of uncategorized incoming messages from event grid 
@@ -63,8 +64,9 @@ namespace NosAyudamos.EventGrid
 
         async Task HandleAsync<TEvent>(TEvent e)
         {
+            // TODO: we could also allow derived handlers invocation here....
             var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
-            foreach (var handler in handlers)
+            foreach (var handler in handlers.OrderBy(h => h.GetType().GetCustomAttribute<OrderAttribute>()?.Order ?? 0))
             {
                 await handler.HandleAsync(e);
             }

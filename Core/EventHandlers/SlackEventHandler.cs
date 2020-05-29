@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -13,6 +13,11 @@ using Slack.Webhooks.Interfaces;
 
 namespace NosAyudamos
 {
+    /// <summary>
+    /// Handles multiple domain events that we want to forward to slack for further 
+    /// human intervention.
+    /// </summary>
+    [Order(10)]
     class SlackEventHandler :
         IEventHandler<TaxStatusRejected>,
         IEventHandler<TaxStatusAccepted>,
