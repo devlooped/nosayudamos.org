@@ -33,6 +33,7 @@ namespace NosAyudamos
             Handles<PhoneNumberUpdated>(OnPhoneNumberUpdated);
             Handles<TaxStatusAccepted>(OnTaxStatusAccepted);
             Handles<TaxStatusRejected>(OnTaxStatusRejected);
+            Handles<TaxStatusApproved>(OnTaxStatusApproved);
         }
 
         // NOTE: the [JsonProperty] attributes allow the deserialization from 
@@ -76,6 +77,11 @@ namespace NosAyudamos
         [JsonProperty]
         public double DonatedAmount { get; private set; }
 
+        /// <summary>
+        /// Whether the user has been validated for operating in the platform.
+        /// </summary>
+        public bool IsValidated => TaxStatus == TaxStatus.Approved || TaxStatus == TaxStatus.Validated;
+
         public void Donate(double amount)
         {
             if (amount < 0)
@@ -100,6 +106,18 @@ namespace NosAyudamos
             (taxId.Kind == TaxIdKind.CUIL ||
             taxId.HasIncomeTax == true ||
             (taxId.Category != TaxCategory.Unknown && taxId.Category != TaxCategory.A));
+
+        /// <summary>
+        /// Marks the user as approved, regardless of its current tax category and kind.
+        /// </summary>
+        public void ApproveTaxStatus(string approver)
+        {
+            if (string.IsNullOrEmpty(approver))
+                throw new ArgumentException("Approver cannot be empty.", nameof(approver));
+
+            if (TaxStatus != TaxStatus.Validated)
+                Raise(new TaxStatusApproved(approver));
+        }
 
         /// <summary>
         /// Tries to validate the tax status given the tax information.
@@ -154,6 +172,8 @@ namespace NosAyudamos
         void OnDonated(Donated e) => DonatedAmount += e.Amount;
 
         void OnPhoneNumberUpdated(PhoneNumberUpdated e) => PhoneNumber = e.NewNumber;
+
+        void OnTaxStatusApproved(TaxStatusApproved e) => TaxStatus = TaxStatus.Approved;
 
         void OnTaxStatusAccepted(TaxStatusAccepted e) => TaxStatus = TaxStatus.Validated;
 

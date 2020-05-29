@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.EventGrid.Models;
@@ -33,6 +33,9 @@ namespace NosAyudamos.EventGrid
 
         [FunctionName("person-registered")]
         public Task PersonRegisteredAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<PersonRegistered>(serializer));
+
+        [FunctionName("tax-status-approved")]
+        public Task TaxStatusApprovedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusApproved>(serializer));
 
         [FunctionName("tax-status-accepted")]
         public Task TaxStatusAcceptedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusAccepted>(serializer));

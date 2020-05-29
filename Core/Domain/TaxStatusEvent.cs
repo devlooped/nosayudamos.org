@@ -10,6 +10,17 @@ namespace NosAyudamos
         public TaxId TaxId { get; }
     }
 
+    /// <summary>
+    /// The tax status was manually approved by an approver, 
+    /// regardless of the <see cref="TaxId"/> automated validation.
+    /// </summary>
+    public class TaxStatusApproved : DomainEvent
+    {
+        public TaxStatusApproved(string approver) => Approver = approver;
+
+        public string Approver { get; }
+    }
+
     public class TaxStatusAccepted : TaxStatusEvent
     {
         public TaxStatusAccepted(TaxId taxId) : base(taxId) { }
