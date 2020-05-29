@@ -19,7 +19,7 @@ namespace NosAyudamos
 
         public MessageReceivedHandler(
             ILogger log,
-            IPersonRepository peopleRepo, 
+            IPersonRepository peopleRepo,
             ILanguageUnderstanding language,
             IEntityRepository<PhoneSystem> phoneDir,
             IWorkflowSelector selector)

@@ -232,10 +232,10 @@ namespace NosAyudamos
 
             var handler = new SlackEventHandler(environment, people, phoneSystems, events,
                 Mock.Of<ILanguageUnderstanding>(x => x.PredictAsync(It.IsAny<string>()) ==
-                    Task.FromResult(new Prediction(Intents.Help, 
+                    Task.FromResult(new Prediction(Intents.Help,
                     new Dictionary<string, Intent>(),
-                    new Dictionary<string, object>(), 
-                    default, 
+                    new Dictionary<string, object>(),
+                    default,
                     default))));
 
             SlackMessageSent sent = default;

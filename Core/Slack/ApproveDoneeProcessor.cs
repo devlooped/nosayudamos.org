@@ -12,7 +12,7 @@ namespace NosAyudamos.Slack
         readonly IEventStreamAsync events;
         readonly HttpClient http;
 
-        public ApproveDoneeProcessor(IEnvironment env, 
+        public ApproveDoneeProcessor(IEnvironment env,
             IPersonRepository peopleRepo,
             IEventStreamAsync events, HttpClient http)
             => (this.env, this.peopleRepo, this.events, this.http)

@@ -17,8 +17,8 @@ namespace NosAyudamos
             if (person == null)
                 return;
 
-            if (prediction.TopIntent == Intents.Instructions && 
-                prediction.Intents.TryGetValue(Intents.Instructions, out var intent) && 
+            if (prediction.TopIntent == Intents.Instructions &&
+                prediction.Intents.TryGetValue(Intents.Instructions, out var intent) &&
                 intent.Score >= 0.85)
             {
                 await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donee.Instructions));
