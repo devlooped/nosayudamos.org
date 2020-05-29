@@ -70,6 +70,15 @@ namespace NosAyudamos {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Donors are auto-approved.
+        /// </summary>
+        internal static string Person_DonorAlwaysApproved {
+            get {
+                return ResourceManager.GetString("Person_DonorAlwaysApproved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot deserialize empty data..
         /// </summary>
         internal static string PersonRepository_EmptyData {
@@ -129,6 +138,18 @@ namespace NosAyudamos {
         internal static string UI_Donee_HighCategory {
             get {
                 return ResourceManager.GetString("UI_Donee_HighCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1. Envianos cuánto necesitás y para qué, por ejemplo &quot;Necesito $1000 para remedios&quot; o &quot;Necesito $1200 para el super&quot;
+        ///2. Nosotros buscamos alguien que pueda ayudarte con ese gasto y te avisamos si conseguimos y cuánto
+        ///3. Con la confirmación del monto que te conseguimos, podés ir a hacer la compra a cualquier lugar que acepte Mercado Pago, y gastar hasta ese monto máximo. 
+        ///4. Cuando tengas que pagar, les pedís que te muestren el código QR de Mercado Pago para el pago, y nos enviás una foto de ese código por [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string UI_Donee_Instructions {
+            get {
+                return ResourceManager.GetString("UI_Donee_Instructions", resourceCulture);
             }
         }
         
@@ -196,11 +217,20 @@ namespace NosAyudamos {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos! INSTRUCCIONES.
+        ///   Looks up a localized string similar to Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos!.
         /// </summary>
         internal static string UI_Donee_Welcome {
             get {
                 return ResourceManager.GetString("UI_Donee_Welcome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string UI_Donor_Instructions {
+            get {
+                return ResourceManager.GetString("UI_Donor_Instructions", resourceCulture);
             }
         }
         

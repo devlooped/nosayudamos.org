@@ -24,6 +24,8 @@ namespace NosAyudamos
             IsReadOnly = false;
             // TODO: validate args.
             Raise(new PersonRegistered(id, firstName, lastName, phoneNumber, role, dateOfBirth, sex));
+            if (role == Role.Donor)
+                Raise(new TaxStatusApproved(Strings.Person.DonorAlwaysApproved));
         }
 
         Person()
