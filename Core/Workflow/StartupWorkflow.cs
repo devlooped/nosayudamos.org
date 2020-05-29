@@ -16,7 +16,6 @@ namespace NosAyudamos
     {
         readonly IEnvironment env;
         readonly IEventStreamAsync events;
-        readonly ILanguageUnderstanding language;
         readonly IPersonalIdRecognizer idRecognizer;
         readonly ITaxIdRecognizer taxRecognizer;
         readonly DurableAction durableAction;
@@ -29,7 +28,6 @@ namespace NosAyudamos
         public StartupWorkflow(
             IEnvironment env,
             IEventStreamAsync events,
-            ILanguageUnderstanding language,
             IPersonalIdRecognizer idRecognizer,
             ITaxIdRecognizer taxRecognizer,
             DurableAction durableAction,
@@ -38,14 +36,11 @@ namespace NosAyudamos
             IBlobStorage blobStorage,
             IPersonRepository peopleRepo,
             ILogger<StartupWorkflow> logger)
-            => (this.env, this.events, this.language, this.idRecognizer, this.taxRecognizer, this.durableAction, this.messaging, this.http, this.blobStorage, this.peopleRepo, this.logger)
-            = (env, events, language, idRecognizer, taxRecognizer, durableAction, messaging, http, blobStorage, peopleRepo, logger);
+            => (this.env, this.events, this.idRecognizer, this.taxRecognizer, this.durableAction, this.messaging, this.http, this.blobStorage, this.peopleRepo, this.logger)
+            = (env, events, idRecognizer, taxRecognizer, durableAction, messaging, http, blobStorage, peopleRepo, logger);
 
-        public async Task RunAsync(MessageEvent @event, Person? person)
+        public async Task RunAsync(MessageReceived message, Prediction prediction, Person? person)
         {
-            if (!(@event is MessageReceived message))
-                return;
-
             // If we receive an image from an unregistered number, we assume 
             // it's someone trying to register by sending their ID as requested 
             // to become a donee.
@@ -55,17 +50,16 @@ namespace NosAyudamos
                 return;
             }
 
-            var intents = await language.GetIntentsAsync(message.Body).ConfigureAwait(false);
-            Intent helpIntent;
-            if ((intents.TryGetValue("Utilities.Help", out helpIntent) ||
-                intents.TryGetValue("Help", out helpIntent)) &&
-                helpIntent.Score >= 0.85)
+            Intent? intent;
+            if ((prediction.Intents.TryGetValue(Intents.Utilities.Help, out intent) ||
+                prediction.Intents.TryGetValue(Intents.Help, out intent)) &&
+                intent.Score >= 0.85)
             {
                 // User wants to be a donee, we need the ID
                 await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donee.SendIdentifier)).ConfigureAwait(false);
             }
-            else if (intents.TryGetValue("Donate", out var donateIntent) &&
-                donateIntent.Score >= 0.85)
+            else if (prediction.Intents.TryGetValue(Intents.Donate, out intent) &&
+                intent.Score >= 0.85)
             {
                 await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donor.SendAmount)).ConfigureAwait(false);
             }
@@ -77,7 +71,7 @@ namespace NosAyudamos
             }
         }
 
-        private async Task RegisterDoneeAsync(MessageReceived message, Uri imageUri)
+        async Task RegisterDoneeAsync(MessageReceived message, Uri imageUri)
         {
             var image = imageUri.Scheme == "file" ?
                 await File.ReadAllBytesAsync(imageUri.AbsolutePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)) :

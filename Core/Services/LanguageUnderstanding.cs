@@ -26,19 +26,12 @@ namespace NosAyudamos
             Sentiment = new Sentiment()
         };
 
-
         readonly IEnvironment enviroment;
         readonly IReadOnlyPolicyRegistry<string> registry;
         readonly ILogger<LanguageUnderstanding> logger;
 
         public LanguageUnderstanding(IEnvironment enviroment, IReadOnlyPolicyRegistry<string> registry, ILogger<LanguageUnderstanding> logger) =>
             (this.enviroment, this.registry, this.logger) = (enviroment, registry, logger);
-
-        public async Task<IDictionary<string, Intent>> GetIntentsAsync(string? text)
-            => new Dictionary<string, Intent>((await PredictAsync(text)).Intents, StringComparer.OrdinalIgnoreCase);
-
-        public async Task<IDictionary<string, object>> GetEntitiesAsync(string? text)
-            => new Dictionary<string, object>((await PredictAsync(text)).Entities, StringComparer.OrdinalIgnoreCase);
 
         public async Task AddUtteranceAsync(string? utterance, string? intent)
         {
@@ -77,9 +70,10 @@ namespace NosAyudamos
             }
         }
 
-        async Task<Prediction> PredictAsync(string? text)
+        public async Task<Prediction> PredictAsync(string text)
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty(text) || 
+                Uri.TryCreate(text, UriKind.Absolute, out _))
                 return emptyPrediction;
 
             using var luisClient = CreateLuisRuntimeClient();
@@ -109,7 +103,7 @@ namespace NosAyudamos
             return predictionResponse.Prediction;
         }
 
-        Authoring.ILUISAuthoringClient CreateLuisAuthoringClient()
+        ILUISAuthoringClient CreateLuisAuthoringClient()
         {
             var credentials = new Authoring.ApiKeyServiceClientCredentials(
                 enviroment.GetVariable("LuisAuthoringKey"));
@@ -120,7 +114,7 @@ namespace NosAyudamos
             };
         }
 
-        Runtime.ILUISRuntimeClient CreateLuisRuntimeClient()
+        ILUISRuntimeClient CreateLuisRuntimeClient()
         {
             var credentials = new Runtime.ApiKeyServiceClientCredentials(
                 enviroment.GetVariable("LuisSubscriptionKey"));
@@ -134,8 +128,7 @@ namespace NosAyudamos
 
     interface ILanguageUnderstanding
     {
-        Task<IDictionary<string, object>> GetEntitiesAsync(string? text);
-        Task<IDictionary<string, Intent>> GetIntentsAsync(string? text);
         Task AddUtteranceAsync(string? utterance, string? intent);
+        Task<Prediction> PredictAsync(string text);
     }
 }

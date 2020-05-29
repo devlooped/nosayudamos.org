@@ -3,16 +3,14 @@ Característica: Registracion de donatarios
 
 Antecedentes:
     Dado Un storage limpio
-    # Por las fotos en storage local
-    Y SendToSlackInDevelopment=false
-    # Porque utilizamos test #s
+    # Porque utilizamos test phone #s
     Y SendToMessagingInDevelopment=false
 
 Escenario: DNI legible
     Cuando Envia ID Content\CUIL.jpg
     Entonces Recibe 'UI_Donee_Welcome'
     """
-    Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos! INSTRUCCIONES
+    Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos!
     """
 
 Escenario: DNI sin código de barras solicita reintentar

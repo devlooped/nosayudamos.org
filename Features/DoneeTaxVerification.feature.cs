@@ -85,7 +85,7 @@ namespace NosAyudamos
 #line 6
     testRunner.And("SendToSlackInDevelopment=true", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
 #line hidden
-#line 7
+#line 8
     testRunner.And("SendToMessagingInDevelopment=false", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
 #line hidden
         }
@@ -102,7 +102,7 @@ namespace NosAyudamos
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI con CUIL es aprobado", null, ((string[])(null)));
-#line 9
+#line 10
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -125,11 +125,11 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 10
+#line 11
     testRunner.When("Envia ID Content\\CUIL2.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 11
-    testRunner.Then("Recibe \'UI_Donee_Welcome\'", "Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos! INSTRUCCIONES", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
+#line 12
+    testRunner.Then("Recibe \'UI_Donee_Welcome\'", "Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos!", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -142,7 +142,7 @@ this.FeatureBackground();
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI con Monotributo Categoría A es aprobado", null, ((string[])(null)));
-#line 16
+#line 17
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -165,11 +165,11 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 17
+#line 18
     testRunner.When("Envia ID Content\\CUIT+MonotributoA.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 18
-    testRunner.Then("Recibe \'UI_Donee_Welcome\'", "Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos! INSTRUCCIONES", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
+#line 19
+    testRunner.Then("Recibe \'UI_Donee_Welcome\'", "Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos!", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -182,7 +182,7 @@ this.FeatureBackground();
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI con CUIT sin Monotributo es rechazado", null, ((string[])(null)));
-#line 23
+#line 24
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -205,10 +205,10 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 24
+#line 25
     testRunner.When("Envia ID Content\\CUIT-Monotributo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 25
+#line 26
     testRunner.Then("Recibe \'UI_Donee_NotApplicable\'", "Gracias {0} por tu mensaje. Actualmente estamos limitando la ayuda a personas \r\nr" +
                         "egistradas en el régimen de Monotributo en la categoría A exclusivamente.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
@@ -223,7 +223,7 @@ this.FeatureBackground();
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI con Monotributo Categoria Alta es rechazado", null, ((string[])(null)));
-#line 31
+#line 32
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -246,10 +246,10 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 32
+#line 33
     testRunner.When("Envia ID Content\\CUIT+Monotributo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 33
+#line 34
     testRunner.Then("Recibe \'UI_Donee_HighCategory\'", "Gracias {0} por tu mensaje. Actualmente estamos limitando la ayuda a personas \r\nr" +
                         "egistradas en el régimen de Monotributo en la categoría A exclusivamente.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
@@ -264,7 +264,7 @@ this.FeatureBackground();
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI con CUIT que paga Ganancias es rechazado", null, ((string[])(null)));
-#line 39
+#line 40
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -287,10 +287,10 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 40
+#line 41
     testRunner.When("Envia ID Content\\CUIT+Ganancias.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 41
+#line 42
     testRunner.Then("Recibe \'UI_Donee_HasIncomeTax\'", "Gracias {0} por tu mensaje. Actualmente estamos limitando la ayuda a personas \r\nq" +
                         "ue no tributan impuesto a las ganancias.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden

@@ -2,6 +2,11 @@
 
 namespace NosAyudamos
 {
+    /// <summary>
+    /// Represents a Slack Event Subscription callback, turned into an entity so that 
+    /// it can be persisted to detect duplicate processing and sent to the event grid 
+    /// to get resilient re-processing if something fails.
+    /// </summary>
     public class SlackEventReceived
     {
         public SlackEventReceived(string channelId, string eventId, string threadId, string text, string payload)
