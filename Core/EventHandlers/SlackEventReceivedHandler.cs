@@ -7,6 +7,12 @@ using NosAyudamos.Slack;
 
 namespace NosAyudamos
 {
+    /// <summary>
+    /// Processes a callback from Slack's Event Subscriptions feature, which 
+    /// for now is always a reply to a message. See <see cref="ThreadReplyProcessor"/> 
+    /// for the filtering conditions applied to the callback. This handler is ultimately 
+    /// called from the event grid handler configured for <see cref="SlackEventReceived"/>.
+    /// </summary>
     class SlackEventReceivedHandler : IEventHandler<SlackEventReceived>
     {
         const string ApiUrl = "https://slack.com/api/";
@@ -34,7 +40,6 @@ namespace NosAyudamos
                 // Save right-away. If this method throws for whatever reason, 
                 // EventGrid would still be retrying.
                 await repository.PutAsync(e);
-
 
                 using var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiUrl}/conversations.replies?channel={e.ChannelId}&ts={e.ThreadId}");
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", env.GetVariable("SlackToken"));

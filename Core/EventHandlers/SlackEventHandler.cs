@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Humanizer;
-using Newtonsoft.Json;
+using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
 using Slack.Webhooks;
 using Slack.Webhooks.Blocks;
 using Slack.Webhooks.Elements;
@@ -22,40 +22,44 @@ namespace NosAyudamos
         IEventHandler<TaxStatusRejected>,
         IEventHandler<TaxStatusAccepted>,
         IEventHandler<UnknownMessageReceived>,
-        IEventHandler<MessageReceived>
+        IEventHandler<MessageReceived>,
+        IEventHandler<RegistrationFailed>
     {
-        readonly IEnvironment environment;
-        readonly IPersonRepository repository;
-        readonly IEntityRepository<PhoneSystem> phoneRepo;
+        readonly IEnvironment env;
+        readonly IPersonRepository peopleRepo;
+        readonly IEntityRepository<PhoneSystem> phoneDir;
         readonly IEventStreamAsync events;
         readonly ILanguageUnderstanding language;
 
         public SlackEventHandler(
-            IEnvironment environment, IPersonRepository repository,
-            IEntityRepository<PhoneSystem> phoneRepo, IEventStreamAsync events,
+            IEnvironment env, IPersonRepository peopleRepo,
+            IEntityRepository<PhoneSystem> phoneDir, IEventStreamAsync events,
             ILanguageUnderstanding language)
-            => (this.environment, this.repository, this.phoneRepo, this.events, this.language)
-            = (environment, repository, phoneRepo, events, language);
+            => (this.env, this.peopleRepo, this.phoneDir, this.events, this.language)
+            = (env, peopleRepo, phoneDir, events, language);
 
         public async Task HandleAsync(UnknownMessageReceived e)
         {
-            if (environment.IsDevelopment() && !environment.GetVariable("SendToSlackInDevelopment", false))
+            if (env.IsDevelopment() && !env.GetVariable("SendToSlackInDevelopment", false))
                 return;
 
-            var intents = await language.GetIntentsAsync(e.Body).ConfigureAwait(false);
+            var prediction = await language.PredictAsync(e.Body).ConfigureAwait(false);
             var context = new StringBuilder();
-            if (intents.TryGetValue("Help", out var help))
-                context = context.Append(":pray: ").Append(help.Score?.ToString("0.##", CultureInfo.CurrentCulture));
+            Intent? intent;
+            if (prediction.Intents.TryGetValue(Intents.Help, out intent) || 
+                prediction.Intents.TryGetValue(Intents.Utilities.Help, out intent))
+                context = context.Append(":pray: ").Append(intent.Score?.ToString("0.##", CultureInfo.CurrentCulture));
 
-            if (intents.TryGetValue("Donate", out var donate))
-                context = context.Append(":money_with_wings: ").Append(donate.Score?.ToString("0.##", CultureInfo.CurrentCulture));
+            if (prediction.Intents.TryGetValue(Intents.Donate, out intent))
+                context = context.Append(":money_with_wings: ").Append(intent.Score?.ToString("0.##", CultureInfo.CurrentCulture));
 
-            var toEmoji = e.PhoneNumber == environment.GetVariable("ChatApiNumber").TrimStart('+') ? ":whatsapp:" : ":twilio:";
-            var phoneSystem = await phoneRepo.GetAsync(e.PhoneNumber).ConfigureAwait(false);
+            var toEmoji = e.PhoneNumber == env.GetVariable("ChatApiNumber").TrimStart('+') ? ":whatsapp:" : ":twilio:";
+            var phoneSystem = await phoneDir.GetAsync(e.PhoneNumber).ConfigureAwait(false);
 
             var message = new SlackMessage
             {
                 Username = "nosayudamos",
+                Text = $":thinking_face: {e.Body}",
                 Blocks = new List<Block>
                 {
                     new Divider(),
@@ -111,18 +115,14 @@ namespace NosAyudamos
 
         public async Task HandleAsync(TaxStatusAccepted e)
         {
-            var person = await repository.GetAsync(e.SourceId!).ConfigureAwait(false);
+            var person = await peopleRepo.GetAsync(e.SourceId!).ConfigureAwait(false);
             if (person == null)
                 return;
-
-            await events.PushAsync(new MessageSent(
-                person.PhoneNumber,
-                Strings.UI.Donee.Welcome(person.FirstName.Split(' ').First(), person.Sex == Sex.Male ? "o" : "a")))
-                .ConfigureAwait(false);
 
             var message = new SlackMessage
             {
                 Username = "nosayudamos",
+                Text = $":thumbsup: {person.FirstName} {person.LastName}",
                 Blocks = new List<Block>
                 {
                     new Divider(),
@@ -137,23 +137,6 @@ namespace NosAyudamos
                                 Type = TextObject.TextType.Markdown
                             },
                         }
-                    },
-                    new Actions
-                    {
-                        BlockId = "actions",
-                        Elements = new List<IActionElement>
-                        {
-                            new Button
-                            {
-                                Text = new TextObject("Pause :automation_pause:") { Emoji = true },
-                                Value = "pause"
-                            },
-                            new Button
-                            {
-                                Text = new TextObject("Resume :automation_resume:") { Emoji = true },
-                                Value = "resume"
-                            },
-                        }
                     }
                 },
             };
@@ -163,24 +146,14 @@ namespace NosAyudamos
 
         public async Task HandleAsync(TaxStatusRejected e)
         {
-            var person = await repository.GetAsync(e.SourceId!).ConfigureAwait(false);
+            var person = await peopleRepo.GetAsync(e.SourceId!).ConfigureAwait(false);
             if (person == null)
                 return;
-
-            var name = person.FirstName.Split(' ').First();
-            var body = e.Reason switch
-            {
-                TaxStatusRejectedReason.NotApplicable => Strings.UI.Donee.NotApplicable(name),
-                TaxStatusRejectedReason.HasIncomeTax => Strings.UI.Donee.HasIncomeTax(name),
-                TaxStatusRejectedReason.HighCategory => Strings.UI.Donee.HighCategory(name),
-                _ => Strings.UI.Donee.Rejected,
-            };
-
-            await events.PushAsync(new MessageSent(person.PhoneNumber, body)).ConfigureAwait(false);
 
             var message = new SlackMessage
             {
                 Username = "nosayudamos",
+                Text = $":thumbsdown: {person.FirstName} {person.LastName} {e.TaxId}",
                 Blocks = new List<Block>
                 {
                     new Divider(),
@@ -203,13 +176,8 @@ namespace NosAyudamos
                         {
                             new Button
                             {
-                                Text = new TextObject("Pause :automation_pause:") { Emoji = true },
-                                Value = "pause"
-                            },
-                            new Button
-                            {
-                                Text = new TextObject("Resume :automation_resume:") { Emoji = true },
-                                Value = "resume"
+                                Text = new TextObject("Approve :approved:") { Emoji = true },
+                                Value = "approve"
                             },
                         }
                     }
@@ -225,18 +193,96 @@ namespace NosAyudamos
         /// </summary>
         public async Task HandleAsync(MessageReceived e)
         {
-            var map = await phoneRepo.GetAsync(e.PhoneNumber).ConfigureAwait(false);
+            var map = await phoneDir.GetAsync(e.PhoneNumber).ConfigureAwait(false);
             // We only foward for paused phones.
             if (map == null || map.AutomationPaused != true)
+                return;
+
+            // In testing scenarios, we might get messages with local file uris, skip those.
+            if (env.IsDevelopment() &&
+                Uri.TryCreate(e.Body, UriKind.Absolute, out var uri) &&
+                uri.Scheme == "file")
                 return;
 
             await SendAsync(e.PhoneNumber, new SlackMessage { Text = e.Body }).ConfigureAwait(false);
         }
 
-        async Task SendAsync(string phoneNumber, SlackMessage message, PhoneSystem? phoneSystem = default)
+        public async Task HandleAsync(RegistrationFailed e)
+        {
+            var message = new SlackMessage
+            {
+                Username = "nosayudamos",
+                Text = $":zap: registration failed for {e.PhoneNumber} :interrobang:",
+                Blocks = new List<Block>
+                {
+                    new Divider(),
+                    new Section
+                    {
+                        BlockId = "sender",
+                        Fields = new List<TextObject>
+                        {
+                            new TextObject($":zap: {e.PhoneNumber}") { Emoji = true },
+                            new TextObject($"Registration failed :interrobang:") { Emoji = true },
+                        }
+                    },
+                },
+            };
+
+            var ngrok = env.GetVariable("StorageNgrok", default(string));
+            if (env.IsTesting() && env.GetVariable("SendToSlackInDevelopment", false))
+            {
+                if (ngrok == null)
+                {
+                    message.Blocks.Add(new Section
+                    {
+                        Fields = new List<TextObject>
+                        {
+                            new TextObject($":warning: SendToSlackInDevelopment=true but StorageNgrok envvar redirecting port 10000 was not defined.") { Emoji = true },
+                            new TextObject($"Attempt #1..{e.Images.Length} images can't be displayed.") { Emoji = true },
+                        }
+                    });
+                }
+                else
+                {
+                    message.Blocks.AddRange(e.Images.Select((uri, i) => new global::Slack.Webhooks.Blocks.Image
+                    {
+                        ImageUrl = new Uri(new Uri(ngrok), uri.PathAndQuery).ToString(),
+                        Title = new TextObject($"Attempt #" + (i + 1)),
+                        AltText = Path.GetFileName(uri.AbsolutePath),
+                    }));
+                }
+            }
+            else
+            {
+                message.Blocks.AddRange(e.Images.Select((uri, i) => new global::Slack.Webhooks.Blocks.Image
+                {
+                    ImageUrl = uri.OriginalString,
+                    Title = new TextObject($"Attempt #" + (i + 1)),
+                    AltText = Path.GetFileName(uri.AbsolutePath),
+                }));
+            }
+
+
+            message.Blocks.Add(new Actions
+            {
+                BlockId = "actions",
+                Elements = new List<IActionElement>
+                {
+                    new Button
+                    {
+                        Text = new TextObject("Register :register_donee:") { Emoji = true },
+                        Value = "register"
+                    },
+                }
+            });
+
+            await events.PushAsync(new SlackMessageSent(e.PhoneNumber, message.AsJson()));
+        }
+
+        internal async Task SendAsync(string phoneNumber, SlackMessage message, PhoneSystem? phoneSystem = default)
         {
             if (phoneSystem == null)
-                phoneSystem = await phoneRepo.GetAsync(phoneNumber).ConfigureAwait(false);
+                phoneSystem = await phoneDir.GetAsync(phoneNumber).ConfigureAwait(false);
 
             if (phoneSystem == null)
                 return;
@@ -271,7 +317,7 @@ namespace NosAyudamos
             }
 
             var by = "+" + phoneNumber;
-            var person = await repository.FindAsync(phoneNumber, readOnly: true).ConfigureAwait(false);
+            var person = await peopleRepo.FindAsync(phoneNumber, readOnly: true).ConfigureAwait(false);
             if (person != null)
             {
                 by = person.FirstName + " " + person.LastName;
