@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.VisualStudio.Threading;
 using Moq;
 using Slack.Webhooks;
@@ -17,6 +16,7 @@ namespace NosAyudamos
     public class SlackTests
     {
         TestEnvironment environment;
+        PhoneSystem phoneSystem = new PhoneSystem(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber);
 
         public SlackTests() => environment = new TestEnvironment();
 
@@ -35,27 +35,15 @@ namespace NosAyudamos
                         BlockId = "sender",
                         Fields = new List<TextObject>
                         {
-                            new TextObject($":rejected: 5491159278282") { Emoji = true },
-                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/20251885398|CUIT sin Monotributo>")
+                            new TextObject($":rejected: {person.PhoneNumber}") { Emoji = true },
+                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/{person.Id}|CUIT sin Monotributo>")
                             {
                                 Type = TextObject.TextType.Markdown
                             },
                         }
                     },
-                    new Actions
-                    {
-                        BlockId = "actions",
-                        Elements = new List<IActionElement>
-                        {
-                            new Button
-                            {
-                                Text = new TextObject("Register :register_donee:") { Emoji = true },
-                                Value = "register"
-                            },
-                        }
-                    }
                 },
-            });
+            }, phoneSystem);
 
             await SendMessageAsync(new SlackMessage
             {
@@ -68,15 +56,15 @@ namespace NosAyudamos
                         BlockId = "sender",
                         Fields = new List<TextObject>
                         {
-                            new TextObject($":rejected: 5491159278282") { Emoji = true },
-                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/20251885398|CUIT paga ganancias>")
+                            new TextObject($":rejected: {person.PhoneNumber}") { Emoji = true },
+                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/{person.Id}|CUIT paga ganancias>")
                             {
                                 Type = TextObject.TextType.Markdown
                             },
                         }
                     },
                 },
-            });
+            }, phoneSystem);
 
             await SendMessageAsync(new SlackMessage
             {
@@ -89,15 +77,15 @@ namespace NosAyudamos
                         BlockId = "sender",
                         Fields = new List<TextObject>
                         {
-                            new TextObject($":rejected: 5491159278282") { Emoji = true },
-                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/20251885398|Monotributo categoría D>")
+                            new TextObject($":rejected: {person.PhoneNumber}") { Emoji = true },
+                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/{person.Id}|Monotributo categoría D>")
                             {
                                 Type = TextObject.TextType.Markdown
                             },
                         }
                     },
                 },
-            });
+            }, phoneSystem);
         }
 
         [Fact]
@@ -120,7 +108,7 @@ namespace NosAyudamos
                         }
                     },
                 },
-            });
+            }, phoneSystem);
         }
 
         [Fact]
@@ -128,7 +116,6 @@ namespace NosAyudamos
         {
             await SendMessageAsync(new SlackMessage
             {
-                Username = "nosayudamos",
                 Blocks = new List<Block>
                 {
                     new Divider(),
@@ -176,7 +163,7 @@ namespace NosAyudamos
                         }
                     }
                 },
-            });
+            }, phoneSystem);
         }
 
         [Fact]
@@ -201,12 +188,12 @@ namespace NosAyudamos
             });
 
             var handler = new SlackEventHandler(environment, people, phoneSystems, events,
-                Mock.Of<ILanguageUnderstanding>(x => x.GetIntentsAsync(It.IsAny<string>()) ==
-                    Task.FromResult<IDictionary<string, Intent>>(new Dictionary<string, Intent>
+                Mock.Of<ILanguageUnderstanding>(x => x.PredictAsync(It.IsAny<string>()) ==
+                    Task.FromResult(new Prediction(Intents.Help, new Dictionary<string, Intent>
                     {
-                        { "Help", new Intent { Score = 0.55 } },
-                        { "Donate", new Intent { Score = 0.25 } },
-                    })));
+                        { Intents.Help, new Intent { Score = 0.55 } },
+                        { Intents.Donate, new Intent { Score = 0.25 } },
+                    }, new Dictionary<string, object>(), default, default))));
 
             SlackMessageSent sent = default;
             events.Of<SlackMessageSent>().Subscribe(e => sent = e);
@@ -226,18 +213,40 @@ namespace NosAyudamos
             await slackHandler.HandleAsync(sent);
         }
 
-        async Task SendMessageAsync(SlackMessage message)
+        async Task SendMessageAsync(SlackMessage message, PhoneSystem phoneSystem)
         {
             using var http = new HttpClient();
-            var handler = new SlackMessageSentHandler(environment,
-                new EntityRepository<PhoneThread>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer()),
-                http);
+            using var jtc = new JoinableTaskContext();
+            using var events = new EventGridStream(
+                Mock.Of<IServiceProvider>(),
+                environment,
+                new Serializer(),
+                jtc.Factory);
 
-            await handler.HandleAsync(new SlackMessageSent(Constants.Donee.PhoneNumber, "{ \"text\": \"Got it!\" }"));
+            var people = new TestPersonRepository();
+            var phoneSystems = new TestEntityRepository<PhoneSystem>();
+            var phoneThreads = new TestEntityRepository<PhoneThread>();
+            var slackHandler = new SlackMessageSentHandler(environment, phoneThreads, http);
 
-            await handler.HandleAsync(new SlackMessageSent(Constants.Donee.PhoneNumber, message.AsJson()));
-            // Subsequent one replies to the prior one.
-            await handler.HandleAsync(new SlackMessageSent(Constants.Donee.PhoneNumber, "{ \"text\": \"Got it!\" }"));
+            await phoneSystems.PutAsync(phoneSystem);
+
+            var handler = new SlackEventHandler(environment, people, phoneSystems, events,
+                Mock.Of<ILanguageUnderstanding>(x => x.PredictAsync(It.IsAny<string>()) ==
+                    Task.FromResult(new Prediction(Intents.Help, 
+                    new Dictionary<string, Intent>(),
+                    new Dictionary<string, object>(), 
+                    default, 
+                    default))));
+
+            SlackMessageSent sent = default;
+            events.Of<SlackMessageSent>().Subscribe(e => sent = e);
+
+            await handler.SendAsync(phoneSystem.UserNumber, message, phoneSystem);
+
+            Assert.NotNull(sent);
+
+            var sender = new SlackMessageSentHandler(environment, phoneThreads, http);
+            await sender.HandleAsync(sent);
         }
     }
 }
