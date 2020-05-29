@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Merq;
@@ -94,7 +96,7 @@ namespace NosAyudamos
 
                 if (handlers != null)
                 {
-                    foreach (var handler in handlers)
+                    foreach (var handler in handlers.OrderBy(h => h.GetType().GetCustomAttribute<OrderAttribute>()?.Order ?? 0))
                     {
                         await handler.HandleAsync(args);
                     }
@@ -104,11 +106,11 @@ namespace NosAyudamos
                 while (type != null && type != typeof(object))
                 {
                     var serviceType = typeof(IEnumerable<>).MakeGenericType(typeof(IEventHandler<>).MakeGenericType(type));
-                    var baseHandlers = (IEnumerable<dynamic>)services.GetService(serviceType);
+                    var baseHandlers = (IEnumerable<object>)services.GetService(serviceType);
 
                     if (baseHandlers != null)
                     {
-                        foreach (var handler in baseHandlers)
+                        foreach (dynamic handler in baseHandlers.OrderBy(h => h.GetType().GetCustomAttribute<OrderAttribute>()?.Order ?? 0))
                         {
                             await handler.HandleAsync((dynamic)args);
                         }
