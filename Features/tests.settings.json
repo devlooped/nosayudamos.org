@@ -1,4 +1,4 @@
 {
   "AZURE_FUNCTIONS_ENVIRONMENT": "Development",
-  "TESTING":  "true"
+  "TESTING": "true"
 }

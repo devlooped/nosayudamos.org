@@ -46,7 +46,7 @@ namespace NosAyudamos
             var prediction = await language.PredictAsync(e.Body).ConfigureAwait(false);
             var context = new StringBuilder();
             Intent? intent;
-            if (prediction.Intents.TryGetValue(Intents.Help, out intent) || 
+            if (prediction.Intents.TryGetValue(Intents.Help, out intent) ||
                 prediction.Intents.TryGetValue(Intents.Utilities.Help, out intent))
                 context = context.Append(":pray: ").Append(intent.Score?.ToString("0.##", CultureInfo.CurrentCulture));
 

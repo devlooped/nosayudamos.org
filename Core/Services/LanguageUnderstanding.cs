@@ -72,7 +72,7 @@ namespace NosAyudamos
 
         public async Task<Prediction> PredictAsync(string text)
         {
-            if (string.IsNullOrEmpty(text) || 
+            if (string.IsNullOrEmpty(text) ||
                 Uri.TryCreate(text, UriKind.Absolute, out _))
                 return emptyPrediction;
 
