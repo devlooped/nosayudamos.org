@@ -27,9 +27,31 @@ namespace NosAyudamos
     [NoExport]
     class Environment : IEnvironment
     {
-        static readonly IConfiguration config;
+        static IConfiguration? config;
 
-        static Environment()
+        static Environment() => Refresh();
+
+        public string GetVariable(string name) =>
+            Ensure.NotEmpty(config![Ensure.NotEmpty(name, nameof(name))], name);
+
+        public T GetVariable<T>(string name, T defaultValue = default)
+        {
+            var value = config![Ensure.NotEmpty(name, nameof(name))];
+
+            if (value != null)
+            {
+                if (value is T typed)
+                    return typed;
+
+                var converter = TypeDescriptor.GetConverter(typeof(T));
+
+                return (T)converter.ConvertFromString(value);
+            }
+
+            return defaultValue;
+        }
+
+        public static void Refresh()
         {
             var basePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             // In locally run tests, the file will be alongside the assembly.
@@ -55,26 +77,6 @@ namespace NosAyudamos
 
             // Now build the final version that includes the keyvault provider.
             config = builder.Build();
-        }
-
-        public string GetVariable(string name) =>
-            Ensure.NotEmpty(config[Ensure.NotEmpty(name, nameof(name))], name);
-
-        public T GetVariable<T>(string name, T defaultValue = default)
-        {
-            var value = config[Ensure.NotEmpty(name, nameof(name))];
-
-            if (value != null)
-            {
-                if (value is T typed)
-                    return typed;
-
-                var converter = TypeDescriptor.GetConverter(typeof(T));
-
-                return (T)converter.ConvertFromString(value);
-            }
-
-            return defaultValue;
         }
     }
 
