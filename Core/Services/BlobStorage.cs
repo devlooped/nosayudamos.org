@@ -9,9 +9,9 @@ namespace NosAyudamos
     class BlobStorage : IBlobStorage
     {
         static readonly Dictionary<string, string> EmptyMetadata = new Dictionary<string, string>();
-        readonly IEnvironment enviroment;
+        readonly IEnvironment env;
 
-        public BlobStorage(IEnvironment enviroment) => this.enviroment = enviroment;
+        public BlobStorage(IEnvironment env) => this.env = env;
 
         public async Task<IDictionary<string, string>> GetMetadataAsync(string containerName, string blobName)
         {
@@ -84,7 +84,7 @@ namespace NosAyudamos
             return blobClient.Uri;
         }
 
-        BlobServiceClient CreateBlobServiceClient() => new BlobServiceClient(enviroment.GetVariable("AzureWebJobsStorage"));
+        BlobServiceClient CreateBlobServiceClient() => new BlobServiceClient(env.GetVariable("AzureWebJobsStorage"));
     }
 
     interface IBlobStorage
