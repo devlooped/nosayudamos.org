@@ -14,9 +14,9 @@ namespace NosAyudamos.Http
         readonly Lazy<string> chatApiNumber;
         readonly IEventStreamAsync events;
 
-        public ChatApi(IEnvironment enviroment, IEventStreamAsync events)
+        public ChatApi(IEnvironment env, IEventStreamAsync events)
         {
-            chatApiNumber = new Lazy<string>(() => enviroment.GetVariable("ChatApiNumber").TrimStart('+'));
+            chatApiNumber = new Lazy<string>(() => env.GetVariable("ChatApiNumber").TrimStart('+'));
             this.events = events;
         }
 

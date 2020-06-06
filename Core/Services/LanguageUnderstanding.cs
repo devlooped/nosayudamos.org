@@ -26,12 +26,12 @@ namespace NosAyudamos
             Sentiment = new Sentiment()
         };
 
-        readonly IEnvironment enviroment;
+        readonly IEnvironment env;
         readonly IReadOnlyPolicyRegistry<string> registry;
         readonly ILogger<LanguageUnderstanding> logger;
 
-        public LanguageUnderstanding(IEnvironment enviroment, IReadOnlyPolicyRegistry<string> registry, ILogger<LanguageUnderstanding> logger) =>
-            (this.enviroment, this.registry, this.logger) = (enviroment, registry, logger);
+        public LanguageUnderstanding(IEnvironment env, IReadOnlyPolicyRegistry<string> registry, ILogger<LanguageUnderstanding> logger) =>
+            (this.env, this.registry, this.logger) = (env, registry, logger);
 
         public async Task AddUtteranceAsync(string? utterance, string? intent)
         {
@@ -42,7 +42,7 @@ namespace NosAyudamos
 
             using var luisClient = CreateLuisAuthoringClient();
 
-            var app = await luisClient.Apps.GetAsync(Guid.Parse(enviroment.GetVariable("LuisAppId")));
+            var app = await luisClient.Apps.GetAsync(Guid.Parse(env.GetVariable("LuisAppId")));
 
             if (app != null && app.Id != null)
             {
@@ -64,7 +64,7 @@ namespace NosAyudamos
                         new ApplicationPublishObject
                         {
                             VersionId = app.ActiveVersion,
-                            IsStaging = enviroment.GetVariable<string>("LuisAppSlot", "staging").Equals("staging", StringComparison.OrdinalIgnoreCase)
+                            IsStaging = env.GetVariable<string>("LuisAppSlot", "staging").Equals("staging", StringComparison.OrdinalIgnoreCase)
                         });
                 }
             }
@@ -93,8 +93,8 @@ namespace NosAyudamos
 
             var predictionResponse = await policy.ExecuteAsync(async () =>
                 await luisClient.Prediction.GetSlotPredictionAsync(
-                    Guid.Parse(enviroment.GetVariable("LuisAppId")),
-                    slotName: enviroment.GetVariable("LuisAppSlot", "staging"),
+                    Guid.Parse(env.GetVariable("LuisAppId")),
+                    slotName: env.GetVariable("LuisAppSlot", "staging"),
                     predictionRequest,
                     verbose: true,
                     showAllIntents: false,
@@ -106,22 +106,22 @@ namespace NosAyudamos
         ILUISAuthoringClient CreateLuisAuthoringClient()
         {
             var credentials = new Authoring.ApiKeyServiceClientCredentials(
-                enviroment.GetVariable("LuisAuthoringKey"));
+                env.GetVariable("LuisAuthoringKey"));
 
             return new Authoring.LUISAuthoringClient(credentials, Array.Empty<DelegatingHandler>())
             {
-                Endpoint = enviroment.GetVariable("LuisAuthoringEndpoint")
+                Endpoint = env.GetVariable("LuisAuthoringEndpoint")
             };
         }
 
         ILUISRuntimeClient CreateLuisRuntimeClient()
         {
             var credentials = new Runtime.ApiKeyServiceClientCredentials(
-                enviroment.GetVariable("LuisSubscriptionKey"));
+                env.GetVariable("LuisSubscriptionKey"));
 
             return new Runtime.LUISRuntimeClient(credentials, Array.Empty<DelegatingHandler>())
             {
-                Endpoint = enviroment.GetVariable("LuisEndpoint")
+                Endpoint = env.GetVariable("LuisEndpoint")
             };
         }
     }
