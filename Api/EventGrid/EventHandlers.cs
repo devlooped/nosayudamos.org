@@ -18,6 +18,12 @@ namespace NosAyudamos.EventGrid
             => (this.serializer, this.services)
             = (serializer, services);
 
+        [FunctionName("automation-paused")]
+        public Task AutomationPausedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<AutomationPaused>(serializer));
+
+        [FunctionName("automation-resumed")]
+        public Task AutomationResumedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<AutomationResumed>(serializer));
+
         /// <summary>
         /// Initial handler of uncategorized incoming messages from event grid 
         /// callbacks into our azure function.
@@ -26,41 +32,57 @@ namespace NosAyudamos.EventGrid
         [FunctionName("message-received")]
         public Task MessageReceivedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<MessageReceived>(serializer));
 
-        [FunctionName("unknown-message")]
-        public Task UnknownMessageAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
-
         [FunctionName("message-sent")]
         public Task MessageSentAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<MessageSent>(serializer));
+
+
+        [FunctionName("language-trained")]
+        public Task LanguageTrainedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<LanguageTrained>(serializer));
+
 
         [FunctionName("person-registered")]
         public Task PersonRegisteredAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<PersonRegistered>(serializer));
 
-        [FunctionName("tax-status-approved")]
-        public Task TaxStatusApprovedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusApproved>(serializer));
-
-        [FunctionName("tax-status-accepted")]
-        public Task TaxStatusAcceptedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusAccepted>(serializer));
-
-        [FunctionName("tax-status-rejected")]
-        public Task TaxStatusRejectedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusRejected>(serializer));
-
         [FunctionName("registration-failed")]
         public Task RegistrationFailedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<RegistrationFailed>(serializer));
 
-        [FunctionName("automation-paused")]
-        public Task AutomationPausedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<AutomationPaused>(serializer));
-
-        [FunctionName("automation-resumed")]
-        public Task AutomationResumedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<AutomationResumed>(serializer));
-
-        [FunctionName("language-trained")]
-        public Task LanguageTrainedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<LanguageTrained>(serializer));
 
         [FunctionName("slack-message-sent")]
         public Task SlackMessageSentAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<SlackMessageSent>(serializer));
 
         [FunctionName("slack-event-received")]
         public Task SlackEventReceivedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<SlackEventReceived>(serializer));
+
+
+        [FunctionName("tax-status-accepted")]
+        public Task TaxStatusAcceptedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusAccepted>(serializer));
+
+        [FunctionName("tax-status-approved")]
+        public Task TaxStatusApprovedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusApproved>(serializer));
+
+        [FunctionName("tax-status-rejected")]
+        public Task TaxStatusRejectedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusRejected>(serializer));
+
+        [FunctionName("unknown-message")]
+        public Task UnknownMessageAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
+
+
+        [FunctionName("donation-received")]
+        public Task DonationReceivedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<DonationReceived>(serializer));
+
+        [FunctionName("subscription-received")]
+        public Task SubscriptionReceivedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<SubscriptionReceived>(serializer));
+
+
+        [FunctionName("payment-code-received")]
+        public Task PaymentCodeReceivedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<PaymentCodeReceived>(serializer));
+
+        [FunctionName("payment-requested")]
+        public Task PaymentRequestedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<PaymentRequested>(serializer));
+
+        [FunctionName("payment-approved")]
+        public Task PaymentApproveddAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<PaymentRequested>(serializer));
+
 
         async Task HandleAsync<TEvent>(TEvent e)
         {
