@@ -63,8 +63,8 @@ namespace NosAyudamos.EventGrid
         [FunctionName("tax-status-rejected")]
         public Task TaxStatusRejectedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusRejected>(serializer));
 
-        [FunctionName("unknown-message")]
-        public Task UnknownMessageAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
+        [FunctionName("unknown-message-received")]
+        public Task UnknownMessageReceivedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<UnknownMessageReceived>(serializer));
 
 
         [FunctionName("donation-received")]
