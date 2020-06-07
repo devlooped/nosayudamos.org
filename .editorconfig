@@ -193,3 +193,6 @@ dotnet_diagnostic.CA1810.severity = suggestion
 
 # CA1034: Nested types should not be visible
 dotnet_diagnostic.CA1034.severity = suggestion
+
+# CA1032: Implement standard exception constructors
+dotnet_diagnostic.CA1032.severity = none
