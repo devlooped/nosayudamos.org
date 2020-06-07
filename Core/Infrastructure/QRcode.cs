@@ -10,12 +10,12 @@ namespace NosAyudamos
 {
     class QRCode : IQRCode
     {
-        readonly HttpClient httpClient;
+        readonly HttpClient http;
         readonly Lazy<BarcodeReader> reader;
 
-        public QRCode(HttpClient httpClient)
+        public QRCode(HttpClient http)
         {
-            this.httpClient = httpClient;
+            this.http = http;
 
             reader = new Lazy<BarcodeReader>(
                 () => new BarcodeReader()
@@ -32,14 +32,22 @@ namespace NosAyudamos
 
         public async Task<string?> ReadAsync(Uri imageUri)
         {
-            var bytes = await httpClient.GetByteArrayAsync(imageUri);
+            var bytes = imageUri.Scheme == "file" ?
+                await File.ReadAllBytesAsync(imageUri.AbsolutePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)) :
+                await http.GetByteArrayAsync(imageUri);
 
+            return Decode(bytes);
+        }
+
+        internal string? Decode(byte[] bytes)
+        {
             using var mem = new MemoryStream(bytes);
             using var image = (Bitmap)Image.FromStream(mem);
 
             var result = reader.Value.Decode(image);
+            var text = result?.Text;
 
-            return result?.Text;
+            return string.IsNullOrEmpty(text) ? null : text;
         }
     }
 
