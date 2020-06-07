@@ -77,13 +77,16 @@ namespace NosAyudamos
                 await File.ReadAllBytesAsync(imageUri.AbsolutePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar)) :
                 await http.GetByteArrayAsync(imageUri);
 
-#pragma warning disable CS8634 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'class' constraint.
             var id = await durableAction.ExecuteAsync(
-#pragma warning restore CS8634 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'class' constraint.
-                async (attempt) =>
+                // We explicitly use the person phone number as the partition key 
+                // instead of the method name, which should make it easier to spot 
+                // retry attempts by user, instead.
+                actionName: message.PhoneNumber,
+                actionId: nameof(RegisterDoneeAsync),
+                async (attempts) =>
                 {
                     await blobStorage.UploadAsync(
-                        image, env.GetVariable("AttachmentsContainerName"), $"cel_{message.PhoneNumber}_{attempt}.png")
+                        image, env.GetVariable("AttachmentsContainerName"), $"cel_{message.PhoneNumber}_{attempts}.png")
                         .ConfigureAwait(false);
                     return await idRecognizer.RecognizeAsync(image).ConfigureAwait(false);
                 },
@@ -99,7 +102,7 @@ namespace NosAyudamos
                     await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donee.RegistrationFailed)).ConfigureAwait(false);
 
                     var images = new List<Uri>();
-                    for (int i = 1; i <= attemps; i++)
+                    for (var i = 1; i <= attemps; i++)
                     {
                         var uri = await blobStorage.GetUriAsync(
                             env.GetVariable("AttachmentsContainerName"),
@@ -114,8 +117,7 @@ namespace NosAyudamos
                     await events.PushAsync(new AutomationPaused(message.PhoneNumber, nameof(StartupWorkflow))).ConfigureAwait(false);
                     // We register the failure at the end of all attempts, to follow-up personally via Slack.
                     await events.PushAsync(new RegistrationFailed(message.PhoneNumber, images.ToArray())).ConfigureAwait(false);
-                },
-                nameof(RegisterDoneeAsync) + message.PhoneNumber);
+                });
 
             if (id != null)
             {
