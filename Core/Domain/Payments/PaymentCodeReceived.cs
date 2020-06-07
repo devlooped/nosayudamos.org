@@ -4,12 +4,11 @@ namespace NosAyudamos
 {
     public class PaymentCodeReceived
     {
-        public PaymentCodeReceived(string personId, Uri codeUri)
-            => (PersonId, CodeUri)
-            = (personId, codeUri);
+        public PaymentCodeReceived(Uri imageUri, string personId)
+            => (ImageUri, PersonId)
+            = (imageUri, personId);
 
+        public Uri ImageUri { get; }
         public string PersonId { get; }
-
-        public Uri CodeUri { get; }
     }
 }

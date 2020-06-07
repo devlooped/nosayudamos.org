@@ -1,17 +1,16 @@
-﻿using System;
-
-namespace NosAyudamos
+﻿namespace NosAyudamos
 {
     public class PaymentRequested
     {
-        public PaymentRequested(string personId, Uri codeUri, double amount, string description)
-            => (PersonId, CodeUri, Amount, Description)
-            = (personId, codeUri, amount, description);
+        public PaymentRequested(double amount, string description, string merchant, string personId, string qrData)
+            => (Amount, Description, Merchant, PersonId, QRData)
+            = (amount, description, merchant, personId, qrData);
 
-        public string PersonId { get; set; }
-        public Uri CodeUri { get; }
+        public double Amount { get; }
+        public string Description { get; }
+        public string Merchant { get; }
 
-        public double Amount { get; set; }
-        public string Description { get; set; }
+        public string PersonId { get; }
+        public string QRData { get; }
     }
 }
