@@ -9,11 +9,11 @@ namespace NosAyudamos
     /// </summary>
     public class HttpStatusException : Exception
     {
-        public HttpStatusException(HttpStatusCode statusCode) 
+        public HttpStatusException(HttpStatusCode statusCode)
             : base(statusCode.ToString())
             => StatusCode = statusCode;
 
-        public HttpStatusException(HttpStatusCode statusCode, Exception innerException) 
+        public HttpStatusException(HttpStatusCode statusCode, Exception innerException)
             : base(statusCode.ToString(), innerException)
             => StatusCode = statusCode;
 

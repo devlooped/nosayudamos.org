@@ -26,7 +26,7 @@ namespace NosAyudamos.Http
             using var reader = new StreamReader(req.Body);
             var payload = await reader.ReadToEndAsync();
             var json = JsonSerializer.Deserialize<JsonElement>(payload);
-            
+
             foreach (var message in json.GetProperty("messages").EnumerateArray())
             {
                 var body = message.GetProperty("body").GetString();
