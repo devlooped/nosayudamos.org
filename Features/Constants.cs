@@ -28,6 +28,18 @@ namespace NosAyudamos
                 new Person(Id, FirstName, LastName, PhoneNumber, Role.Donee, DateOfBirth);
         }
 
+        public static class Donee2
+        {
+            public const string Id = "33333333";
+            public const string FirstName = "Lucian@";
+            public const string LastName = nameof(Donee2);
+            public const string PhoneNumber = "333";
+            public static DateTime DateOfBirth { get; } = new DateTime(2000, 3, 15);
+
+            public static Person Create() =>
+                new Person(Id, FirstName, LastName, PhoneNumber, Role.Donee, DateOfBirth);
+        }
+
         public static class System
         {
             public const string PhoneNumber = "999";
