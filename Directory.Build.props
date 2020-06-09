@@ -1,8 +1,8 @@
 <Project>
-	<PropertyGroup Condition="'$(CI)' == ''">
-		<CI>false</CI>
-		<CI Condition="'$(TF_BUILD)' == 'true'">true</CI>
-	</PropertyGroup>
+  <PropertyGroup Condition="'$(CI)' == ''">
+    <CI>false</CI>
+    <CI Condition="'$(TF_BUILD)' == 'true'">true</CI>
+  </PropertyGroup>
 
   <PropertyGroup>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>

@@ -70,29 +70,29 @@ namespace NosAyudamos {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Donors are auto-approved.
-        /// </summary>
-        internal static string Person_DonorAlwaysApproved {
-            get {
-                return ResourceManager.GetString("Person_DonorAlwaysApproved", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Cannot deserialize empty data..
         /// </summary>
-        internal static string PersonRepository_EmptyData {
+        internal static string DomainRepository_EmptyData {
             get {
-                return ResourceManager.GetString("PersonRepository_EmptyData", resourceCulture);
+                return ResourceManager.GetString("DomainRepository_EmptyData", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Cannot deserialize empty event type..
         /// </summary>
-        internal static string PersonRepository_EmptyEventType {
+        internal static string DomainRepository_EmptyEventType {
             get {
-                return ResourceManager.GetString("PersonRepository_EmptyEventType", resourceCulture);
+                return ResourceManager.GetString("DomainRepository_EmptyEventType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Donors are auto-approved.
+        /// </summary>
+        internal static string Person_DonorAlwaysApproved {
+            get {
+                return ResourceManager.GetString("Person_DonorAlwaysApproved", resourceCulture);
             }
         }
         

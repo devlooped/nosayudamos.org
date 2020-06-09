@@ -29,8 +29,17 @@ namespace NosAyudamos
         /// Whether the domain object was created in a readonly manner, meaning 
         /// that events cannot be produced from it.
         /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
         [JsonIgnore]
         public bool IsReadOnly { get; protected set; } = true;
+
+        /// <summary>
+        /// Version of the domain object when it was originally loaded. Enables 
+        /// optimistic concurrency checks.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        [JsonIgnore]
+        public int Version { get; internal set; }
 
         /// <summary>
         /// Accepts the pending events emitted by the domain object, and moves them to 

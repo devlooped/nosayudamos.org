@@ -9,8 +9,12 @@ dotnet_analyzer_diagnostic.severity = info
 # VSTHRD200: Use "Async" suffix for async methods
 dotnet_diagnostic.VSTHRD200.severity = none
 
+# VSTHRD111: Use ConfigureAwait(bool)
+dotnet_diagnostic.VSTHRD111.severity = none
+
 # CA1307: Specify StringComparison
 dotnet_diagnostic.CA1307.severity = none
 
 # CA1031: Do not catch general exception types
 dotnet_diagnostic.CA1031.severity = none
+
