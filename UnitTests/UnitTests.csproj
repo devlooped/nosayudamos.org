@@ -35,10 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Api\Api.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="..\Features\LocalOnly\Content\**\*.*" LinkBase="Content" />
     <None Include="..\Features\tests.settings.json" Link="tests.settings.json" />
     <Content Include="..\Api\appsettings.json" Link="appsettings.json" />
@@ -55,5 +51,9 @@
   <ItemGroup>
     <Folder Include="Core\" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
 </Project>

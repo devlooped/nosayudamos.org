@@ -120,10 +120,10 @@
   <data name="DomainObject_ReadOnly" xml:space="preserve">
     <value>The current instance is read-only, so events cannot be produced.</value>
   </data>
-  <data name="PersonRepository_EmptyData" xml:space="preserve">
+  <data name="DomainRepository_EmptyData" xml:space="preserve">
     <value>Cannot deserialize empty data.</value>
   </data>
-  <data name="PersonRepository_EmptyEventType" xml:space="preserve">
+  <data name="DomainRepository_EmptyEventType" xml:space="preserve">
     <value>Cannot deserialize empty event type.</value>
   </data>
   <data name="PersonRepository_InvalidEventType" xml:space="preserve">

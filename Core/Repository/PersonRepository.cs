@@ -71,8 +71,8 @@ namespace NosAyudamos
             var header = DataEntity.Create(person.Id!, person, serializer);
             header.Version = stream.Version + person.Events.Count();
 
-            await Stream.WriteAsync(stream, person.Events.Select((e, i) =>
-                ToEventData(e, stream.Version + i, header)).ToArray());
+            await Stream.WriteAsync(partition, person.Version, person.Events.Select((e, i) =>
+                e.ToEventData(stream.Version + i, header)).ToArray());
 
             person.AcceptEvents();
 
@@ -91,7 +91,7 @@ namespace NosAyudamos
                     return default;
 
                 if (header.Data == null)
-                    throw new ArgumentException(Strings.PersonRepository.EmptyData);
+                    throw new ArgumentException(Strings.DomainRepository.EmptyData);
 
                 return serializer.Deserialize<Person>(header.Data);
             }
@@ -102,9 +102,10 @@ namespace NosAyudamos
             if (!existent.Found)
                 return default;
 
-            var events = (await Stream.ReadAsync<DomainEventEntity>(partition)).Events.Select(ToDomainEvent).ToList();
+            var events = (await Stream.ReadAsync<DomainEventEntity>(partition))
+                .Events.Select(e => e.ToDomainEvent(serializer)).ToList();
 
-            return new Person(events);
+            return new Person(events) { Version = existent.Stream.Version };
         }
 
         public async Task<Person?> FindAsync(string phoneNumber, bool readOnly = true)
@@ -139,42 +140,6 @@ namespace NosAyudamos
             await table.CreateIfNotExistsAsync();
 
             return table;
-        }
-
-        DomainEvent ToDomainEvent(DomainEventEntity entity)
-        {
-            if (entity.Data == null)
-                throw new ArgumentException(Strings.PersonRepository.EmptyData);
-            if (entity.EventType == null)
-                throw new ArgumentException(Strings.PersonRepository.EmptyEventType);
-
-            var entityType = Type.GetType(entity.EventType, true)!;
-            if (!typeof(DomainEvent).IsAssignableFrom(entityType))
-                throw new ArgumentException(Strings.PersonRepository.EmptyData);
-
-            var e = (DomainEvent)serializer.Deserialize(entity.Data, entityType);
-            e.SourceId = entity.PartitionKey;
-            e.EventId = entity.EventId ?? Guid.NewGuid().ToString();
-            e.Version = entity.Version;
-            e.EventTime = entity.Timestamp.UtcDateTime;
-            return e;
-        }
-
-        static EventData ToEventData(DomainEvent e, int version, params ITableEntity[] includes)
-        {
-            var properties = new
-            {
-                e.EventId,
-                EventType = e.GetType().FullName,
-                Data = new Serializer().Serialize(e),
-                DataVersion = (e.GetType().Assembly.GetName().Version ?? new Version(1, 0)).ToString(2),
-                Version = version,
-            };
-
-            return new EventData(
-                EventId.None,
-                EventProperties.From(properties),
-                EventIncludes.From(includes.Select(x => Include.InsertOrReplace(x))));
         }
     }
 }

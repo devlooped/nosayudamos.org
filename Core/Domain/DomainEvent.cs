@@ -5,7 +5,7 @@ namespace NosAyudamos
     [NoExport]
     public abstract class DomainEvent : IEventMetadata
     {
-        protected DomainEvent() => EventId = Guid.NewGuid().ToString();
+        protected DomainEvent() => EventId = Guid.NewGuid().ToString("n");
 
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
