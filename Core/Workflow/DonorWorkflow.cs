@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
-using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
 {
@@ -11,14 +10,12 @@ namespace NosAyudamos
 
         public DonorWorkflow(IEventStreamAsync events) => this.events = events;
 
-        public async Task RunAsync(MessageReceived message, Prediction prediction, Person? person)
+        public async Task RunAsync(MessageReceived message, TextAnalysis analysis, Person? person)
         {
             if (person == null)
                 return;
 
-            if (prediction.TopIntent == Intents.Instructions &&
-                prediction.Intents.TryGetValue(Intents.Instructions, out var intent) &&
-                intent.Score >= 0.85)
+            if (analysis.Prediction.IsIntent(Intents.Instructions))
             {
                 await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donor.Instructions));
                 return;

@@ -10,12 +10,12 @@ using Polly.Registry;
 namespace NosAyudamos
 {
     [Shared]
-    class TextAnalysis : ITextAnalysis
+    class TextAnalyzer : ITextAnalyzer
     {
         readonly IEnvironment env;
         readonly IReadOnlyPolicyRegistry<string> registry;
 
-        public TextAnalysis(IReadOnlyPolicyRegistry<string> registry, IEnvironment env) => (this.registry, this.env) = (registry, env);
+        public TextAnalyzer(IReadOnlyPolicyRegistry<string> registry, IEnvironment env) => (this.registry, this.env) = (registry, env);
 
         public async Task<IEnumerable<string>> GetKeyPhrasesAsync(string? text)
         {
@@ -54,7 +54,7 @@ namespace NosAyudamos
         }
     }
 
-    interface ITextAnalysis
+    interface ITextAnalyzer
     {
         Task<IEnumerable<string>> GetKeyPhrasesAsync(string? text);
         Task<IEnumerable<CategorizedEntity>> GetEntitiesAsync(string? text);

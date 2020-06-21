@@ -153,7 +153,7 @@ namespace NosAyudamos
         }
     }
 
-    public static class MercadoPago
+    internal static class MercadoPago
     {
         public static HttpRequestMessage AddHeaders(this HttpRequestMessage request, string headers, string sessionId)
         {

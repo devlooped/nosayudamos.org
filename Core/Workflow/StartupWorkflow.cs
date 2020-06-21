@@ -39,7 +39,7 @@ namespace NosAyudamos
             => (this.env, this.events, this.idRecognizer, this.taxRecognizer, this.durableAction, this.messaging, this.http, this.blobStorage, this.peopleRepo, this.logger)
             = (env, events, idRecognizer, taxRecognizer, durableAction, messaging, http, blobStorage, peopleRepo, logger);
 
-        public async Task RunAsync(MessageReceived message, Prediction prediction, Person? person)
+        public async Task RunAsync(MessageReceived message, TextAnalysis analysis, Person? person)
         {
             // If we receive an image from an unregistered number, we assume 
             // it's someone trying to register by sending their ID as requested 
@@ -50,16 +50,12 @@ namespace NosAyudamos
                 return;
             }
 
-            Intent? intent;
-            if ((prediction.Intents.TryGetValue(Intents.Utilities.Help, out intent) ||
-                prediction.Intents.TryGetValue(Intents.Help, out intent)) &&
-                intent.Score >= 0.85)
+            if (analysis.Prediction.IsIntent(Intents.Utilities.Help, Intents.Help))
             {
                 // User wants to be a donee, we need the ID
                 await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donee.SendIdentifier)).ConfigureAwait(false);
             }
-            else if (prediction.Intents.TryGetValue(Intents.Donate, out intent) &&
-                intent.Score >= 0.85)
+            else if (analysis.Prediction.IsIntent(Intents.Donate))
             {
                 await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donor.SendAmount)).ConfigureAwait(false);
             }
@@ -126,10 +122,10 @@ namespace NosAyudamos
                         env.GetVariable("AttachmentsContainerName"), $"dni_{id.NationalId}.png")
                     .ConfigureAwait(false);
 
-                var person = await peopleRepo.GetAsync(id.NationalId, readOnly: false).ConfigureAwait(false);
+                var person = await peopleRepo.GetAsync<Donee>(id.NationalId, readOnly: false).ConfigureAwait(false);
                 if (person == null)
                 {
-                    person = new Person(id.NationalId, id.FirstName, id.LastName, message.PhoneNumber, Role.Donee, id.DateOfBirth, id.Sex);
+                    person = new Donee(id.NationalId, id.FirstName, id.LastName, message.PhoneNumber, id.DateOfBirth, id.Sex);
 
                     var tax = await taxRecognizer.RecognizeAsync(person).ConfigureAwait(false);
                     if (tax != null)
