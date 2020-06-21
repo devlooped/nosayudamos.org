@@ -5,22 +5,23 @@ namespace NosAyudamos
 {
     class TestPersonRepository : IPersonRepository
     {
-        Dictionary<string, string> phoneIdMap = new Dictionary<string, string>();
+        Dictionary<string, (string Id, Role Role)> phoneIdMap = new Dictionary<string, (string, Role)>();
         Dictionary<string, Person> people = new Dictionary<string, Person>();
 
         public Task<Person> FindAsync(string phoneNumber, bool readOnly = true)
         {
-            if (phoneIdMap.TryGetValue(phoneNumber, out var nationalId))
-                return GetAsync(nationalId);
+            if (phoneIdMap.TryGetValue(phoneNumber, out var phoneMap))
+                return Task.FromResult(people[phoneMap.Id]);
 
             return Task.FromResult(default(Person));
         }
 
-        public Task<Person> GetAsync(string nationalId, bool readOnly = true) => Task.FromResult(people[nationalId]);
+        public Task<TPerson> GetAsync<TPerson>(string nationalId, bool readOnly = true) where TPerson : Person
+            => Task.FromResult((TPerson)people[nationalId]);
 
-        public Task<Person> PutAsync(Person person)
+        public Task<TPerson> PutAsync<TPerson>(TPerson person) where TPerson : Person
         {
-            phoneIdMap[person.PhoneNumber] = person.Id;
+            phoneIdMap[person.PhoneNumber] = (person.Id, person.Role);
             people[person.Id] = person;
             return Task.FromResult(person);
         }

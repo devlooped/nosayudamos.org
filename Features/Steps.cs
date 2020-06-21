@@ -54,13 +54,13 @@ namespace NosAyudamos.Steps
         public async Task GivenADonee() =>
             context.Set(await container.Resolve<IPersonRepository>().PutAsync(Constants.Donee.Create()));
 
-        [Given(@"Una persona '(.*)' con DNI '(.*)' y telefono '(.*)'")]
+        [Given(@"Un donatario '(.*)' con DNI '(.*)' y telefono '(.*)'")]
         public void GivenAPerson(string fullName, string nationalId, string phoneNumber)
         {
             var repo = container.Resolve<IPersonRepository>();
             var names = fullName.Split(' ');
 
-            var person = new Person(string.Join(' ', names[..^1]), names[^1], nationalId, phoneNumber);
+            var person = new Donee(string.Join(' ', names[..^1]), names[^1], nationalId, phoneNumber);
 
             repo.PutAsync(person);
 

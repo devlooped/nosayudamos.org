@@ -14,9 +14,9 @@ namespace NosAyudamos
 
             var repo = container.Resolve<IPersonRepository>();
 
-            await repo.PutAsync(new Person("23696294", "Daniel", "Cazzulino", "5491159278282"));
+            await repo.PutAsync(Constants.Donee.Create());
 
-            var person = await repo.GetAsync("23696294", false);
+            var person = await repo.GetAsync<Donee>(Constants.Donee.Id, false);
 
             person.Donate(500);
 

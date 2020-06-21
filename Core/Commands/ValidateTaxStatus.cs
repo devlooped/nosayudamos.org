@@ -30,7 +30,7 @@ namespace NosAyudamos
 
         public async Task ExecuteAsync(ValidateTaxStatus command, CancellationToken cancellation)
         {
-            var person = await personRepo.GetAsync(command.PersonId, false);
+            var person = await personRepo.GetAsync<Donee>(command.PersonId, false);
             if (person == null)
             {
                 await entityRepo.DeleteAsync(command);

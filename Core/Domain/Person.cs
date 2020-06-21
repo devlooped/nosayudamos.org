@@ -6,12 +6,12 @@ using Newtonsoft.Json.Converters;
 
 namespace NosAyudamos
 {
-    class Person : DomainObject
+    abstract class Person : DomainObject
     {
         public Person(IEnumerable<DomainEvent> history)
             : this() => Load(history);
 
-        public Person(
+        protected internal Person(
             string id,
             string firstName,
             string lastName,
@@ -24,11 +24,9 @@ namespace NosAyudamos
             IsReadOnly = false;
             // TODO: validate args.
             Raise(new PersonRegistered(id, firstName, lastName, phoneNumber, role, dateOfBirth, sex));
-            if (role == Role.Donor)
-                Raise(new TaxStatusApproved(Strings.Person.DonorAlwaysApproved));
         }
 
-        Person()
+        protected internal Person()
         {
             Handles<PersonRegistered>(OnRegistered);
             Handles<Donated>(OnDonated);

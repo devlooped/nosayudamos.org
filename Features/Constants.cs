@@ -12,8 +12,8 @@ namespace NosAyudamos
             public const string PhoneNumber = "100";
             public static DateTime DateOfBirth { get; } = new DateTime(2000, 3, 15);
 
-            public static Person Create() =>
-                new Person(Id, FirstName, LastName, PhoneNumber, Role.Donor, DateOfBirth);
+            public static global::NosAyudamos.Donor Create() =>
+                new global::NosAyudamos.Donor(Id, FirstName, LastName, PhoneNumber, DateOfBirth);
         }
 
         public static class Donor2
@@ -24,8 +24,8 @@ namespace NosAyudamos
             public const string PhoneNumber = "101";
             public static DateTime DateOfBirth { get; } = new DateTime(2000, 3, 15);
 
-            public static Person Create() =>
-                new Person(Id, FirstName, LastName, PhoneNumber, Role.Donor, DateOfBirth);
+            public static global::NosAyudamos.Donor Create() =>
+                new global::NosAyudamos.Donor(Id, FirstName, LastName, PhoneNumber, DateOfBirth);
         }
 
 
@@ -37,8 +37,8 @@ namespace NosAyudamos
             public const string PhoneNumber = "200";
             public static DateTime DateOfBirth { get; } = new DateTime(2000, 3, 15);
 
-            public static Person Create() =>
-                new Person(Id, FirstName, LastName, PhoneNumber, Role.Donee, DateOfBirth);
+            public static global::NosAyudamos.Donee Create() =>
+                new global::NosAyudamos.Donee(Id, FirstName, LastName, PhoneNumber, DateOfBirth);
         }
 
         public static class Donee2
@@ -49,8 +49,8 @@ namespace NosAyudamos
             public const string PhoneNumber = "202";
             public static DateTime DateOfBirth { get; } = new DateTime(2000, 3, 15);
 
-            public static Person Create() =>
-                new Person(Id, FirstName, LastName, PhoneNumber, Role.Donee, DateOfBirth);
+            public static global::NosAyudamos.Donee Create() =>
+                new global::NosAyudamos.Donee(Id, FirstName, LastName, PhoneNumber, DateOfBirth);
         }
 
         public static class System

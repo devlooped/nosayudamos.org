@@ -14,7 +14,7 @@ namespace NosAyudamos
         /// <summary>
         /// Inserts or updates the given person information.
         /// </summary>
-        Task<Person> PutAsync(Person person);
+        Task<TPerson> PutAsync<TPerson>(TPerson person) where TPerson : Person;
         /// <summary>
         /// Retrieves an existing person from its <paramref name="id"/>.
         /// </summary>
@@ -22,7 +22,7 @@ namespace NosAyudamos
         /// <param name="readOnly">If <see langword="true"/>, will only return the last-known state for the person, 
         /// rather than loading its history too, and no mutation operations will be allowed on it.</param>
         /// <returns>The stored person information or <see langword="null"/> if none was found with the given <paramref name="id"/>.</returns>
-        Task<Person?> GetAsync(string id, bool readOnly = true);
+        Task<TPerson?> GetAsync<TPerson>(string id, bool readOnly = true) where TPerson : Person;
         /// <summary>
         /// Tries to locate the person that matches the given phone number.
         /// </summary>
@@ -43,10 +43,10 @@ namespace NosAyudamos
             => (this.serializer, this.storageAccount)
             = (serializer, storageAccount);
 
-        public async Task<Person> PutAsync(Person person)
+        public async Task<TPerson> PutAsync<TPerson>(TPerson person) where TPerson : Person
         {
             var table = await GetTableAsync();
-            var existing = await GetAsync(person.Id, readOnly: true).ConfigureAwait(false);
+            var existing = await GetAsync<TPerson>(person.Id, readOnly: true).ConfigureAwait(false);
 
             // First check if the person changed phone numbers since our last interaction
             if (existing != null && existing.PhoneNumber != person.PhoneNumber)
@@ -63,7 +63,7 @@ namespace NosAyudamos
 
             await table.ExecuteAsync(
                 TableOperation.InsertOrReplace(
-                    new PhoneIdMap(person.PhoneNumber, person.Id!))).ConfigureAwait(false);
+                    new PhoneIdMap(person.PhoneNumber, person.Id!, person.Role))).ConfigureAwait(false);
 
             var partition = new Partition(table, person.Id!);
             var result = await Stream.TryOpenAsync(partition);
@@ -79,21 +79,21 @@ namespace NosAyudamos
             return person;
         }
 
-        public async Task<Person?> GetAsync(string id, bool readOnly = true)
+        public async Task<TPerson?> GetAsync<TPerson>(string id, bool readOnly = true) where TPerson : Person
         {
             if (string.IsNullOrEmpty(id))
                 return default;
 
             if (readOnly)
             {
-                var header = await GetAsync<DataEntity>(id, typeof(Person).FullName!).ConfigureAwait(false);
+                var header = await GetAsync<DataEntity>(id, typeof(TPerson).FullName!).ConfigureAwait(false);
                 if (header == null)
                     return default;
 
                 if (header.Data == null)
                     throw new ArgumentException(Strings.DomainRepository.EmptyData);
 
-                return serializer.Deserialize<Person>(header.Data);
+                return serializer.Deserialize<TPerson>(header.Data);
             }
 
             var table = await GetTableAsync();
@@ -105,7 +105,10 @@ namespace NosAyudamos
             var events = (await Stream.ReadAsync<DomainEventEntity>(partition))
                 .Events.Select(e => e.ToDomainEvent(serializer)).ToList();
 
-            return new Person(events) { Version = existent.Stream.Version };
+            var person = (TPerson)Activator.CreateInstance(typeof(TPerson), new object[] { events });
+            person.Version = existent.Stream.Version;
+
+            return person;
         }
 
         public async Task<Person?> FindAsync(string phoneNumber, bool readOnly = true)
@@ -113,7 +116,9 @@ namespace NosAyudamos
             var mapEntity = await GetAsync<PhoneIdMap>(phoneNumber).ConfigureAwait(false);
 
             return mapEntity == null ? default :
-                await GetAsync(mapEntity.NationalId, readOnly).ConfigureAwait(false);
+                mapEntity.Role == Role.Donee
+                ? (Person?)await GetAsync<Donee>(mapEntity.NationalId, readOnly).ConfigureAwait(false)
+                : await GetAsync<Donor>(mapEntity.NationalId, readOnly).ConfigureAwait(false);
         }
 
         Task<T> GetAsync<T>(string partitionKey) where T : class, ITableEntity, new()

@@ -15,7 +15,7 @@ namespace NosAyudamos.EventHandlers
 
         public async Task HandleAsync(TaxStatusAccepted e)
         {
-            var person = await peopleRepo.GetAsync(e.SourceId!).ConfigureAwait(false);
+            var person = await peopleRepo.GetAsync<Donee>(e.SourceId!).ConfigureAwait(false);
             if (person == null)
                 return;
 
@@ -24,7 +24,7 @@ namespace NosAyudamos.EventHandlers
 
         public async Task HandleAsync(TaxStatusApproved e)
         {
-            var person = await peopleRepo.GetAsync(e.SourceId!).ConfigureAwait(false);
+            var person = await peopleRepo.GetAsync<Donee>(e.SourceId!).ConfigureAwait(false);
             if (person == null)
                 return;
 

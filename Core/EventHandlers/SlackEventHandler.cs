@@ -115,7 +115,7 @@ namespace NosAyudamos
 
         public async Task HandleAsync(TaxStatusAccepted e)
         {
-            var person = await peopleRepo.GetAsync(e.SourceId!).ConfigureAwait(false);
+            var person = await peopleRepo.GetAsync<Donee>(e.SourceId!).ConfigureAwait(false);
             if (person == null)
                 return;
 
@@ -146,7 +146,7 @@ namespace NosAyudamos
 
         public async Task HandleAsync(TaxStatusRejected e)
         {
-            var person = await peopleRepo.GetAsync(e.SourceId!).ConfigureAwait(false);
+            var person = await peopleRepo.GetAsync<Donee>(e.SourceId!).ConfigureAwait(false);
             if (person == null)
                 return;
 
