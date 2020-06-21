@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Serilog;
 
 namespace NosAyudamos
@@ -13,6 +14,7 @@ namespace NosAyudamos
         readonly ILogger log;
         readonly IPersonRepository peopleRepo;
         readonly ILanguageUnderstanding language;
+        readonly ITextAnalyzer textAnalyzer;
         readonly IEntityRepository<PhoneSystem> phoneDir;
         readonly IWorkflowSelector selector;
 
@@ -20,10 +22,11 @@ namespace NosAyudamos
             ILogger log,
             IPersonRepository peopleRepo,
             ILanguageUnderstanding language,
+            ITextAnalyzer textAnalyzer,
             IEntityRepository<PhoneSystem> phoneDir,
             IWorkflowSelector selector)
-            => (this.log, this.peopleRepo, this.language, this.phoneDir, this.selector)
-            = (log, peopleRepo, language, phoneDir, selector);
+            => (this.log, this.peopleRepo, this.language, this.textAnalyzer, this.phoneDir, this.selector)
+            = (log, peopleRepo, language, textAnalyzer, phoneDir, selector);
 
         public async Task HandleAsync(MessageReceived message)
         {
@@ -50,8 +53,10 @@ namespace NosAyudamos
             var person = await peopleRepo.FindAsync(message.PhoneNumber).ConfigureAwait(false);
             var workflow = selector.Select(person?.Role);
             var prediction = await language.PredictAsync(message.Body);
+            var entities = await textAnalyzer.GetEntitiesAsync(message.Body);
+            var keyPhrases = await textAnalyzer.GetKeyPhrasesAsync(message.Body);
 
-            await workflow.RunAsync(message, prediction, person).ConfigureAwait(false);
+            await workflow.RunAsync(message, new TextAnalysis(prediction, entities.ToArray(), keyPhrases.ToArray()), person).ConfigureAwait(false);
         }
     }
 }
