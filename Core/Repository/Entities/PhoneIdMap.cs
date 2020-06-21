@@ -6,13 +6,16 @@ namespace NosAyudamos
     {
         public PhoneIdMap() { }
 
-        public PhoneIdMap(string phoneNumber, string nationalId)
+        public PhoneIdMap(string phoneNumber, string nationalId, Role role)
         {
             PartitionKey = phoneNumber;
             RowKey = typeof(PhoneIdMap).FullName;
             NationalId = nationalId;
+            Role = role;
         }
 
         public string NationalId { get; set; } = "";
+
+        public Role Role { get; set; } = Role.Donee;
     }
 }

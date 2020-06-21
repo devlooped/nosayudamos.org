@@ -21,6 +21,7 @@ namespace NosAyudamos
                 .GetTableReference(nameof(Person)).DeleteIfExists();
         }
 
+        [Fact]
         public void PersonSerialization()
         {
             var person = Constants.Donee.Create();
@@ -28,10 +29,9 @@ namespace NosAyudamos
             var obj = JObject.Parse(json);
             obj["TaxStatus"] = TaxStatus.Validated.ToString();
 
-            var actual = JsonConvert.DeserializeObject<Person>(obj.ToString());
+            var actual = JsonConvert.DeserializeObject<Donee>(obj.ToString());
 
             Assert.Equal(TaxStatus.Validated, actual.TaxStatus);
-
         }
 
         [Fact]
@@ -41,8 +41,8 @@ namespace NosAyudamos
 
             await repo.PutAsync(Constants.Donor.Create());
 
-            var first = await repo.GetAsync(Constants.Donor.Id, readOnly: false);
-            var second = await repo.GetAsync(Constants.Donor.Id, readOnly: false);
+            var first = await repo.GetAsync<Donor>(Constants.Donor.Id, readOnly: false);
+            var second = await repo.GetAsync<Donor>(Constants.Donor.Id, readOnly: false);
 
             first.Donate(500);
             second.Donate(500);
@@ -59,14 +59,14 @@ namespace NosAyudamos
 
             await repo.PutAsync(Constants.Donor.Create());
 
-            var expected = await repo.GetAsync(Constants.Donor.Id);
+            var expected = await repo.GetAsync<Donor>(Constants.Donor.Id);
 
             Assert.True(expected.IsReadOnly);
             Assert.Empty(expected.History);
 
             Assert.Throws<InvalidOperationException>(() => expected.Donate(500));
 
-            var person = await repo.GetAsync(Constants.Donor.Id, readOnly: false);
+            var person = await repo.GetAsync<Donor>(Constants.Donor.Id, readOnly: false);
 
             Assert.False(person.IsReadOnly);
 
@@ -85,7 +85,7 @@ namespace NosAyudamos
 
             Assert.Empty(person.Events);
 
-            person = await repo.GetAsync(Constants.Donor.Id, readOnly: false);
+            person = await repo.GetAsync<Donor>(Constants.Donor.Id, readOnly: false);
 
             Assert.NotEmpty(person.History);
             Assert.Equal(500, person.DonatedAmount);
@@ -96,13 +96,13 @@ namespace NosAyudamos
             Assert.Single(person.Events);
 
             await repo.PutAsync(person);
-            person = await repo.GetAsync(Constants.Donor.Id, readOnly: true);
+            person = await repo.GetAsync<Donor>(Constants.Donor.Id, readOnly: true);
 
             // History is not loaded when creating readonly
             Assert.Empty(person.History);
             Assert.Equal(1500, person.DonatedAmount);
 
-            person = await repo.GetAsync(Constants.Donor.Id, readOnly: false);
+            person = await repo.GetAsync<Donor>(Constants.Donor.Id, readOnly: false);
 
             Assert.All(person.History, h => Assert.Equal(Constants.Donor.Id, h.SourceId));
 
@@ -112,7 +112,7 @@ namespace NosAyudamos
 
             await repo.PutAsync(person);
 
-            person = await repo.GetAsync(Constants.Donor.Id, readOnly: true);
+            person = await repo.GetAsync<Donor>(Constants.Donor.Id, readOnly: true);
 
             Assert.Equal(Constants.Donee.PhoneNumber, person.PhoneNumber);
         }

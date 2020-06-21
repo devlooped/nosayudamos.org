@@ -21,10 +21,10 @@ namespace NosAyudamos
         public Task<Person?> FindAsync(string phoneNumber, bool readOnly = true)
             => repository.FindAsync(phoneNumber, readOnly);
 
-        public Task<Person?> GetAsync(string id, bool readOnly = true)
-            => repository.GetAsync(id, readOnly);
+        public Task<TPerson?> GetAsync<TPerson>(string id, bool readOnly = true) where TPerson : Person
+            => repository.GetAsync<TPerson>(id, readOnly);
 
-        public async Task<Person> PutAsync(Person person)
+        public async Task<TPerson> PutAsync<TPerson>(TPerson person) where TPerson : Person
         {
             var changes = person.Events.ToArray();
             var saved = await repository.PutAsync(person);

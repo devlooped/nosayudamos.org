@@ -35,7 +35,7 @@ namespace NosAyudamos
             var recognizer = new TaxIdRecognizer(env, http, Mock.Of<ILogger<TaxIdRecognizer>>());
 
             var id = await recognizer.RecognizeAsync(
-                new Person(nationalId, firstName, lastName, "9112223333", sex: sex));
+                new Donee(nationalId, firstName, lastName, "9112223333", sex: sex));
 
             if (category != null)
                 Assert.Equal(category, id.Category);
