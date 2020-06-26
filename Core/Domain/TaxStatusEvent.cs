@@ -12,7 +12,8 @@ namespace NosAyudamos
 
     /// <summary>
     /// The tax status was manually approved by an approver, 
-    /// regardless of the <see cref="TaxId"/> automated validation.
+    /// regardless of the <see cref="TaxId"/> automated validation, 
+    /// or automatically approved in the case of a donor.
     /// </summary>
     public class TaxStatusApproved : DomainEvent
     {
@@ -21,9 +22,14 @@ namespace NosAyudamos
         public string Approver { get; }
     }
 
-    public class TaxStatusAccepted : TaxStatusEvent
+    /// <summary>
+    /// Tax status was validated automatically based on rules 
+    /// according to the <see cref="TaxId.Category"/> and 
+    /// <see cref="TaxId.Kind"/>.
+    /// </summary>
+    public class TaxStatusValidated : TaxStatusEvent
     {
-        public TaxStatusAccepted(TaxId taxId) : base(taxId) { }
+        public TaxStatusValidated(TaxId taxId) : base(taxId) { }
     }
 
     public enum TaxStatusRejectedReason { HasIncomeTax, NotApplicable, HighCategory }

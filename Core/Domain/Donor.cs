@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace NosAyudamos
 {
@@ -21,5 +22,8 @@ namespace NosAyudamos
         }
 
         Donor() : base() { }
+
+        [JsonProperty]
+        public long DonatedAmount { get; private set; }
     }
 }

@@ -29,11 +29,10 @@ namespace NosAyudamos
         protected internal Person()
         {
             Handles<PersonRegistered>(OnRegistered);
-            Handles<Donated>(OnDonated);
             Handles<PhoneNumberUpdated>(OnPhoneNumberUpdated);
-            Handles<TaxStatusAccepted>(OnTaxStatusAccepted);
-            Handles<TaxStatusRejected>(OnTaxStatusRejected);
             Handles<TaxStatusApproved>(OnTaxStatusApproved);
+            Handles<TaxStatusRejected>(OnTaxStatusRejected);
+            Handles<TaxStatusValidated>(OnTaxStatusValidated);
         }
 
         // NOTE: the [JsonProperty] attributes allow the deserialization from 
@@ -133,7 +132,7 @@ namespace NosAyudamos
             {
                 // We just accept CUIL-based registrations, we can't know whether 
                 // they pay earnings or not :(
-                Raise(new TaxStatusAccepted(taxId));
+                Raise(new TaxStatusValidated(taxId));
                 return;
             }
 
@@ -158,7 +157,7 @@ namespace NosAyudamos
 
             if (taxId.Category == TaxCategory.A)
             {
-                Raise(new TaxStatusAccepted(taxId));
+                Raise(new TaxStatusValidated(taxId));
                 return;
             }
 
@@ -175,8 +174,8 @@ namespace NosAyudamos
 
         void OnTaxStatusApproved(TaxStatusApproved e) => TaxStatus = TaxStatus.Approved;
 
-        void OnTaxStatusAccepted(TaxStatusAccepted e) => TaxStatus = TaxStatus.Validated;
-
         void OnTaxStatusRejected(TaxStatusRejected e) => TaxStatus = TaxStatus.Rejected;
+
+        void OnTaxStatusValidated(TaxStatusValidated e) => TaxStatus = TaxStatus.Validated;
     }
 }

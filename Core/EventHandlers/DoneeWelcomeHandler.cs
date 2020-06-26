@@ -1,9 +1,9 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace NosAyudamos.EventHandlers
 {
-    class DoneeWelcomeHandler : IEventHandler<TaxStatusAccepted>, IEventHandler<TaxStatusApproved>
+    class DoneeWelcomeHandler : IEventHandler<TaxStatusValidated>, IEventHandler<TaxStatusApproved>
     {
         readonly IPersonRepository peopleRepo;
         readonly IEntityRepository<PhoneSystem> phoneDir;
@@ -13,7 +13,7 @@ namespace NosAyudamos.EventHandlers
             => (this.peopleRepo, this.phoneDir, this.events)
             = (peopleRepo, phoneDir, events);
 
-        public async Task HandleAsync(TaxStatusAccepted e)
+        public async Task HandleAsync(TaxStatusValidated e)
         {
             var person = await peopleRepo.GetAsync<Donee>(e.SourceId!).ConfigureAwait(false);
             if (person == null)
