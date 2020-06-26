@@ -20,7 +20,8 @@ namespace NosAyudamos
 
         public async Task RunAsync(MessageReceived message, TextAnalysis analysis, Person? person)
         {
-            if (person == null)
+            if (person == null || 
+                !(person is Donee donee))
                 return;
 
             if (analysis.Prediction.IsIntent(Intents.Instructions))
@@ -47,7 +48,10 @@ namespace NosAyudamos
                     return;
                 }
 
-                // person.RequestHelp()
+                // TODO: for the above cases, as well as further clarification interactions 
+                // to polish the publication before submission, we 
+
+                //var request = donee.RequestHelp(int.Parse(quantity.Value.Text), message.Body);
 
 
                 return;
