@@ -54,14 +54,15 @@ namespace NosAyudamos.EventGrid
         public Task SlackEventReceivedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<SlackEventReceived>(serializer));
 
 
-        [FunctionName("tax-status-accepted")]
-        public Task TaxStatusAcceptedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusAccepted>(serializer));
-
         [FunctionName("tax-status-approved")]
         public Task TaxStatusApprovedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusApproved>(serializer));
 
         [FunctionName("tax-status-rejected")]
         public Task TaxStatusRejectedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusRejected>(serializer));
+
+        [FunctionName("tax-status-validated")]
+        public Task TaxStatusValidatedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<TaxStatusValidated>(serializer));
+
 
         [FunctionName("unknown-message-received")]
         public Task UnknownMessageReceivedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<UnknownMessageReceived>(serializer));

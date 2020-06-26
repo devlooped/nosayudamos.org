@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -20,7 +20,7 @@ namespace NosAyudamos
     [Order(10)]
     class SlackEventHandler :
         IEventHandler<TaxStatusRejected>,
-        IEventHandler<TaxStatusAccepted>,
+        IEventHandler<TaxStatusValidated>,
         IEventHandler<UnknownMessageReceived>,
         IEventHandler<MessageReceived>,
         IEventHandler<RegistrationFailed>
@@ -113,7 +113,7 @@ namespace NosAyudamos
             await SendAsync(e.PhoneNumber, message, phoneSystem).ConfigureAwait(false);
         }
 
-        public async Task HandleAsync(TaxStatusAccepted e)
+        public async Task HandleAsync(TaxStatusValidated e)
         {
             var person = await peopleRepo.GetAsync<Donee>(e.SourceId!).ConfigureAwait(false);
             if (person == null)
