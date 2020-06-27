@@ -20,7 +20,7 @@ namespace NosAyudamos
 
         public async Task RunAsync(MessageReceived message, TextAnalysis analysis, Person? person)
         {
-            if (person == null || 
+            if (person == null ||
                 !(person is Donee donee))
                 return;
 

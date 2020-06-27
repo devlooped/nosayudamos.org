@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc.Internal;
 using Newtonsoft.Json;
 
 namespace NosAyudamos
@@ -17,11 +18,12 @@ namespace NosAyudamos
             string phoneNumber,
             DateTime? dateOfBirth = default,
             Sex? sex = default)
-            : base(id, firstName, lastName, phoneNumber, Role.Donee, dateOfBirth, sex)
-        {
-        }
+            : base(id, firstName, lastName, phoneNumber, Role.Donee, dateOfBirth, sex) =>
+            // Base ctor cannot invoke our parameterless ctor, so we need to 
+            // invoke same Init here
+            Init();
 
-        Donee() : base() => Handles<Requested>(OnHelpRequested);
+        Donee() : base() => Init();
 
         public Request Request(int amount, string description, string[] keywords)
         {
@@ -34,9 +36,9 @@ namespace NosAyudamos
             // TODO: validate that there isn't another ongoing request, 
             // that we're not suspended, etc.
 
-            var request = new Request(amount, description, keywords);
+            var request = new Request(Id, amount, description, keywords);
 
-            Raise(new Requested(request.Id, amount, description, keywords));
+            Raise(new Requested(request.RequestId, amount, description, keywords));
 
             return request;
         }
@@ -45,27 +47,44 @@ namespace NosAyudamos
         {
             var request = Requests.FirstOrDefault(x => x.RequestId == donation.RequestId);
             if (request == null)
-                throw new ArgumentException();
+                throw new ArgumentException("Request not found for the donation.");
 
             //if (request.)
-
         }
-
-        [JsonProperty]
-        public long TotalReceived { get; private set; }
 
         [JsonProperty]
         public long TotalRequested { get; private set; }
 
         [JsonProperty]
-        public List<RequestInfo> Requests { get; private set; } = new List<RequestInfo>();
+        public long TotalReceived { get; private set; }
 
-        void OnHelpRequested(Requested requested)
+        [JsonProperty]
+        public long TotalSpent { get; private set; }
+
+        [JsonProperty]
+        public List<RequestData> Requests { get; private set; } = new List<RequestData>();
+
+        void Init() => Handles<Requested>(OnRequested);
+
+        void OnRequested(Requested requested)
         {
             TotalRequested += requested.Amount;
-            Requests.Add(new RequestInfo(requested.RequestId, requested.Amount, requested.Description));
+            Requests.Add(new RequestData(requested.RequestId, requested.Amount, requested.Description));
         }
 
         //void OnHelpReceived(HelpReceived received) => TotalReceived += received.Amount;
+
+        public class RequestData
+        {
+            public RequestData(string requestId, int amount, string description)
+                => (RequestId, Amount, Description)
+                = (requestId, amount, description);
+            public int Amount { get; }
+            public string Description { get; }
+            public string RequestId { get; }
+            public override int GetHashCode() => (RequestId, Amount, Description).GetHashCode();
+            public override bool Equals(object obj)
+                => obj is RequestData data && data.RequestId == RequestId && data.Amount == Amount && data.Description == Description;
+        }
     }
 }
