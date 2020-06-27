@@ -73,21 +73,10 @@ namespace NosAyudamos
         [JsonConverter(typeof(StringEnumConverter))]
         public TaxStatus TaxStatus { get; private set; } = TaxStatus.Unknown;
 
-        [JsonProperty]
-        public double DonatedAmount { get; private set; }
-
         /// <summary>
         /// Whether the user has been validated for operating in the platform.
         /// </summary>
         public bool IsValidated => TaxStatus == TaxStatus.Approved || TaxStatus == TaxStatus.Validated;
-
-        public void Donate(double amount)
-        {
-            if (amount < 0)
-                throw new ArgumentException("Can only donate positive amounts.");
-
-            Raise(new Donated(amount));
-        }
 
         public void UpdatePhoneNumber(string phoneNumber)
         {
@@ -167,8 +156,6 @@ namespace NosAyudamos
         void OnRegistered(PersonRegistered e)
             => (Id, FirstName, LastName, PhoneNumber, Role, DateOfBirth, Sex)
             = (e.Id, e.FirstName, e.LastName, e.PhoneNumber, e.Role, e.DateOfBirth, e.Sex);
-
-        void OnDonated(Donated e) => DonatedAmount += e.Amount;
 
         void OnPhoneNumberUpdated(PhoneNumberUpdated e) => PhoneNumber = e.NewNumber;
 

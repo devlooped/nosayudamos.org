@@ -9,9 +9,9 @@ namespace NosAyudamos
     {
         readonly IEventStreamAsync events;
         readonly IPersonRepository peopleRepo;
-        readonly IHelpRequestRepository helpRepo;
+        readonly IRequestRepository helpRepo;
 
-        public DoneeWorkflow(IEventStreamAsync events, IPersonRepository peopleRepo, IHelpRequestRepository helpRepo)
+        public DoneeWorkflow(IEventStreamAsync events, IPersonRepository peopleRepo, IRequestRepository helpRepo)
         {
             this.events = events;
             this.peopleRepo = peopleRepo;
