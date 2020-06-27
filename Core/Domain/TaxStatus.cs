@@ -1,5 +1,8 @@
 ﻿namespace NosAyudamos
 {
+    /// <summary>
+    /// The tax status of a <see cref="Donee"/>.
+    /// </summary>
     public enum TaxStatus
     {
         /// <summary>

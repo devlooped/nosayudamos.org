@@ -3,7 +3,7 @@
 namespace NosAyudamos
 {
     /// <summary>
-    /// Maps the phone system used by a user, by phone number
+    /// Maps the phone system used by a user, by phone number.
     /// </summary>
     public class PhoneSystem
     {

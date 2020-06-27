@@ -87,11 +87,11 @@ namespace NosAyudamos
             person = await repo.GetAsync<Donor>(Constants.Donor.Id, readOnly: false);
 
             Assert.NotEmpty(person.History);
-            Assert.Equal(500, person.DonatedAmount);
+            Assert.Equal(500, person.TotalDonated);
 
             person.Donate(1000);
 
-            Assert.Equal(1500, person.DonatedAmount);
+            Assert.Equal(1500, person.TotalDonated);
             Assert.Single(person.Events);
 
             await repo.PutAsync(person);
@@ -99,7 +99,7 @@ namespace NosAyudamos
 
             // History is not loaded when creating readonly
             Assert.Empty(person.History);
-            Assert.Equal(1500, person.DonatedAmount);
+            Assert.Equal(1500, person.TotalDonated);
 
             person = await repo.GetAsync<Donor>(Constants.Donor.Id, readOnly: false);
 

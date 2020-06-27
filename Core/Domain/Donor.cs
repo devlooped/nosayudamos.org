@@ -18,12 +18,21 @@ namespace NosAyudamos
             Sex? sex = default)
             : base(id, firstName, lastName, phoneNumber, Role.Donor, dateOfBirth, sex)
         {
-            Raise(new TaxStatusApproved(Strings.Person.DonorAlwaysApproved));
         }
 
-        Donor() : base() { }
+        Donor() : base() => Handles<Donated>(OnDonated);
 
         [JsonProperty]
-        public long DonatedAmount { get; private set; }
+        public long TotalDonated { get; private set; }
+
+        public void Donate(int amount)
+        {
+            if (amount < 0)
+                throw new ArgumentException("Can only donate positive amounts.");
+
+            Raise(new Donated(amount));
+        }
+
+        void OnDonated(Donated e) => TotalDonated += e.Amount;
     }
 }
