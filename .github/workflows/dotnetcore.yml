@@ -33,7 +33,7 @@ jobs:
         "%ProgramFiles(x86)%\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe" init /server "(localdb)\MsSqlLocalDb"
         "%ProgramFiles(x86)%\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator" start
     - name: Test
-      run: dotnet test --no-restore
+      run: dotnet test --no-build -- xunit.parallelizeAssembly=false xunit.parallelizeTestCollections=false
       env:
         AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
