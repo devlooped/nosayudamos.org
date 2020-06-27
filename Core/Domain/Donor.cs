@@ -17,10 +17,9 @@ namespace NosAyudamos
             DateTime? dateOfBirth = default,
             Sex? sex = default)
             : base(id, firstName, lastName, phoneNumber, Role.Donor, dateOfBirth, sex)
-        {
-        }
+            => Init();
 
-        Donor() : base() => Handles<Donated>(OnDonated);
+        Donor() : base() => Init();
 
         [JsonProperty]
         public long TotalDonated { get; private set; }
@@ -33,6 +32,9 @@ namespace NosAyudamos
             Raise(new Donated(amount));
         }
 
+        void Init() => Handles<Donated>(OnDonated);
+
         void OnDonated(Donated e) => TotalDonated += e.Amount;
     }
 }
+

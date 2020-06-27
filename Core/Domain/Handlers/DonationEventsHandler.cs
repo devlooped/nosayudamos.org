@@ -10,9 +10,8 @@ namespace NosAyudamos
         readonly IPersonRepository people;
 
         public DonationEventsHandler(IEnvironment env, HttpClient http, IPersonRepository people)
-        {
-
-        }
+            => (this.env, this.http, this.people)
+            = (env, http, people);
 
         public Task HandleAsync(SubscriptionReceived e) => Task.CompletedTask;
 
