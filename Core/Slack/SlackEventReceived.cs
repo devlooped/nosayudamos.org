@@ -19,7 +19,7 @@ namespace NosAyudamos
             Payload = payload;
         }
 
-        [Key]
+        [RowKey]
         public string Key { get; }
         public string ChannelId { get; }
         public string EventId { get; }

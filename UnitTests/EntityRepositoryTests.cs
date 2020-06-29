@@ -49,14 +49,41 @@ namespace NosAyudamos
 
         }
 
+        [Fact]
+        public async Task WhenSavingTypeWithNoPartitionKey_ThenUsesTypeNameAsDefault()
+        {
+            var repository = await GetRepositoryAsync<TypeWithNoPartitionKey>();
+
+            await repository.PutAsync(new TypeWithNoPartitionKey { Id = "123", Value = "asdf" });
+
+            var table = GetTable();
+
+            var result = await table.ExecuteAsync(TableOperation.Retrieve(typeof(TypeWithNoPartitionKey).Name, "123"));
+
+            Assert.NotNull(result?.Result);
+        }
+
+        class TypeWithNoPartitionKey
+        {
+            [RowKey]
+            public string Id { get; set; }
+            public string Value { get; set; }
+        }
+
+
         async Task<EntityRepository<T>> GetRepositoryAsync<T>([CallerMemberName] string tableName = null) where T : class
         {
-            var tableClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient();
-            var table = tableClient.GetTableReference(tableName);
-
+            var table = GetTable(tableName);
             await table.DeleteIfExistsAsync();
             tableNames.Add(tableName);
             return new EntityRepository<T>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer(), tableName);
+        }
+
+        static CloudTable GetTable([CallerMemberName] string tableName = null)
+        {
+            var tableClient = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient();
+            var table = tableClient.GetTableReference(tableName);
+            return table;
         }
 
         List<string> tableNames = new List<string>();
@@ -73,7 +100,7 @@ namespace NosAyudamos
 
         class NestedType
         {
-            [Key]
+            [RowKey]
             public string Id { get; set; }
             public int IntProp { get; set; }
             public string StringProp { get; set; }

@@ -13,9 +13,15 @@ namespace NosAyudamos
     {
         ConcurrentDictionary<string, T> values = new ConcurrentDictionary<string, T>();
 
+        public Task DeleteAsync(string rowKey)
+        {
+            values.TryRemove(rowKey, out _);
+            return Task.CompletedTask;
+        }
+
         public Task DeleteAsync(T entity)
         {
-            values.TryRemove(GetKey(entity), out _);
+            values.TryRemove(GetRowKey(entity), out _);
             return Task.CompletedTask;
         }
 
@@ -28,9 +34,9 @@ namespace NosAyudamos
             }
         }
 
-        public Task<T> GetAsync(string key)
+        public Task<T> GetAsync(string rowKey)
         {
-            if (values.TryGetValue(key, out var value))
+            if (values.TryGetValue(rowKey, out var value))
                 return Task.FromResult(value);
 
             return Task.FromResult<T>(default);
@@ -38,25 +44,22 @@ namespace NosAyudamos
 
         public Task<T> PutAsync(T entity)
         {
-            values[GetKey(entity)] = entity;
+            values[GetRowKey(entity)] = entity;
             return Task.FromResult(entity);
         }
 
-        static string GetKey(T entity)
+        static string GetRowKey(T entity)
         {
-            // TODO: maybe we can support composite keys by allowing more than 
-            // one [Key]-annotated property?
-
             var idProp = typeof(T).GetProperties()
                 .FirstOrDefault(prop => prop.GetCustomAttribute<KeyAttribute>() != null)
-                ?? throw new ArgumentException("Entity must have one property annotated with [Key]");
+                ?? throw new ArgumentException("Entity must have one property annotated with [RowKey]");
 
             if (idProp.PropertyType != typeof(string))
-                throw new ArgumentException("Property annotated with [Key] must be of type string.");
+                throw new ArgumentException("Property annotated with [RowKey] must be of type string.");
 
             var id = (string)idProp.GetValue(entity);
             if (string.IsNullOrEmpty(id))
-                throw new ArgumentException($"Key property {idProp.Name} cannot be null or empty.");
+                throw new ArgumentException($"RowKey property {idProp.Name} cannot be null or empty.");
 
             return id;
         }

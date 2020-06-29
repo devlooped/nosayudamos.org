@@ -13,7 +13,7 @@ namespace NosAyudamos
             SystemNumber = systemNumber;
         }
 
-        [Key]
+        [RowKey]
         public string UserNumber { get; set; }
         public string SystemNumber { get; set; }
 
