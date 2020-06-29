@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace NosAyudamos
+﻿namespace NosAyudamos
 {
     /// <summary>
     /// Maps the phone system used by a user, by phone number.

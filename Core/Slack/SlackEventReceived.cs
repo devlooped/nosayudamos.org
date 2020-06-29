@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace NosAyudamos
+﻿namespace NosAyudamos
 {
     /// <summary>
     /// Represents a Slack Event Subscription callback, turned into an entity so that 
