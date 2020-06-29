@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Streamstone;
 using Microsoft.Azure.Cosmos.Table;
 using System.Threading.Tasks;

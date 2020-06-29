@@ -14,7 +14,7 @@ namespace NosAyudamos
             => (PhoneNumber, ThreadId, LastUpdated)
             = (phoneNumber, threadId, lastUpdated);
 
-        [Key]
+        [RowKey]
         public string PhoneNumber { get; }
         public string ThreadId { get; }
         public DateTime LastUpdated { get; }

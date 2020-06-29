@@ -20,7 +20,7 @@ namespace NosAyudamos
 
         public class Foo
         {
-            [Key]
+            [RowKey]
             public string Id { get; set; }
             public string Value { get; set; }
         }

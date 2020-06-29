@@ -9,7 +9,7 @@ namespace NosAyudamos
     {
         public ValidateTaxStatus(string personId) => PersonId = personId;
 
-        [Key]
+        [RowKey]
         public string PersonId { get; }
     }
 
