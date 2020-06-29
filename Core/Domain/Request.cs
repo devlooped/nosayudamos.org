@@ -1,5 +1,4 @@
 ﻿#pragma warning disable CS8618 // Non-nullable field is uninitialized. The pattern is intentional for an event-sourced domain object.
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
