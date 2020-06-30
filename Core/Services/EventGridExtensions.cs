@@ -31,7 +31,7 @@ namespace NosAyudamos
 
             return new EventGridEvent
             {
-                Id = metadata?.EventId ?? Guid.NewGuid().ToString(),
+                Id = metadata?.EventId ?? Guid.NewGuid().ToString("n"),
                 Subject = metadata?.Subject ?? data.GetType().Namespace,
                 // Unless the object itself provides a different default, 
                 // like DomainEvent does, we send everything to the System 
@@ -66,7 +66,7 @@ namespace NosAyudamos
 
             return new EventGridEventEntity
             {
-                RowKey = metadata?.EventId ?? Guid.NewGuid().ToString(),
+                RowKey = metadata?.EventId ?? Guid.NewGuid().ToString("n"),
                 Data = serializer.Serialize(data),
                 DataVersion = data.GetType().Assembly.GetName().Version?.ToString(2) ?? "1.0",
                 EventTime = data.EventTime,
