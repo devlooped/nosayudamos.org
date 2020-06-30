@@ -15,6 +15,7 @@ using System.Runtime.CompilerServices;
 using System.IO;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.VisualStudio.Threading;
+using Microsoft.Extensions.Logging;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -24,9 +25,6 @@ namespace NosAyudamos
     {
         public void Configure(IWebJobsBuilder builder)
         {
-            // non-testable services are registered here.
-            builder.Services.AddApplicationInsightsTelemetry();
-
             // testable service registrations in the test-invoked method.
 #pragma warning disable CA2000 // Dispose objects before losing scope
             Configure(builder.Services, new Environment());
@@ -47,30 +45,27 @@ namespace NosAyudamos
                 .MinimumLevel.Override("Host", LogEventLevel.Warning)
                 .MinimumLevel.Override("Function", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Azure", LogEventLevel.Warning)
-                .Enrich.FromLogContext()
-                .WriteTo.Console();
+                .Enrich.FromLogContext();
 
             var seqUrl = env.GetVariable("SeqUrl", default(string));
             if (!string.IsNullOrEmpty(seqUrl))
                 config.WriteTo.Seq(seqUrl);
 
-            if (env.IsTesting())
+            if (!env.IsDevelopment())
             {
-                if (File.Exists("log.txt"))
-                {
-                    try
-                    {
-                        File.Delete("log.txt");
-                    }
-                    catch (IOException) { }
-                }
-
-                config.MinimumLevel.Verbose()
-                    .WriteTo.File("log.txt");
+                //Add ApplicationInsights in production only
+                services.AddLogging(builder => builder.AddApplicationInsights(env.GetVariable("ApplicationInsightsKey")));
+                services.AddApplicationInsightsTelemetry(env.GetVariable("ApplicationInsightsKey"));
+            }
+            else
+            {
+                //Add Serilog (Console) in development and testing
+                config.WriteTo.Console();
             }
 
             if (!env.IsTesting())
             {
+                //Add Serilog (Slack) in production and development
                 config.WriteTo.Logger(lc => lc.Filter
                      .ByIncludingOnly(e => e.Properties.ContainsKey("Category"))
                      .WriteTo.Slack(new SlackSinkOptions
@@ -85,10 +80,8 @@ namespace NosAyudamos
 
             var logger = config.CreateLogger();
 
-            Log.Information(Strings.Startup.Starting);
+            services.AddLogging(builder => builder.AddSerilog(logger));
 
-            services.AddSingleton<ILogger>(logger);
-            services.AddLogging(lb => lb.AddSerilog(logger));
             services.AddSingleton(env);
 
             // DI conventions are:

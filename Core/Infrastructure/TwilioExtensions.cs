@@ -18,7 +18,7 @@ namespace NosAyudamos
         /// <summary>
         /// Validates the Twilio signature of the request.
         /// </summary>
-        public static bool IsTwilioSigned(this HttpRequest http, string body)
+        public static bool IsTwilioSigned(this HttpRequest http, IEnvironment environment, string body)
         {
             if (!http.IsTwilioRequest())
                 throw new ArgumentException("Request did not come from Twilio. Cannot verify its signature.", nameof(http));
@@ -31,7 +31,7 @@ namespace NosAyudamos
             }
 
             var signature = values[0];
-            var token = Ensure.NotEmpty(System.Environment.GetEnvironmentVariable("TwilioAuthToken"), "TwilioAuthToken");
+            var token = environment.GetVariable("TwilioAuthToken");
 
             if (signature == token)
                 return true;

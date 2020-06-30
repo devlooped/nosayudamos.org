@@ -17,7 +17,7 @@ namespace NosAyudamos
             => (this.registry, this.env)
             = (registry, env);
 
-        public async Task SendTextAsync(string body, string to)
+        public async Task SendTextAsync(string to, string body)
         {
             if (!initialized)
             {

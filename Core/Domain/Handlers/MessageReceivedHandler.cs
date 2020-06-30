@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace NosAyudamos
 {
@@ -11,7 +11,7 @@ namespace NosAyudamos
     /// </summary>
     class MessageReceivedHandler : IEventHandler<MessageReceived>
     {
-        readonly ILogger log;
+        readonly ILogger<MessageReceivedHandler> log;
         readonly IPersonRepository peopleRepo;
         readonly ILanguageUnderstanding language;
         readonly ITextAnalyzer textAnalyzer;
@@ -19,7 +19,7 @@ namespace NosAyudamos
         readonly IWorkflowSelector selector;
 
         public MessageReceivedHandler(
-            ILogger log,
+            ILogger<MessageReceivedHandler> log,
             IPersonRepository peopleRepo,
             ILanguageUnderstanding language,
             ITextAnalyzer textAnalyzer,
@@ -30,7 +30,7 @@ namespace NosAyudamos
 
         public async Task HandleAsync(MessageReceived message)
         {
-            log.Verbose("{@Message:j}", message);
+            log.LogInformation("{@Message:j}", message);
 
             var phoneSystem = await phoneDir.GetAsync(message.PhoneNumber).ConfigureAwait(false);
             if (phoneSystem == null)
