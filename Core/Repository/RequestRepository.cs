@@ -16,13 +16,13 @@ namespace NosAyudamos
         /// </summary>
         Task<Request> PutAsync(Request request);
         /// <summary>
-        /// Retrieves an existing help request from its <paramref name="id"/>.
+        /// Retrieves an existing help request from its <paramref name="requestId"/>.
         /// </summary>
-        /// <param name="id">The identifier for the request.</param>
+        /// <param name="requestId">The identifier for the request.</param>
         /// <param name="readOnly">If <see langword="true"/>, will only return the last-known state for the help request, 
         /// rather than loading its history too, and no mutation operations will be allowed on it.</param>
-        /// <returns>The stored help request or <see langword="null"/> if none was found with the given <paramref name="id"/>.</returns>
-        Task<Request?> GetAsync(string id, bool readOnly = true);
+        /// <returns>The stored help request or <see langword="null"/> if none was found with the given <paramref name="requestId"/>.</returns>
+        Task<Request?> GetAsync(string requestId, bool readOnly = true);
     }
 
     class RequestRepository : IRequestRepository
@@ -34,6 +34,35 @@ namespace NosAyudamos
         public RequestRepository(ISerializer serializer, CloudStorageAccount storageAccount)
             => (this.serializer, this.storageAccount)
             = (serializer, storageAccount);
+
+        public async Task<Request?> GetAsync(string requestId, bool readOnly = true)
+        {
+            if (string.IsNullOrEmpty(requestId))
+                return default;
+
+            if (readOnly)
+            {
+                var header = await GetAsync<DataEntity>(requestId, typeof(Request).FullName!).ConfigureAwait(false);
+                if (header == null)
+                    return default;
+
+                if (header.Data == null)
+                    throw new ArgumentException(Strings.DomainRepository.EmptyData);
+
+                return serializer.Deserialize<Request>(header.Data);
+            }
+
+            var table = await GetTableAsync();
+            var partition = new Partition(table, requestId);
+            var existent = await Stream.TryOpenAsync(partition);
+            if (!existent.Found)
+                return default;
+
+            var events = (await Stream.ReadAsync<DomainEventEntity>(partition))
+                .Events.Select(e => e.ToDomainEvent(serializer)).ToList();
+
+            return new Request(events) { Version = existent.Stream.Version };
+        }
 
         public async Task<Request> PutAsync(Request request)
         {
@@ -50,35 +79,6 @@ namespace NosAyudamos
             request.AcceptEvents();
 
             return request;
-        }
-
-        public async Task<Request?> GetAsync(string id, bool readOnly = true)
-        {
-            if (string.IsNullOrEmpty(id))
-                return default;
-
-            if (readOnly)
-            {
-                var header = await GetAsync<DataEntity>(id, typeof(Request).FullName!).ConfigureAwait(false);
-                if (header == null)
-                    return default;
-
-                if (header.Data == null)
-                    throw new ArgumentException(Strings.DomainRepository.EmptyData);
-
-                return serializer.Deserialize<Request>(header.Data);
-            }
-
-            var table = await GetTableAsync();
-            var partition = new Partition(table, id);
-            var existent = await Stream.TryOpenAsync(partition);
-            if (!existent.Found)
-                return default;
-
-            var events = (await Stream.ReadAsync<DomainEventEntity>(partition))
-                .Events.Select(e => e.ToDomainEvent(serializer)).ToList();
-
-            return new Request(events) { Version = existent.Stream.Version };
         }
 
         async Task<T> GetAsync<T>(string partitionKey, string rowKey) where T : class, ITableEntity, new()

@@ -145,6 +145,7 @@ namespace NosAyudamos
             services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
             services.AddScoped(typeof(ITableRepository<>), typeof(TableRepository<>));
             services.Decorate<IPersonRepository, EventGridPersonRepository>();
+            services.Decorate<IRequestRepository, EventGridRequestRepository>();
 
 #pragma warning disable CA2000 // Dispose objects before losing scope: This factory is intended to live for the duration of the app.
             var jtc = new JoinableTaskContext();
