@@ -36,7 +36,7 @@ namespace NosAyudamos
                         Fields = new List<TextObject>
                         {
                             new TextObject($":rejected: {person.PhoneNumber}") { Emoji = true },
-                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/{person.Id}|CUIT sin Monotributo>")
+                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/{person.PersonId}|CUIT sin Monotributo>")
                             {
                                 Type = TextObject.TextType.Markdown
                             },
@@ -57,7 +57,7 @@ namespace NosAyudamos
                         Fields = new List<TextObject>
                         {
                             new TextObject($":rejected: {person.PhoneNumber}") { Emoji = true },
-                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/{person.Id}|CUIT paga ganancias>")
+                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/{person.PersonId}|CUIT paga ganancias>")
                             {
                                 Type = TextObject.TextType.Markdown
                             },
@@ -78,7 +78,7 @@ namespace NosAyudamos
                         Fields = new List<TextObject>
                         {
                             new TextObject($":rejected: {person.PhoneNumber}") { Emoji = true },
-                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/{person.Id}|Monotributo categoría D>")
+                            new TextObject($"{person.FirstName} {person.LastName} ({person.Age}), <https://www.cuitonline.com/constancia/inscripcion/{person.PersonId}|Monotributo categoría D>")
                             {
                                 Type = TextObject.TextType.Markdown
                             },

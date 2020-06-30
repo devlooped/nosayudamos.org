@@ -1,23 +1,27 @@
 ﻿#pragma warning disable CS8618 // Non-nullable field is uninitialized. The pattern is intentional for an event-sourced domain object.
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace NosAyudamos
 {
-    class Request : DomainObject
+    class Request : DomainObject, IIdentifiable
     {
+        string requestId;
+
         public Request(IEnumerable<DomainEvent> history)
             : this() => Load(history);
 
         public Request(
             string personId,
+            int personVersion,
             int amount,
             string description,
-            string[] keywords)
+            string[]? keywords = default)
             : this()
         {
             IsReadOnly = false;
-            Raise(new RequestCreated(personId, amount, description, keywords));
+            Raise(new RequestCreated(personId, amount, description, keywords, personVersion: personVersion));
         }
 
         Request()
@@ -26,15 +30,32 @@ namespace NosAyudamos
             Handles<RequestReplied>(OnReplied);
         }
 
+        /// <summary>
+        /// The <see cref="RequestId"/> is sufficiently unique, since it 
+        /// contains both the <see cref="PersonId"/> in addition to the request 
+        /// identifier itself, so we can safely use that to generate unique 
+        /// event identifiers.
+        /// </summary>
+        string IIdentifiable.Id => RequestId;
+
         // NOTE: the [JsonProperty] attributes allow the deserialization from 
         // JSON to be able to set the properties when loading from the last  
         // saved known snapshot state.
 
-        [JsonProperty]
+        [JsonIgnore]
         public string PersonId { get; private set; }
 
         [JsonProperty]
-        public string RequestId { get; private set; }
+        public string RequestId
+        {
+            get => requestId;
+            private set
+            {
+                requestId = value;
+                // By setting this via the setter, we can avoid serializing the PersonId explicitly.
+                PersonId = requestId.Substring(0, requestId.IndexOf('-', StringComparison.Ordinal));
+            }
+        }
 
         /// <summary>
         /// The requested amount.
@@ -59,8 +80,8 @@ namespace NosAyudamos
             => Raise(new RequestReplied(senderId, message));
 
         void OnCreated(RequestCreated created)
-            => (PersonId, RequestId, Amount, Description, Keywords)
-            = (created.PersonId, created.RequestId, created.Amount, created.Description, created.Keywords);
+            => (RequestId, Amount, Description, Keywords)
+            = (created.RequestId, created.Amount, created.Description, created.Keywords);
 
         void OnReplied(RequestReplied reply)
             => Messages.Add(new MessageData(reply.SenderId, reply.Message));

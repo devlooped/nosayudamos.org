@@ -5,17 +5,17 @@ namespace NosAyudamos
     public class PersonRegistered : DomainEvent
     {
         public PersonRegistered(
-            string id,
+            string personId,
             string firstName,
             string lastName,
             string phoneNumber,
             Role role,
             DateTime? dateOfBirth,
             Sex? sex)
-            => (Id, FirstName, LastName, PhoneNumber, Role, DateOfBirth, Sex)
-            = (id, firstName, lastName, phoneNumber, role, dateOfBirth, sex);
+            => (PersonId, FirstName, LastName, PhoneNumber, Role, DateOfBirth, Sex)
+            = (personId, firstName, lastName, phoneNumber, role, dateOfBirth, sex);
 
-        public string Id { get; }
+        public string PersonId { get; }
         public string FirstName { get; }
         public string LastName { get; }
         public string PhoneNumber { get; }

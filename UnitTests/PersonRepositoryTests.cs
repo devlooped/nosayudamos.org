@@ -69,7 +69,7 @@ namespace NosAyudamos
 
             Assert.False(person.IsReadOnly);
 
-            Assert.Equal(expected.Id, person.Id);
+            Assert.Equal(expected.PersonId, person.PersonId);
             Assert.Equal(expected.FirstName, person.FirstName);
             Assert.Equal(expected.LastName, person.LastName);
             Assert.Equal(expected.PhoneNumber, person.PhoneNumber);

@@ -76,7 +76,7 @@ namespace NosAyudamos
 
         public async Task<TaxId?> RecognizeAsync(Person person)
         {
-            var tax = await LookupAsync(person.Id);
+            var tax = await LookupAsync(person.PersonId);
 
             // If we got something from the quick lookup that can be sufficient to 
             // approve/deny status quickly, shortcircuit.
@@ -87,7 +87,7 @@ namespace NosAyudamos
             if (tax.Kind == TaxIdKind.CUIL)
                 return tax;
 
-            var taxId = TaxId.FromNationalId(person.Id, person.Sex);
+            var taxId = TaxId.FromNationalId(person.PersonId, person.Sex);
 
             var xml = await PostFormAsync(new Dictionary<string, string>
             {

@@ -12,7 +12,7 @@ public static class Base62
     /// <summary>
     /// Encodes a numeric value into a base62 string.
     /// </summary>
-    public static string Encode(int value)
+    public static string Encode(long value)
     {
         // TODO: I'm almost sure there's a more succint way 
         // of doing this with LINQ and Aggregate, but just 
@@ -31,18 +31,18 @@ public static class Base62
     /// <summary>
     /// Decodes a base62 string into its original numeric value.
     /// </summary>
-    public static int Decode(string value)
-        => value.Aggregate(0, (current, c) => current * 62 + FromBase62(c));
+    public static long Decode(string value)
+        => value.Aggregate(0L, (current, c) => current * 62 + FromBase62(c));
 
-    static char ToBase62(int d) => d switch
+    static char ToBase62(long d) => d switch
     {
-        int v when v < 10 => (char)('0' + d),
-        int v when v < 36 => (char)('A' + d - 10),
-        int v when v < 62 => (char)('a' + d - 36),
+        long v when v < 10 => (char)('0' + d),
+        long v when v < 36 => (char)('A' + d - 10),
+        long v when v < 62 => (char)('a' + d - 36),
         _ => throw new ArgumentException($"Cannot encode digit {d} to base 62.", nameof(d)),
     };
 
-    static int FromBase62(char c) => c switch
+    static long FromBase62(char c) => c switch
     {
         char v when c >= 'a' && v <= 'z' => 36 + c - 'a',
         char v when c >= 'A' && v <= 'Z' => 10 + c - 'A',

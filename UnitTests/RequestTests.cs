@@ -9,10 +9,16 @@ namespace NosAyudamos
     public class RequestTests
     {
         public RequestTests()
-            => CloudStorageAccount
+        {
+            CloudStorageAccount
                 .DevelopmentStorageAccount
                 .CreateCloudTableClient()
                 .GetTableReference(nameof(Request)).DeleteIfExists();
+            CloudStorageAccount
+                .DevelopmentStorageAccount
+                .CreateCloudTableClient()
+                .GetTableReference(nameof(Person)).DeleteIfExists();
+        }
 
         [Fact]
         public async Task WhenDoneeRequestsHelp_ThenRequestIsCreated()
@@ -55,7 +61,7 @@ namespace NosAyudamos
         {
             var requests = new RequestRepository(new Serializer(), CloudStorageAccount.DevelopmentStorageAccount);
 
-            var request = new Request(Constants.Donee.Id, 1000, "Necesito 1000 para supermercado", Array.Empty<string>());
+            var request = new Request(Constants.Donee.Id, 0, 1000, "Necesito 1000 para supermercado");
 
             await requests.PutAsync(request);
 
