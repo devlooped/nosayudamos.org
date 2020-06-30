@@ -83,6 +83,21 @@ namespace NosAyudamos
         }
     }
 
+    public class DurableActionEntity
+    {
+        public DurableActionEntity(string action, string id, int attempts = 0)
+            => (Action, Id, Attempts)
+            = (action, id, attempts);
+
+        [PartitionKey]
+        public string Action { get; private set; }
+
+        [RowKey]
+        public string Id { get; private set; }
+
+        public int Attempts { get; set; } = 1;
+    }
+
     interface IDurableAction
     {
         Task<TResult> ExecuteAsync<TResult>(

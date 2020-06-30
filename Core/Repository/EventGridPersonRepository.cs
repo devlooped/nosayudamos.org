@@ -7,7 +7,9 @@ namespace NosAyudamos
     /// A decorator of <see cref="IPersonRepository"/> that pushes 
     /// events from changes in domain objects to EventGrid.
     /// </summary>
-    // We make it non-discoverable since we register it as a decorator instead.
+    /// <devdoc>
+    /// We make it non-discoverable since we register it as a decorator instead.
+    /// </devdoc>
     [NoExport]
     class EventGridPersonRepository : IPersonRepository
     {

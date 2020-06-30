@@ -5,7 +5,7 @@ using Streamstone;
 
 namespace NosAyudamos
 {
-    static class DomainRepositoryExtensions
+    static class DomainExtensions
     {
         public static DomainEvent ToDomainEvent(this DomainEventEntity entity, ISerializer serializer)
         {
@@ -23,6 +23,7 @@ namespace NosAyudamos
             e.EventId = entity.EventId ?? Guid.NewGuid().ToString("n");
             e.Version = entity.Version;
             e.EventTime = entity.Timestamp.UtcDateTime;
+
             return e;
         }
 
