@@ -12,7 +12,7 @@ namespace NosAyudamos
             var container = new FeatureContainer();
             var repo = container.Resolve<IEntityRepository<Foo>>();
 
-            container.Resolve<IRepository<Foo>>();
+            container.Resolve<ITableRepository<Foo>>();
 
             await repo.PutAsync(new Foo { Id = "Bar", Value = "Baz" });
         }

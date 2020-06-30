@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace NosAyudamos
 {
-    class TestRepository<T> : IRepository<T> where T : class
+    class TestRepository<T> : ITableRepository<T> where T : class
     {
         static readonly Func<T, string> getPartitionKey = PartitionKeyAttribute.CreateAccessor<T>();
         static readonly Func<T, string> getRowKey = RowKeyAttribute.CreateAccessor<T>();
