@@ -46,7 +46,7 @@ namespace NosAyudamos
         public async Task<TPerson> PutAsync<TPerson>(TPerson person) where TPerson : Person
         {
             var table = await GetTableAsync();
-            var existing = await GetAsync<TPerson>(person.Id, readOnly: true).ConfigureAwait(false);
+            var existing = await GetAsync<TPerson>(person.PersonId, readOnly: true).ConfigureAwait(false);
 
             // First check if the person changed phone numbers since our last interaction
             if (existing != null && existing.PhoneNumber != person.PhoneNumber)
@@ -63,13 +63,13 @@ namespace NosAyudamos
 
             await table.ExecuteAsync(
                 TableOperation.InsertOrReplace(
-                    new PhoneIdMap(person.PhoneNumber, person.Id!, person.Role))).ConfigureAwait(false);
+                    new PhoneIdMap(person.PhoneNumber, person.PersonId!, person.Role))).ConfigureAwait(false);
 
-            var partition = new Partition(table, person.Id!);
+            var partition = new Partition(table, person.PersonId!);
             var result = await Stream.TryOpenAsync(partition);
             var stream = result.Found ? result.Stream : new Stream(partition);
-            var header = DataEntity.Create(person.Id!, person, serializer);
-            header.Version = stream.Version + person.Events.Count();
+            var header = DataEntity.Create(person.PersonId!, person, serializer);
+            header.Version = stream.Version + person.Events.Count;
 
             await Stream.WriteAsync(partition, person.Version, person.Events.Select((e, i) =>
                 e.ToEventData(stream.Version + i, header)).ToArray());
@@ -117,8 +117,8 @@ namespace NosAyudamos
 
             return mapEntity == null ? default :
                 mapEntity.Role == Role.Donee
-                ? (Person?)await GetAsync<Donee>(mapEntity.NationalId, readOnly).ConfigureAwait(false)
-                : await GetAsync<Donor>(mapEntity.NationalId, readOnly).ConfigureAwait(false);
+                ? (Person?)await GetAsync<Donee>(mapEntity.PersonId, readOnly).ConfigureAwait(false)
+                : await GetAsync<Donor>(mapEntity.PersonId, readOnly).ConfigureAwait(false);
         }
 
         Task<T> GetAsync<T>(string partitionKey) where T : class, ITableEntity, new()
@@ -151,15 +151,15 @@ namespace NosAyudamos
         {
             public PhoneIdMap() { }
 
-            public PhoneIdMap(string phoneNumber, string nationalId, Role role)
+            public PhoneIdMap(string phoneNumber, string personId, Role role)
             {
                 PartitionKey = phoneNumber;
                 RowKey = "NosAyudamos.PhoneIdMap";
-                NationalId = nationalId;
+                PersonId = personId;
                 Role = role;
             }
 
-            public string NationalId { get; set; } = "";
+            public string PersonId { get; set; } = "";
 
             public Role Role { get; set; } = Role.Donee;
         }

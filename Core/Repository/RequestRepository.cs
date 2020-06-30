@@ -71,7 +71,7 @@ namespace NosAyudamos
             var result = await Stream.TryOpenAsync(partition);
             var stream = result.Found ? result.Stream : new Stream(partition);
             var header = DataEntity.Create(request.RequestId!, request, serializer);
-            header.Version = stream.Version + request.Events.Count();
+            header.Version = stream.Version + request.Events.Count;
 
             await Stream.WriteAsync(partition, request.Version, request.Events.Select((e, i) =>
                 e.ToEventData(stream.Version + i, header)).ToArray());

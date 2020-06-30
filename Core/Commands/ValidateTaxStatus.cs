@@ -58,7 +58,7 @@ namespace NosAyudamos
         {
             if (e.Role == Role.Donee)
             {
-                var command = new ValidateTaxStatus(e.Id);
+                var command = new ValidateTaxStatus(e.PersonId);
                 // Persist the command so we can delete it when validation completes.
                 await entityRepo.PutAsync(command);
                 // Attempt initial validation right-away, inline with the raised event.

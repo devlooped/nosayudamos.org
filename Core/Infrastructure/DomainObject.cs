@@ -1,9 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Newtonsoft.Json;
 
 namespace NosAyudamos
 {
+    /// <summary>
+    /// If the <see cref="DomainObject"/>-derived type implements this 
+    /// interface, the <see cref="DomainEvent.EventId"/> can be made friendlier 
+    /// and much shorter instead of being <see cref="Guid"/>, since the 
+    /// uniqueness can be guaranteed by compunding it with the <see cref="PersonId"/>
+    /// provided by the domain object.
+    /// </summary>
+    interface IIdentifiable
+    {
+        string Id { get; }
+    }
+
     abstract class DomainObject
     {
         Dictionary<Type, Action<DomainEvent>> handlers = new Dictionary<Type, Action<DomainEvent>>();
@@ -15,7 +28,7 @@ namespace NosAyudamos
         // as a list of events.
         [System.Text.Json.Serialization.JsonIgnore]
         [JsonIgnore]
-        public IEnumerable<DomainEvent> Events => events ??= new List<DomainEvent>();
+        public IReadOnlyList<DomainEvent> Events => events ??= new List<DomainEvent>();
 
         /// <summary>
         /// When the domain object is loaded from history, provides access to 
@@ -23,7 +36,7 @@ namespace NosAyudamos
         /// </summary>
         [System.Text.Json.Serialization.JsonIgnore]
         [JsonIgnore]
-        public IEnumerable<DomainEvent> History => history ??= new List<DomainEvent>();
+        public IReadOnlyList<DomainEvent> History => history ??= new List<DomainEvent>();
 
         /// <summary>
         /// Whether the domain object was created in a readonly manner, meaning 
@@ -76,13 +89,38 @@ namespace NosAyudamos
             if (IsReadOnly)
                 throw new InvalidOperationException(Strings.DomainObject.ReadOnly);
 
+            events ??= new List<DomainEvent>();
+
+            var identifiable = this as IIdentifiable;
+            var idSet = false;
+
+            // If we can avoid it, let's try to create a friendlier and 
+            // shorter identifier than a Guid (which is already created by default otherwise)
+            // Note: we pad to 10 digits for consistency with StreamStone and because it seems 
+            // large enough for a single root object entity.
+            if (identifiable != null && 
+                !string.IsNullOrEmpty(identifiable.Id))
+            {
+                e.EventId = identifiable.Id + '-' + (Version + events.Count + 1).ToString(CultureInfo.InvariantCulture).PadLeft(10, '0');
+                idSet = true;
+            }
+
             // NOTE: we don't fail for generated events that don't have a handler 
             // because those just mean they are events important to the domain, but 
             // that don't cause state changes to the current domain object.
             if (handlers.TryGetValue(e.GetType(), out var handler))
                 handler(e);
 
-            events ??= new List<DomainEvent>();
+            // It's typical during the initial ctor-called Raise to not have the Id property 
+            // set yet, which would have been done in the handler instead, so set it right-after.
+            // NOTE: this might cause handlers that consume the EventId to be out of sync, but 
+            // that would be a quite unusal usage of the event sourced events anyway.
+            if (!idSet && 
+                identifiable != null)
+            {
+                e.EventId = identifiable.Id + '-' + (Version + events.Count + 1).ToString(CultureInfo.InvariantCulture).PadLeft(10, '0');
+            }
+
             events.Add(e);
         }
 

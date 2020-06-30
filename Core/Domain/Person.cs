@@ -6,13 +6,13 @@ using Newtonsoft.Json.Converters;
 
 namespace NosAyudamos
 {
-    abstract class Person : DomainObject
+    abstract class Person : DomainObject, IIdentifiable
     {
         public Person(IEnumerable<DomainEvent> history)
             : this() => Load(history);
 
         protected internal Person(
-            string id,
+            string personId,
             string firstName,
             string lastName,
             string phoneNumber,
@@ -22,8 +22,7 @@ namespace NosAyudamos
             : this()
         {
             IsReadOnly = false;
-            // TODO: validate args.
-            Raise(new PersonRegistered(id, firstName, lastName, phoneNumber, role, dateOfBirth, sex));
+            Raise(new PersonRegistered(personId, firstName, lastName, phoneNumber, role, dateOfBirth, sex));
         }
 
         protected internal Person()
@@ -39,8 +38,10 @@ namespace NosAyudamos
         // JSON to be able to set the properties when loading from the last  
         // saved known snapshot state.
 
+        string IIdentifiable.Id => PersonId;
+
         [JsonProperty]
-        public string Id { get; private set; }
+        public string PersonId { get; private set; }
 
         [JsonProperty]
         public string FirstName { get; private set; }
@@ -154,8 +155,8 @@ namespace NosAyudamos
         }
 
         void OnRegistered(PersonRegistered e)
-            => (Id, FirstName, LastName, PhoneNumber, Role, DateOfBirth, Sex)
-            = (e.Id, e.FirstName, e.LastName, e.PhoneNumber, e.Role, e.DateOfBirth, e.Sex);
+            => (PersonId, FirstName, LastName, PhoneNumber, Role, DateOfBirth, Sex)
+            = (e.PersonId, e.FirstName, e.LastName, e.PhoneNumber, e.Role, e.DateOfBirth, e.Sex);
 
         void OnPhoneNumberUpdated(PhoneNumberUpdated e) => PhoneNumber = e.NewNumber;
 

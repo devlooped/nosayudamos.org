@@ -21,8 +21,8 @@ namespace NosAyudamos
 
         public Task<TPerson> PutAsync<TPerson>(TPerson person) where TPerson : Person
         {
-            phoneIdMap[person.PhoneNumber] = (person.Id, person.Role);
-            people[person.Id] = person;
+            phoneIdMap[person.PhoneNumber] = (person.PersonId, person.Role);
+            people[person.PersonId] = person;
             return Task.FromResult(person);
         }
     }
