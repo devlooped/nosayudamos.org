@@ -14,11 +14,13 @@ namespace NosAyudamos.Http
     class Twilio
     {
         readonly IEventStreamAsync events;
+        readonly IEnvironment environment;
         readonly ILogger<Twilio> logger;
 
-        public Twilio(IEventStreamAsync events, ILogger<Twilio> logger)
+        public Twilio(IEventStreamAsync events, IEnvironment environment, ILogger<Twilio> logger)
         {
             this.events = events;
+            this.environment = environment;
             this.logger = logger;
         }
 
@@ -29,7 +31,7 @@ namespace NosAyudamos.Http
             var raw = await reader.ReadToEndAsync();
             var body = WebUtility.UrlDecode(raw);
 
-            if (req.IsTwilioRequest() && !req.IsTwilioSigned(raw))
+            if (req.IsTwilioRequest() && !req.IsTwilioSigned(environment, raw))
             {
                 logger.LogWarning("Received callback came from Twilio but is not properly signed.");
                 return new BadRequestResult();
