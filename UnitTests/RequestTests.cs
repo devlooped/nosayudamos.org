@@ -14,14 +14,10 @@ namespace NosAyudamos
                 .DevelopmentStorageAccount
                 .CreateCloudTableClient()
                 .GetTableReference(nameof(Request)).DeleteIfExists();
-            CloudStorageAccount
-                .DevelopmentStorageAccount
-                .CreateCloudTableClient()
-                .GetTableReference(nameof(Person)).DeleteIfExists();
         }
 
         [Fact]
-        public async Task WhenDoneeRequestsHelp_ThenRequestIsCreated()
+        public void WhenDoneeRequestsHelp_ThenRequestIsCreated()
         {
             var person = Constants.Donee.Create();
             person.ApproveTaxStatus("kzu");
@@ -48,12 +44,6 @@ namespace NosAyudamos
             Assert.Equal(requested.Amount, created.Amount);
             Assert.Equal(requested.Description, created.Description);
             Assert.Equal(requested.Keywords, created.Keywords);
-
-            var people = new PersonRepository(new Serializer(), CloudStorageAccount.DevelopmentStorageAccount);
-            var requests = new RequestRepository(new Serializer(), CloudStorageAccount.DevelopmentStorageAccount);
-
-            await people.PutAsync(person);
-            await requests.PutAsync(request);
         }
 
         [Fact]
