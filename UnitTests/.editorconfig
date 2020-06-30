@@ -1,10 +1,10 @@
 [*.cs]
 
 # Default severity for analyzer diagnostics with category 'Design'
-dotnet_analyzer_diagnostic.category-Design.severity = info
+dotnet_analyzer_diagnostic.category-Design.severity = none
 
 # Default severity for all analyzer diagnostics
-dotnet_analyzer_diagnostic.severity = info
+dotnet_analyzer_diagnostic.severity = none
 
 # VSTHRD200: Use "Async" suffix for async methods
 dotnet_diagnostic.VSTHRD200.severity = none
