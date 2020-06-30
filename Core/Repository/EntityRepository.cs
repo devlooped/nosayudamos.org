@@ -22,11 +22,11 @@ namespace NosAyudamos
     /// </remarks>
     class EntityRepository<T> : IEntityRepository<T> where T : class
     {
+        static readonly Func<T, string> getRowKey = RowKeyAttribute.CreateAccessor<T>();
+
         readonly CloudStorageAccount storageAccount;
         readonly ISerializer serializer;
         readonly AsyncLazy<CloudTable> table;
-
-        static readonly Func<T, string> getRowKey = CreateRowKeyGetter();
 
         /// <summary>
         /// Default table name.
@@ -43,26 +43,9 @@ namespace NosAyudamos
             table = new AsyncLazy<CloudTable>(() => GetTableAsync(tableName ?? DefaultTableName));
         }
 
-        public async Task DeleteAsync(string rowKey)
-        {
-            var table = await this.table.GetValueAsync().ConfigureAwait(false);
-
-            await table.ExecuteAsync(TableOperation.Delete(
-                new DynamicTableEntity(typeof(T).FullName!, rowKey) { ETag = "*" }))
-                .ConfigureAwait(false);
-        }
-
-        public async Task DeleteAsync(T entity)
-        {
-            var rowKey = getRowKey.Invoke(entity);
-
-            var table = await this.table.GetValueAsync().ConfigureAwait(false);
-
-            await table.ExecuteAsync(TableOperation.Delete(
-                new DynamicTableEntity(typeof(T).FullName!, rowKey) { ETag = "*" }))
-                .ConfigureAwait(false);
-        }
-
+        /// <summary>
+        /// Performs a partition scan and retrieves all entities of the same type.
+        /// </summary>
         public async IAsyncEnumerable<T> GetAllAsync()
         {
             var table = await this.table.GetValueAsync().ConfigureAwait(false);
@@ -109,6 +92,26 @@ namespace NosAyudamos
             return ToEntity((DynamicTableEntity)result.Result);
         }
 
+        public async Task DeleteAsync(string rowKey)
+        {
+            var table = await this.table.GetValueAsync().ConfigureAwait(false);
+
+            await table.ExecuteAsync(TableOperation.Delete(
+                new DynamicTableEntity(typeof(T).FullName!, rowKey) { ETag = "*" }))
+                .ConfigureAwait(false);
+        }
+
+        public async Task DeleteAsync(T entity)
+        {
+            var rowKey = getRowKey.Invoke(entity);
+
+            var table = await this.table.GetValueAsync().ConfigureAwait(false);
+
+            await table.ExecuteAsync(TableOperation.Delete(
+                new DynamicTableEntity(typeof(T).FullName!, rowKey) { ETag = "*" }))
+                .ConfigureAwait(false);
+        }
+
         /// <summary>
         /// Uses JSON deserialization to convert from the persisted entity data 
         /// to the entity type, so that the right constructor and property 
@@ -123,13 +126,12 @@ namespace NosAyudamos
             // perform its advanced ctor and conversion detection as usual.
             writer.WriteStartObject();
 
-            var idProp = typeof(T).GetProperties()
-                .FirstOrDefault(prop => prop.GetCustomAttribute<RowKeyAttribute>() != null)
-                ?? throw new ArgumentException("Entity must have one property annotated with [RowKey]");
+            var rowKeyProp = typeof(T).GetProperties()
+                .First(prop => prop.GetCustomAttribute<RowKeyAttribute>() != null);
 
-            // Persist the id property with the property name, so it can 
+            // Persist the row key property with the property name, so it can 
             // be resolved either via the ctor or as a property setter.
-            writer.WritePropertyName(idProp.Name);
+            writer.WritePropertyName(rowKeyProp.Name);
             writer.WriteValue(entity.RowKey);
 
             foreach (var property in entity.Properties)
@@ -152,34 +154,6 @@ namespace NosAyudamos
 
             await table.CreateIfNotExistsAsync();
             return table;
-        }
-
-        static Func<T, string> CreateRowKeyGetter()
-        {
-            var idProp = typeof(T).GetProperties()
-                .FirstOrDefault(prop => prop.GetCustomAttribute<RowKeyAttribute>() != null)
-                ?? throw new ArgumentException("Entity must have one property annotated with [RowKey]");
-
-            if (idProp.PropertyType != typeof(string))
-                throw new ArgumentException("Property annotated with [RowKey] must be of type string.");
-
-            var param = Expression.Parameter(typeof(T), "x");
-
-            return Expression.Lambda<Func<T, string>>(
-                Expression.Call(
-                    typeof(EntityRepository<T>).GetMethod(nameof(EnsureRowKey), BindingFlags.NonPublic | BindingFlags.Static), 
-                    Expression.Constant(idProp.Name, typeof(string)), 
-                    Expression.Property(param, idProp)),
-                param)
-               .Compile();
-        }
-
-        static string EnsureRowKey(string propertyName, string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                throw new ArgumentException($"RowKey property {propertyName} cannot be null or empty.");
-
-            return value;
         }
     }
 

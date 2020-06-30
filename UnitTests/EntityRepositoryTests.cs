@@ -48,28 +48,6 @@ namespace NosAyudamos
 
         }
 
-        [Fact]
-        public async Task WhenSavingTypeWithNoPartitionKey_ThenUsesTypeNameAsDefault()
-        {
-            var repository = await GetRepositoryAsync<TypeWithNoPartitionKey>();
-
-            await repository.PutAsync(new TypeWithNoPartitionKey { Id = "123", Value = "asdf" });
-
-            var table = GetTable();
-
-            var result = await table.ExecuteAsync(TableOperation.Retrieve(typeof(TypeWithNoPartitionKey).Name, "123"));
-
-            Assert.NotNull(result?.Result);
-        }
-
-        class TypeWithNoPartitionKey
-        {
-            [RowKey]
-            public string Id { get; set; }
-            public string Value { get; set; }
-        }
-
-
         async Task<EntityRepository<T>> GetRepositoryAsync<T>([CallerMemberName] string tableName = null) where T : class
         {
             var table = GetTable(tableName);

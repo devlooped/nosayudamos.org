@@ -1,17 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos.Table;
 
 namespace NosAyudamos
 {
-    class TestRepository<T> : IRepository<T>
-        where T : class, ITableEntity
+    class TestRepository<T> : IRepository<T> where T : class
     {
+        static readonly Func<T, string> getPartitionKey = PartitionKeyAttribute.CreateAccessor<T>();
+        static readonly Func<T, string> getRowKey = RowKeyAttribute.CreateAccessor<T>();
+
         Dictionary<(string, string), T> values = new Dictionary<(string, string), T>();
 
         public Task DeleteAsync(T entity)
         {
-            values.Remove((entity.PartitionKey, entity.RowKey));
+            values.Remove((getPartitionKey(entity), getRowKey(entity)));
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteAsync(string partitionKey, string rowKey)
+        {
+            values.Remove((partitionKey, rowKey));
             return Task.CompletedTask;
         }
 
@@ -25,7 +33,7 @@ namespace NosAyudamos
 
         public Task<T> PutAsync(T entity)
         {
-            values[(entity.PartitionKey, entity.RowKey)] = entity;
+            values[(getPartitionKey(entity), getRowKey(entity))] = entity;
             return Task.FromResult(entity);
         }
     }

@@ -146,5 +146,22 @@ namespace NosAyudamos
 
             return table;
         }
+
+        class PhoneIdMap : TableEntity
+        {
+            public PhoneIdMap() { }
+
+            public PhoneIdMap(string phoneNumber, string nationalId, Role role)
+            {
+                PartitionKey = phoneNumber;
+                RowKey = "NosAyudamos.PhoneIdMap";
+                NationalId = nationalId;
+                Role = role;
+            }
+
+            public string NationalId { get; set; } = "";
+
+            public Role Role { get; set; } = Role.Donee;
+        }
     }
 }

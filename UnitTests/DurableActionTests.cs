@@ -11,7 +11,7 @@ namespace NosAyudamos
         [Fact]
         public async Task SimpleExecute()
         {
-            var durable = new DurableAction(new Environment(), new Repository<DurableActionEntity>(CloudStorageAccount.DevelopmentStorageAccount));
+            var durable = new DurableAction(new Environment(), new Repository<DurableActionEntity>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer()));
             var expected = new { Value = 5 };
 
             var result = await durable.ExecuteAsync(
@@ -26,7 +26,7 @@ namespace NosAyudamos
         [Fact]
         public async Task ExecuteWithRetries()
         {
-            var durable = new DurableAction(new Environment(), new Repository<DurableActionEntity>(CloudStorageAccount.DevelopmentStorageAccount));
+            var durable = new DurableAction(new Environment(), new Repository<DurableActionEntity>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer()));
 
             var expected = new object();
             var executeCalls = new List<int>();
@@ -67,7 +67,7 @@ namespace NosAyudamos
         [Fact]
         public async Task ExecuteFailsAfterRetries()
         {
-            var durable = new DurableAction(new Environment(), new Repository<DurableActionEntity>(CloudStorageAccount.DevelopmentStorageAccount));
+            var durable = new DurableAction(new Environment(), new Repository<DurableActionEntity>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer()));
 
             var expected = new object();
             var executeCalls = new List<int>();

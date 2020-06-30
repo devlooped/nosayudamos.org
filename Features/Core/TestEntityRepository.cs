@@ -49,18 +49,18 @@ namespace NosAyudamos
 
         static string GetRowKey(T entity)
         {
-            var idProp = typeof(T).GetProperties()
-                .FirstOrDefault(prop => prop.GetCustomAttribute<KeyAttribute>() != null)
+            var rowKeyProp = typeof(T).GetProperties()
+                .FirstOrDefault(prop => prop.GetCustomAttribute<RowKeyAttribute>() != null)
                 ?? throw new ArgumentException("Entity must have one property annotated with [RowKey]");
 
-            if (idProp.PropertyType != typeof(string))
+            if (rowKeyProp.PropertyType != typeof(string))
                 throw new ArgumentException("Property annotated with [RowKey] must be of type string.");
 
-            var id = (string)idProp.GetValue(entity);
-            if (string.IsNullOrEmpty(id))
-                throw new ArgumentException($"RowKey property {idProp.Name} cannot be null or empty.");
+            var rowKey = (string)rowKeyProp.GetValue(entity);
+            if (string.IsNullOrEmpty(rowKey))
+                throw new ArgumentException($"RowKey property {rowKeyProp.Name} cannot be null or empty.");
 
-            return id;
+            return rowKey;
         }
     }
 }
