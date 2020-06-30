@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -20,7 +19,7 @@ namespace NosAyudamos
     /// If no <see cref="TableAttribute"/> is provided, entities are persisted in a table 
     /// named after the <typeparamref name="T"/>, without the <c>Entity</c> word (if any).
     /// </remarks>
-    class Repository<T> : IRepository<T> where T : class
+    class TableRepository<T> : ITableRepository<T> where T : class
     {
         static readonly string DefaultTableName = typeof(T).GetCustomAttribute<TableAttribute>()?.Name ??
             typeof(T).Name.Replace("Entity", "", StringComparison.Ordinal);
@@ -32,10 +31,10 @@ namespace NosAyudamos
         readonly ISerializer serializer;
         readonly AsyncLazy<CloudTable> table;
 
-        public Repository(CloudStorageAccount storageAccount, ISerializer serializer)
+        public TableRepository(CloudStorageAccount storageAccount, ISerializer serializer)
             : this(storageAccount, serializer, DefaultTableName) { }
 
-        public Repository(CloudStorageAccount storageAccount, ISerializer serializer, string tableName)
+        public TableRepository(CloudStorageAccount storageAccount, ISerializer serializer, string tableName)
         {
             this.storageAccount = storageAccount;
             this.serializer = serializer;
@@ -145,7 +144,7 @@ namespace NosAyudamos
         }
     }
 
-    public interface IRepository<T> where T : class
+    public interface ITableRepository<T> where T : class
     {
         Task<T?> GetAsync(string partitionKey, string rowKey);
         Task<T> PutAsync(T entity);

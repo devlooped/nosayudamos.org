@@ -9,7 +9,7 @@ namespace NosAyudamos
 {
     public static class PopulationExtensions
     {
-        public static Task<Population> GetPopulationAsync(this IRepository<Population> repository, string country, string city)
+        public static Task<Population> GetPopulationAsync(this ITableRepository<Population> repository, string country, string city)
             => repository.GetAsync(country, city);
     }
 
@@ -49,13 +49,13 @@ namespace NosAyudamos
             Assert.Equal(expected.Quantity, actual.Quantity);
         }
 
-        async Task<IRepository<T>> GetRepositoryAsync<T>([CallerMemberName] string tableName = null) where T : class
+        async Task<ITableRepository<T>> GetRepositoryAsync<T>([CallerMemberName] string tableName = null) where T : class
         {
             tableName = tableName.Replace("_", "");
             var table = GetTable(tableName);
             await table.DeleteIfExistsAsync();
             tableNames.Add(tableName);
-            return new Repository<T>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer(), tableName);
+            return new TableRepository<T>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer(), tableName);
         }
 
         static CloudTable GetTable([CallerMemberName] string tableName = null)

@@ -25,10 +25,10 @@ namespace NosAyudamos
     [Export]
     class DurableAction : IDurableAction
     {
-        readonly IRepository<DurableActionEntity> repository;
+        readonly ITableRepository<DurableActionEntity> repository;
         readonly IEnvironment env;
 
-        public DurableAction(IEnvironment env, IRepository<DurableActionEntity> repository)
+        public DurableAction(IEnvironment env, ITableRepository<DurableActionEntity> repository)
             => (this.repository, this.env)
             = (repository, env);
 

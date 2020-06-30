@@ -143,7 +143,7 @@ namespace NosAyudamos
                 services.AddSingleton(CloudStorageAccount.Parse(env.GetVariable("StorageConnectionString")));
 
             services.AddScoped(typeof(IEntityRepository<>), typeof(EntityRepository<>));
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped(typeof(ITableRepository<>), typeof(TableRepository<>));
             services.Decorate<IPersonRepository, EventGridPersonRepository>();
 
 #pragma warning disable CA2000 // Dispose objects before losing scope: This factory is intended to live for the duration of the app.
