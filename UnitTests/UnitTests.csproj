@@ -8,20 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="EventStoreTests.cs" />
-    <Compile Remove="FundsTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\Features\Constants.cs" Link="Core\Constants.cs" />
     <Compile Include="..\Features\Core\TestEntityRepository.cs" Link="Core\TestEntityRepository.cs" />
     <Compile Include="..\Features\Core\TestEnvironment.cs" Link="Core\TestEnvironment.cs" />
     <Compile Include="..\Features\Core\TestPersonRepository.cs" Link="Core\TestPersonRepository.cs" />
     <Compile Include="..\Features\Core\TestRepository.cs" Link="Core\TestRepository.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="EventStoreTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
