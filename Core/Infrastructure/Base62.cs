@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 
 /// <summary>
@@ -12,7 +13,7 @@ public static class Base62
     /// <summary>
     /// Encodes a numeric value into a base62 string.
     /// </summary>
-    public static string Encode(long value)
+    public static string Encode(BigInteger value)
     {
         // TODO: I'm almost sure there's a more succint way 
         // of doing this with LINQ and Aggregate, but just 
@@ -31,18 +32,18 @@ public static class Base62
     /// <summary>
     /// Decodes a base62 string into its original numeric value.
     /// </summary>
-    public static long Decode(string value)
-        => value.Aggregate(0L, (current, c) => current * 62 + FromBase62(c));
+    public static BigInteger Decode(string value)
+        => value.Aggregate(new BigInteger(0), (current, c) => current * 62 + FromBase62(c));
 
-    static char ToBase62(long d) => d switch
+    static char ToBase62(BigInteger d) => d switch
     {
-        long v when v < 10 => (char)('0' + d),
-        long v when v < 36 => (char)('A' + d - 10),
-        long v when v < 62 => (char)('a' + d - 36),
+        BigInteger v when v < 10 => (char)('0' + d),
+        BigInteger v when v < 36 => (char)('A' + d - 10),
+        BigInteger v when v < 62 => (char)('a' + d - 36),
         _ => throw new ArgumentException($"Cannot encode digit {d} to base 62.", nameof(d)),
     };
 
-    static long FromBase62(char c) => c switch
+    static BigInteger FromBase62(char c) => c switch
     {
         char v when c >= 'a' && v <= 'z' => 36 + c - 'a',
         char v when c >= 'A' && v <= 'Z' => 10 + c - 'A',
