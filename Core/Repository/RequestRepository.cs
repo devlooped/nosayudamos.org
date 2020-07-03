@@ -30,10 +30,11 @@ namespace NosAyudamos
         readonly ISerializer serializer;
         readonly CloudStorageAccount storageAccount;
         readonly CloudTable? cloudTable = null;
+        readonly string tableName;
 
-        public RequestRepository(ISerializer serializer, CloudStorageAccount storageAccount)
-            => (this.serializer, this.storageAccount)
-            = (serializer, storageAccount);
+        public RequestRepository(ISerializer serializer, CloudStorageAccount storageAccount, string tableName = "Request")
+            => (this.serializer, this.storageAccount, this.tableName)
+            = (serializer, storageAccount, tableName);
 
         public async Task<Request?> GetAsync(string requestId, bool readOnly = true)
         {
@@ -92,7 +93,7 @@ namespace NosAyudamos
         }
 
         async Task<CloudTable> GetTableAsync()
-            => cloudTable ?? await GetTableAsync("Request");
+            => cloudTable ?? await GetTableAsync(tableName);
 
         async Task<CloudTable> GetTableAsync(string tableName)
         {

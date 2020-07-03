@@ -3,17 +3,42 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace NosAyudamos
 {
     public class RequestTests
     {
-        public RequestTests()
+        const string tableName = nameof(RequestTests);
+        readonly ITestOutputHelper output;
+
+        public RequestTests(ITestOutputHelper output)
         {
+            this.output = output;
+
             CloudStorageAccount
                 .DevelopmentStorageAccount
                 .CreateCloudTableClient()
-                .GetTableReference(nameof(Request)).DeleteIfExists();
+                .GetTableReference(tableName).DeleteIfExists();
+        }
+
+        [Fact]
+        public void WhenSerializingRequestCreated_ThenCanDeserialize()
+        {
+            var serializer = new Serializer();
+
+            var expected = new RequestCreated(Constants.Donee.Id + "-" + Base62.Encode(PreciseTime.UtcNow.Ticks), 0, "");
+
+            var json = serializer.Serialize(expected);
+
+#if DEBUG
+            output.WriteLine(json);
+#endif
+
+            var actual = serializer.Deserialize<RequestCreated>(json);
+
+            Assert.Equal(expected.PersonId, actual.PersonId);
+            Assert.Equal(expected.RequestId, actual.RequestId);
         }
 
         [Fact]
@@ -49,7 +74,7 @@ namespace NosAyudamos
         [Fact]
         public async Task WhenReplying_AddsReplyToRequest()
         {
-            var requests = new RequestRepository(new Serializer(), CloudStorageAccount.DevelopmentStorageAccount);
+            var requests = new RequestRepository(new Serializer(), CloudStorageAccount.DevelopmentStorageAccount, tableName);
 
             var request = new Request(Constants.Donee.Id, 1000, "Necesito 1000 para supermercado");
 

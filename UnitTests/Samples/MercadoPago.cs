@@ -12,13 +12,15 @@ using ZXing;
 
 namespace NosAyudamos
 {
-    public class MercadoPagoTests
+    /// <summary>
+    /// Manual sample of how a payment is processed.
+    /// </summary>
+    public class MercadoPagoSamples
     {
         readonly ITestOutputHelper output;
 
-        public MercadoPagoTests(ITestOutputHelper output) => this.output = output;
+        public MercadoPagoSamples(ITestOutputHelper output) => this.output = output;
 
-        //[Fact]
         public async Task Pay()
         {
             var reader = new BarcodeReader

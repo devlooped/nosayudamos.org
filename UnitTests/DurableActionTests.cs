@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos.Table;
 using Xunit;
 
 namespace NosAyudamos
@@ -11,7 +10,7 @@ namespace NosAyudamos
         [Fact]
         public async Task SimpleExecute()
         {
-            var durable = new DurableAction(new Environment(), new TableRepository<DurableActionEntity>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer()));
+            var durable = new DurableAction(new Environment(), new TestTableRepository<DurableActionEntity>());
             var expected = new { Value = 5 };
 
             var result = await durable.ExecuteAsync(
@@ -26,7 +25,7 @@ namespace NosAyudamos
         [Fact]
         public async Task ExecuteWithRetries()
         {
-            var durable = new DurableAction(new Environment(), new TableRepository<DurableActionEntity>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer()));
+            var durable = new DurableAction(new Environment(), new TestTableRepository<DurableActionEntity>());
 
             var expected = new object();
             var executeCalls = new List<int>();
@@ -67,7 +66,7 @@ namespace NosAyudamos
         [Fact]
         public async Task ExecuteFailsAfterRetries()
         {
-            var durable = new DurableAction(new Environment(), new TableRepository<DurableActionEntity>(CloudStorageAccount.DevelopmentStorageAccount, new Serializer()));
+            var durable = new DurableAction(new Environment(), new TestTableRepository<DurableActionEntity>());
 
             var expected = new object();
             var executeCalls = new List<int>();

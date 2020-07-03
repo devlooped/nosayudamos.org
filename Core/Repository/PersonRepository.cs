@@ -38,10 +38,11 @@ namespace NosAyudamos
         readonly ISerializer serializer;
         readonly CloudStorageAccount storageAccount;
         readonly CloudTable? cloudTable = null;
+        readonly string tableName;
 
-        public PersonRepository(ISerializer serializer, CloudStorageAccount storageAccount)
-            => (this.serializer, this.storageAccount)
-            = (serializer, storageAccount);
+        public PersonRepository(ISerializer serializer, CloudStorageAccount storageAccount, string tableName = "Person")
+            => (this.serializer, this.storageAccount, this.tableName)
+            = (serializer, storageAccount, tableName);
 
         public async Task<TPerson> PutAsync<TPerson>(TPerson person) where TPerson : Person
         {
@@ -135,7 +136,7 @@ namespace NosAyudamos
         }
 
         async Task<CloudTable> GetTableAsync()
-            => cloudTable ?? await GetTableAsync("Person");
+            => cloudTable ?? await GetTableAsync(tableName);
 
         async Task<CloudTable> GetTableAsync(string tableName)
         {
