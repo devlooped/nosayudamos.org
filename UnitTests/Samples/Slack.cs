@@ -13,14 +13,19 @@ using Xunit;
 
 namespace NosAyudamos
 {
-    public class SlackTests
+    public class SlackSamples
     {
         TestEnvironment environment;
         PhoneSystem phoneSystem = new PhoneSystem(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber);
 
-        public SlackTests() => environment = new TestEnvironment();
+        public SlackSamples()
+        {
+            environment = new TestEnvironment();
+            // Since these are samples run explicitly and manually, always send them to slack 
+            // since that's the whole point of this class :)
+            environment.SetVariable("SendToSlackInDevelopment", "true");
+        }
 
-        [Fact]
         public async Task SendRejected()
         {
             var person = Constants.Donee.Create();
@@ -88,7 +93,6 @@ namespace NosAyudamos
             }, phoneSystem);
         }
 
-        [Fact]
         public async Task SendApproved()
         {
             var person = Constants.Donee.Create();
@@ -111,7 +115,6 @@ namespace NosAyudamos
             }, phoneSystem);
         }
 
-        [Fact]
         public async Task SendUnknown()
         {
             await SendMessageAsync(new SlackMessage
@@ -166,7 +169,6 @@ namespace NosAyudamos
             }, phoneSystem);
         }
 
-        [Fact]
         public async Task SendAddsAutomationActions()
         {
             using var http = new HttpClient();

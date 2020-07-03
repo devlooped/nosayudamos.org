@@ -6,18 +6,22 @@ namespace NosAyudamos
     class TestPersonRepository : IPersonRepository
     {
         Dictionary<string, (string Id, Role Role)> phoneIdMap = new Dictionary<string, (string, Role)>();
-        Dictionary<string, Person> people = new Dictionary<string, Person>();
+        Dictionary<string, object> people = new Dictionary<string, object>();
 
         public Task<Person> FindAsync(string phoneNumber, bool readOnly = true)
         {
             if (phoneIdMap.TryGetValue(phoneNumber, out var phoneMap))
-                return Task.FromResult(people[phoneMap.Id]);
+                return Task.FromResult((Person)people[phoneMap.Id]);
 
             return Task.FromResult(default(Person));
         }
 
         public Task<TPerson> GetAsync<TPerson>(string nationalId, bool readOnly = true) where TPerson : Person
-            => Task.FromResult((TPerson)people[nationalId]);
+        {
+            object person = default;
+            people.TryGetValue(nationalId, out person);
+            return Task.FromResult((TPerson)person);
+        }
 
         public Task<TPerson> PutAsync<TPerson>(TPerson person) where TPerson : Person
         {

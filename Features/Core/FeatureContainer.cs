@@ -55,6 +55,10 @@ namespace NosAyudamos
             {
                 typeof(HttpClient),
                 typeof(IEnvironment),
+                typeof(IEntityRepository<>),
+                typeof(IEntityRepository<>),
+                typeof(IPersonRepository),
+                typeof(IRequestRepository),
             };
 
             new Startup().Configure(services, new Environment());
@@ -111,6 +115,15 @@ namespace NosAyudamos
             // For some reason, the built-in registrations we were providing via Startup for HttpClient weren't working.
             builder.RegisterType<HttpClient>().InstancePerDependency();
             builder.RegisterType<TestEnvironment>().SingleInstance().AsSelf().AsImplementedInterfaces();
+
+            builder.RegisterGeneric(typeof(TestEntityRepository<>)).SingleInstance().AsSelf().AsImplementedInterfaces();
+            builder.RegisterGeneric(typeof(TestTableRepository<>)).SingleInstance().AsSelf().AsImplementedInterfaces();
+
+            builder.RegisterType<TestPersonRepository>().As<IPersonRepository>().SingleInstance();
+            builder.RegisterDecorator<EventGridPersonRepository, IPersonRepository>();
+
+            builder.RegisterType<TestRequestRepository>().As<IRequestRepository>().SingleInstance();
+            builder.RegisterDecorator<EventGridRequestRepository, IRequestRepository>();
 
             return builder;
         }

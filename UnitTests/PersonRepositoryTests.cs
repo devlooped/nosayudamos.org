@@ -17,7 +17,7 @@ namespace NosAyudamos
             CloudStorageAccount
                 .DevelopmentStorageAccount
                 .CreateCloudTableClient()
-                .GetTableReference(nameof(Person)).DeleteIfExists();
+                .GetTableReference(nameof(PersonRepositoryTests)).DeleteIfExists();
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace NosAyudamos
         [Fact]
         public async Task ConcurrentSaveFails()
         {
-            var repo = new PersonRepository(serializer, CloudStorageAccount.DevelopmentStorageAccount);
+            var repo = new PersonRepository(serializer, CloudStorageAccount.DevelopmentStorageAccount, nameof(PersonRepositoryTests));
 
             await repo.PutAsync(Constants.Donor.Create());
 
@@ -54,7 +54,7 @@ namespace NosAyudamos
         [Fact]
         public async Task CanManipulatePersonAndHistory()
         {
-            var repo = new PersonRepository(serializer, CloudStorageAccount.DevelopmentStorageAccount);
+            var repo = new PersonRepository(serializer, CloudStorageAccount.DevelopmentStorageAccount, nameof(PersonRepositoryTests));
 
             await repo.PutAsync(Constants.Donor.Create());
 
