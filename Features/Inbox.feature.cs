@@ -81,10 +81,7 @@ namespace NosAyudamos
 #line 7
 #line hidden
 #line 8
-    testRunner.Given("Un storage limpio", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Dado ");
-#line hidden
-#line 9
- testRunner.And("Un usuario no registrado", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
+    testRunner.Given("Un usuario no registrado", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Dado ");
 #line hidden
         }
         
@@ -104,7 +101,7 @@ namespace NosAyudamos
         {
             string[] tagsOfScenario = exampleTags;
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Contacto inicial de un donatario", null, exampleTags);
-#line 11
+#line 10
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -127,10 +124,10 @@ this.ScenarioInitialize(scenarioInfo);
 #line 7
 this.FeatureBackground();
 #line hidden
-#line 12
+#line 11
  testRunner.When(string.Format("Envia \'{0}\'", mensaje), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 13
+#line 12
  testRunner.Then("Recibe \'UI_Donee_SendIdentifier\'", "Gracias por tu mensaje! Por favor envianos una \r\nfoto de tu DNI para registrarte " +
                         "para recibir ayuda.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
@@ -145,7 +142,7 @@ this.FeatureBackground();
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Contacto inicial con mensaje confuso", null, ((string[])(null)));
-#line 26
+#line 25
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -168,10 +165,10 @@ this.ScenarioInitialize(scenarioInfo);
 #line 7
 this.FeatureBackground();
 #line hidden
-#line 27
+#line 26
  testRunner.When("Envia mensaje", "Foo", ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 31
+#line 30
  testRunner.Then("Recibe \'UI_UnknownIntent\'", "Gracias por tu mensaje! Comentanos si necesitas \r\nayuda o estás interesando en ay" +
                         "udar a otros.", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
@@ -186,7 +183,7 @@ this.FeatureBackground();
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Contacto inicial de un donante", null, ((string[])(null)));
-#line 37
+#line 36
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -209,10 +206,10 @@ this.ScenarioInitialize(scenarioInfo);
 #line 7
 this.FeatureBackground();
 #line hidden
-#line 38
+#line 37
  testRunner.When("Envia mensaje", "Quiero ayudar", ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 42
+#line 41
  testRunner.Then("Recibe \'UI_Donor_SendAmount\'", "Gracias por tu mensaje! Cuánto querés donar?", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }

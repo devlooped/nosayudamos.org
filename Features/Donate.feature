@@ -2,8 +2,7 @@
 Característica: Donacion
 
 Antecedentes:
-    Dado Un storage limpio
-	Y un donante cualquiera
+    Dado Un donante cualquiera
 
 @Draft
 Escenario: Primer donacion

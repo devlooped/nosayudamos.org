@@ -2,7 +2,6 @@
 Característica: Registracion de donatarios
 
 Antecedentes:
-    Dado Un storage limpio
     # Porque utilizamos test phone #s
     Y SendToMessagingInDevelopment=false
 
