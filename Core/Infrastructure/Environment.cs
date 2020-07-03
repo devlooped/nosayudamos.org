@@ -67,16 +67,20 @@ namespace NosAyudamos
                  .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                  .AddEnvironmentVariables();
 
-            var cfg = builder.Build();
-
-            // Use the config above to initialize the keyvault config extension.
-            builder.AddAzureKeyVault(
-                $"https://{cfg["AzureKeyVaultName"]}.vault.azure.net/",
-                cfg["AZURE_CLIENT_ID"],
-                cfg["AZURE_CLIENT_SECRET"]);
-
-            // Now build the final version that includes the keyvault provider.
             config = builder.Build();
+
+            if (!string.IsNullOrEmpty(config["AZURE_CLIENT_ID"]) &&
+                !string.IsNullOrEmpty(config["AZURE_CLIENT_SECRET"]))
+            {
+                // Use the config above to initialize the keyvault config extension.
+                builder.AddAzureKeyVault(
+                    $"https://{config["AzureKeyVaultName"]}.vault.azure.net/",
+                    config["AZURE_CLIENT_ID"],
+                    config["AZURE_CLIENT_SECRET"]);
+
+                // Now build the final version again that includes the keyvault provider.
+                config = builder.Build();
+            }
         }
     }
 
