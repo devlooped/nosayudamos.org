@@ -41,7 +41,7 @@ namespace NosAyudamos.Http
                 if (from == chatApiNumber.Value)
                     continue;
 
-                await events.PushAsync(new NosAyudamos.MessageReceived(from, chatApiNumber.Value, body));
+                await events.PushAsync(new MessageReceived(from, chatApiNumber.Value, body));
             }
 
             return new OkResult();
