@@ -104,5 +104,10 @@ namespace NosAyudamos
 
             return value;
         }
+
+        /// <summary>
+        /// Sanitizes the value so that it can be used as a key in table storage (either PartitionKey or RowKey).
+        /// </summary>
+        public static string Sanitize(string value) => new string(value.Where(c => !char.IsControl(c) && !InvalidChars.Contains(c)).ToArray());
     }
 }

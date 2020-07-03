@@ -20,26 +20,6 @@ namespace NosAyudamos
         public Misc(ITestOutputHelper output) => this.output = output;
 
         [Fact]
-        public void EncodeIds()
-        {
-            var since = new DateTimeOffset(2020, 3, 20, 0, 0, 0, TimeSpan.Zero);
-            var delta = (DateTimeOffset.UtcNow.AddYears(30)  - since);
-
-            // In 30 years' time, we'd still have plenty to go
-            Assert.True(delta.TotalSeconds < int.MaxValue);
-
-            // Sample of encoding just the seconds
-            output.WriteLine(Base62.Encode((long)delta.TotalSeconds));
-            // vs encoding total ticks
-            output.WriteLine(Base62.Encode(delta.Ticks));
-
-            // Final sample of encoding using person version too.
-            output.WriteLine(new RequestCreated(Constants.Donee.Id, 0, "", personVersion: 5).RequestId);
-            output.WriteLine(new RequestCreated(Constants.Donee.Id, 0, "", personVersion: 6).RequestId);
-            output.WriteLine(new RequestCreated(Constants.Donee.Id, 0, "", personVersion: 7).RequestId);
-        }
-
-        [Fact]
         public void DefaultCulture()
         {
             var culture = typeof(IMessaging).Assembly.GetCustomAttribute<NeutralResourcesLanguageAttribute>().CultureName;

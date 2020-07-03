@@ -14,14 +14,15 @@ namespace NosAyudamos
 
         public Request(
             string personId,
-            int personVersion,
             int amount,
             string description,
             string[]? keywords = default)
             : this()
         {
             IsReadOnly = false;
-            Raise(new RequestCreated(personId, amount, description, keywords, personVersion: personVersion));
+            // Requests only need to be unique within a person, so we use that as the prefix to disambiguate 
+            // multiple requests at the same UtcNow. The high-precision time also helps make that unique too.
+            Raise(new RequestCreated(personId + "-" + Base62.Encode(PreciseTime.UtcNow.Ticks), amount, description, keywords, personId: personId));
         }
 
         Request()
@@ -52,8 +53,12 @@ namespace NosAyudamos
             private set
             {
                 requestId = value;
-                // By setting this via the setter, we can avoid serializing the PersonId explicitly.
-                PersonId = requestId.Substring(0, requestId.IndexOf('-', StringComparison.Ordinal));
+                // When processing OnCreated(RequestCreated), we'll have already set 
+                if (string.IsNullOrEmpty(PersonId) || !requestId.StartsWith(PersonId, StringComparison.Ordinal))
+                {
+                    // By setting this via the setter, we can avoid serializing the PersonId explicitly.
+                    PersonId = requestId.Substring(0, requestId.IndexOf('-', StringComparison.Ordinal));
+                }
             }
         }
 
@@ -80,8 +85,8 @@ namespace NosAyudamos
             => Raise(new RequestReplied(senderId, message));
 
         void OnCreated(RequestCreated created)
-            => (RequestId, Amount, Description, Keywords)
-            = (created.RequestId, created.Amount, created.Description, created.Keywords);
+            => (PersonId, RequestId, Amount, Description, Keywords)
+            = (created.PersonId, created.RequestId, created.Amount, created.Description, created.Keywords);
 
         void OnReplied(RequestReplied reply)
             => Messages.Add(new MessageData(reply.SenderId, reply.Message));

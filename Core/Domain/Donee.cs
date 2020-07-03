@@ -35,7 +35,7 @@ namespace NosAyudamos
             // TODO: validate that there isn't another ongoing request, 
             // that we're not suspended, etc.
 
-            var request = new Request(PersonId, Version + Events.Count + 1, amount, description, keywords);
+            var request = new Request(PersonId, amount, description, keywords);
 
             Raise(new Requested(request.RequestId, amount, description, keywords));
 
