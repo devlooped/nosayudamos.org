@@ -72,9 +72,9 @@ namespace NosAyudamos
                 RowKey = metadata.EventId,
                 Data = serializer.Serialize(data),
                 DataVersion = data.GetType().Assembly.GetName().Version?.ToString(2) ?? "1.0",
-                
+
                 Subject = metadata.Subject ?? data.GetType().Namespace,
-                Topic =  metadata?.Topic ?? "System",
+                Topic = metadata?.Topic ?? "System",
             };
         }
 
