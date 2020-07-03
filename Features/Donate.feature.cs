@@ -80,10 +80,7 @@ namespace NosAyudamos
 #line 4
 #line hidden
 #line 5
-    testRunner.Given("Un storage limpio", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Dado ");
-#line hidden
-#line 6
- testRunner.And("un donante cualquiera", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
+    testRunner.Given("Un donante cualquiera", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Dado ");
 #line hidden
         }
         
@@ -102,7 +99,7 @@ namespace NosAyudamos
                     "Draft"};
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Primer donacion", null, new string[] {
                         "Draft"});
-#line 9
+#line 8
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -125,10 +122,10 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 10
+#line 9
     testRunner.When("Envia \'Donar $500\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 11
+#line 10
     testRunner.Then("Recibe \'Gracias!\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }

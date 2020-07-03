@@ -79,10 +79,7 @@ namespace NosAyudamos
         {
 #line 4
 #line hidden
-#line 5
-    testRunner.Given("Un storage limpio", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Dado ");
-#line hidden
-#line 7
+#line 6
     testRunner.And("SendToMessagingInDevelopment=false", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
 #line hidden
         }
@@ -99,7 +96,7 @@ namespace NosAyudamos
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI legible", null, ((string[])(null)));
-#line 9
+#line 8
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -122,10 +119,10 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 10
+#line 9
     testRunner.When("Envia ID Content\\CUIL.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 11
+#line 10
     testRunner.Then("Recibe \'UI_Donee_Welcome\'", "Hola {0}, bienvenid{1} a la comunidad de Nos Ayudamos!", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");
 #line hidden
             }
@@ -139,7 +136,7 @@ this.FeatureBackground();
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI sin código de barras solicita reintentar", null, ((string[])(null)));
-#line 16
+#line 15
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -162,10 +159,10 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 17
+#line 16
     testRunner.When("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 18
+#line 17
     testRunner.Then("Recibe \'UI_Donee_ResendIdentifier1\'", @"Recibimos tu mensaje, pero no pudimos reconocer tus datos en la imagen. 
 Podrías enviarnos una nueva foto del DNI, quizás con mejor iluminación o más 
 de cerca? Es importante que cuando tomes la foto, el DNI ocupe la totalidad 
@@ -182,7 +179,7 @@ de la pantalla de tu celular. Gracias por tu paciencia!", ((TechTalk.SpecFlow.Ta
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI sin código de barras por segunda vez solicita reintentar", null, ((string[])(null)));
-#line 26
+#line 25
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -205,13 +202,13 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 27
+#line 26
     testRunner.When("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
 #line hidden
-#line 28
+#line 27
     testRunner.And("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
 #line hidden
-#line 29
+#line 28
     testRunner.Then("Recibe \'UI_Donee_ResendIdentifier2\'", @"Sigo sin poder reconocer tus datos :(. Intentemos una última vez antes 
 de involucrar a las personas de soporte técnico, que siempre aprecian 
 que agotemos nuestras posibilidades primero. Buscá si es posible un lugar 
@@ -230,7 +227,7 @@ Vamos que la tercera es la vencida!", ((TechTalk.SpecFlow.Table)(null)), "Entonc
         {
             string[] tagsOfScenario = ((string[])(null));
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("DNI sin código de barras por tercera vez avisa a humanos", null, ((string[])(null)));
-#line 39
+#line 38
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -253,16 +250,16 @@ this.ScenarioInitialize(scenarioInfo);
 #line 4
 this.FeatureBackground();
 #line hidden
-#line 40
+#line 39
     testRunner.When("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Cuando ");
+#line hidden
+#line 40
+    testRunner.And("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
 #line hidden
 #line 41
     testRunner.And("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
 #line hidden
 #line 42
-    testRunner.And("Envia ID Content\\DNI-SinCodigo.jpg", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Y ");
-#line hidden
-#line 43
     testRunner.Then("Recibe \'UI_Donee_RegistrationFailed\'", "Lamento tener problemas para reconocer tu DNI. Ya avisé a los seres \r\nhumanos que" +
                         " programaron esto para que me ayuden. Se van a contactar \r\ncon vos a la brevedad" +
                         ". Perdón y gracias de nuevo por tu paciencia!", ((TechTalk.SpecFlow.Table)(null)), "Entonces ");

@@ -4,7 +4,7 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace NosAyudamos
 {
-    class DomainTests
+    class DomainSamples
     {
         public async Task CanPushRepositoryEventsToGrid()
         {

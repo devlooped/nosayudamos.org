@@ -2,8 +2,7 @@
 Característica: Verificacion de donatarios
 
 Antecedentes:
-    Dado Un storage limpio
-    Y SendToSlackInDevelopment=true
+    Dado SendToSlackInDevelopment=true
     # Porque utilizamos test phone #s
     Y SendToMessagingInDevelopment=false
 

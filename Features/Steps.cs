@@ -38,15 +38,11 @@ namespace NosAyudamos.Steps
         public void GivenEnvironmentVariable(string name, string value)
             => container.Resolve<TestEnvironment>().SetVariable(name, value);
 
-        [Given(@"Un storage limpio")]
-        public async Task GivenAClearStorage()
-            => await CloudStorageAccount.DevelopmentStorageAccount.ClearStorageAsync();
-
         [Given(@"Un usuario no registrado")]
         public void GivenAnUnregisteredUser() { }
 
         [Given(@"Un donador(.*)")]
-        [Given(@"un donante(.*)")]
+        [Given(@"Un donante(.*)")]
         public async Task GivenADonor(string _ = null) =>
             context.Set(await container.Resolve<IPersonRepository>().PutAsync(Constants.Donor.Create()));
 

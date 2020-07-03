@@ -5,8 +5,7 @@ Característica: Bandeja de entrada
     Que determina qué tipo de usuarios registrar
 
 Antecedentes:
-    Dado Un storage limpio
-	Y Un usuario no registrado
+    Dado Un usuario no registrado
 
 Escenario: Contacto inicial de un donatario
 	Cuando Envia '<mensaje>'
