@@ -96,6 +96,9 @@ namespace NosAyudamos
             if (handlers.TryGetValue(e.GetType(), out var handler))
                 handler(e);
 
+            if (this is IIdentifiable identifiable)
+                e.SourceId = identifiable.Id;
+
             events.Add(e);
         }
 
