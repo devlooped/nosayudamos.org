@@ -36,9 +36,9 @@ namespace NosAyudamos
         /// within a 10th of a microsecond of another.
         /// </devdoc>
         string IEventMetadata.EventId => EventId + "_" + SourceId;
-        
+
         DateTime? IEventMetadata.EventTime => EventTime;
-        
+
         string? IEventMetadata.Subject => SourceId;
 
         /// <summary>

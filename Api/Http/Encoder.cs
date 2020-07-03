@@ -12,7 +12,7 @@ namespace NosAyudamos
         {
             if (!req.QueryString.HasValue ||
                 !long.TryParse(req.QueryString.Value.TrimStart('?'), out var number))
-                return new BadRequestObjectResult("Query string should contain a number to encode.");
+                return new BadRequestObjectResult(Properties.Resources.Encoder_MissingEncodeQuery);
 
             return new OkObjectResult(Base62.Encode(number));
         }
@@ -21,7 +21,7 @@ namespace NosAyudamos
         public IActionResult Decode([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "encoder/decode")] HttpRequest req)
         {
             if (!req.QueryString.HasValue)
-                return new BadRequestObjectResult("Query string should contain the string to decode.");
+                return new BadRequestObjectResult(Properties.Resources.Encoder_MissingDecodeQuery);
 
             return new OkObjectResult(Base62.Decode(req.QueryString.Value.TrimStart('?')));
         }
