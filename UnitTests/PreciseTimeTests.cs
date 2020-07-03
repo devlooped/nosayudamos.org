@@ -1,0 +1,29 @@
+﻿using System;
+using System.Diagnostics;
+using System.Threading;
+using Xunit;
+using Xunit.Abstractions;
+
+namespace NosAyudamos
+{
+    public class PreciseTimeTests
+    {
+        ITestOutputHelper output;
+
+        public PreciseTimeTests(ITestOutputHelper output) => this.output = output;
+
+        [Fact]
+        public void WhenGettingNow_ThenThereAreNeverDuplicates()
+        {
+            for (var i = 0; i < Stopwatch.Frequency; i++)
+            {
+                var first = PreciseTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
+                var second = PreciseTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
+
+                Assert.NotEqual(first, second);
+            }
+
+            output.WriteLine($"Run for {Stopwatch.Frequency} iterations");
+        }
+    }
+}

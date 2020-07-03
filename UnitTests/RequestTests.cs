@@ -51,7 +51,7 @@ namespace NosAyudamos
         {
             var requests = new RequestRepository(new Serializer(), CloudStorageAccount.DevelopmentStorageAccount);
 
-            var request = new Request(Constants.Donee.Id, 0, 1000, "Necesito 1000 para supermercado");
+            var request = new Request(Constants.Donee.Id, 1000, "Necesito 1000 para supermercado");
 
             await requests.PutAsync(request);
 

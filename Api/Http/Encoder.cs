@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -15,7 +10,7 @@ namespace NosAyudamos
         [FunctionName("encode")]
         public IActionResult Encode([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "encoder/encode")] HttpRequest req)
         {
-            if (!req.QueryString.HasValue || 
+            if (!req.QueryString.HasValue ||
                 !long.TryParse(req.QueryString.Value.TrimStart('?'), out var number))
                 return new BadRequestObjectResult("Query string should contain a number to encode.");
 

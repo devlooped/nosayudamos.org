@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Globalization;
 
 namespace NosAyudamos
 {
     [NoExport]
     public abstract class DomainEvent : IEventMetadata
     {
-        protected DomainEvent() => EventId = Guid.NewGuid().ToString("n");
+        protected DomainEvent() => EventId = PreciseTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ", CultureInfo.InvariantCulture);
 
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]

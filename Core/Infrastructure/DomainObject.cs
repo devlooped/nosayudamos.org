@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Newtonsoft.Json;
 
 namespace NosAyudamos
@@ -91,35 +90,11 @@ namespace NosAyudamos
 
             events ??= new List<DomainEvent>();
 
-            var identifiable = this as IIdentifiable;
-            var idSet = false;
-
-            // If we can avoid it, let's try to create a friendlier and 
-            // shorter identifier than a Guid (which is already created by default otherwise)
-            // Note: we pad to 10 digits for consistency with StreamStone and because it seems 
-            // large enough for a single root object entity.
-            if (identifiable != null && 
-                !string.IsNullOrEmpty(identifiable.Id))
-            {
-                e.EventId = identifiable.Id + '-' + (Version + events.Count + 1).ToString(CultureInfo.InvariantCulture).PadLeft(10, '0');
-                idSet = true;
-            }
-
             // NOTE: we don't fail for generated events that don't have a handler 
             // because those just mean they are events important to the domain, but 
             // that don't cause state changes to the current domain object.
             if (handlers.TryGetValue(e.GetType(), out var handler))
                 handler(e);
-
-            // It's typical during the initial ctor-called Raise to not have the Id property 
-            // set yet, which would have been done in the handler instead, so set it right-after.
-            // NOTE: this might cause handlers that consume the EventId to be out of sync, but 
-            // that would be a quite unusal usage of the event sourced events anyway.
-            if (!idSet && 
-                identifiable != null)
-            {
-                e.EventId = identifiable.Id + '-' + (Version + events.Count + 1).ToString(CultureInfo.InvariantCulture).PadLeft(10, '0');
-            }
 
             events.Add(e);
         }

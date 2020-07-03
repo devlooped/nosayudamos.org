@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 
 namespace NosAyudamos
@@ -17,7 +14,7 @@ namespace NosAyudamos
         {
             var serializer = new Serializer();
 
-            var expected = new RequestCreated(Constants.Donee.Id, 0, "", personVersion: 5);
+            var expected = new RequestCreated(Constants.Donee.Id + "-" + Base62.Encode(PreciseTime.UtcNow.Ticks), 0, "");
 
             var json = serializer.Serialize(expected);
 
