@@ -8,6 +8,6 @@ namespace NosAyudamos
 
         public string PhoneNumber { get; }
 
-        public DateTimeOffset When { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset When { get; set; } = PreciseTime.UtcNow;
     }
 }
