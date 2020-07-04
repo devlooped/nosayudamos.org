@@ -11,25 +11,25 @@ namespace NosAyudamos
     {
         JsonSerializerSettings settings = new JsonSerializerSettings
         {
-            NullValueHandling = NullValueHandling.Ignore,
             Converters =
             {
                 new IsoDateTimeConverter
                 {
-                    DateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss",
-                    DateTimeStyles = DateTimeStyles.RoundtripKind
-                }
+                    DateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK",
+                    DateTimeStyles = DateTimeStyles.AdjustToUniversal
+                },
             },
-#if DEBUG
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffK",
             Formatting = Formatting.Indented,
-#endif
+            NullValueHandling = NullValueHandling.Ignore,
         };
 
         public object Deserialize(string data, Type type)
-            => JsonConvert.DeserializeObject(data?.ToString() ?? throw new ArgumentNullException(nameof(data)), type, settings)!;
+            => JsonConvert.DeserializeObject(data ?? throw new ArgumentNullException(nameof(data)), type, settings)!;
 
         public T Deserialize<T>(string data)
-            => JsonConvert.DeserializeObject<T>(data?.ToString() ?? throw new ArgumentNullException(nameof(data)), settings)!;
+            => JsonConvert.DeserializeObject<T>(data ?? throw new ArgumentNullException(nameof(data)), settings)!;
 
         public string Serialize(object value)
             => JsonConvert.SerializeObject(value, settings);

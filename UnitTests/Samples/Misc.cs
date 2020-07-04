@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Resources;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.EventGrid;
 using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 using ZXing;
 using ZXing.PDF417;
@@ -23,6 +30,97 @@ namespace NosAyudamos
     /// </summary>
     public class Misc
     {
+        TelemetryClient client;
+
+        public Misc()
+        {
+            var configuration = new TelemetryConfiguration("160f0ea2-8aa2-416f-83c0-813efea62e1f");
+            QuickPulseTelemetryProcessor processor = null;
+
+            configuration.TelemetryProcessorChainBuilder
+                .Use((next) =>
+                {
+                    processor = new QuickPulseTelemetryProcessor(next);
+                    return processor;
+                })
+                        .Build();
+
+            var QuickPulse = new QuickPulseTelemetryModule()
+            {
+                AuthenticationApiKey = "qlcmbw246dpsur28kin18fkbs4vbbtnfdlotsox0"
+            };
+            QuickPulse.Initialize(configuration);
+            QuickPulse.RegisterTelemetryProcessor(processor);
+            foreach (var telemetryProcessor in configuration.TelemetryProcessors)
+            {
+                if (telemetryProcessor is ITelemetryModule telemetryModule)
+                {
+                    telemetryModule.Initialize(configuration);
+                }
+            }
+
+            client = new TelemetryClient(configuration);
+        }
+
+        public void ContinouslyTelemetry()
+        {
+            for (int i = 0; i < 5000; i++)
+            {
+                CanSendTelemetryFromSerializedEvents();
+            }
+        }
+
+        public void CanSendTelemetryFromSerializedEvents()
+        {
+            var serializer = new Serializer();
+            var json = serializer.Serialize(new MessageReceived(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber, "Hola"));
+
+            client.TrackEvent(typeof(MessageReceived).FullName, JsonConvert.DeserializeObject<IDictionary<string, string>>(json));
+
+            var donee = Constants.Donee.Create();
+            donee.UpdatePhoneNumber(Constants.Donee2.PhoneNumber);
+
+            Thread.Sleep(400);
+
+            donee.UpdateTaxStatus(TaxId.None);
+
+            Thread.Sleep(300);
+
+            foreach (var e in donee.Events)
+            {
+                json = serializer.Serialize(e);
+                var obj = (JObject)JsonConvert.DeserializeObject(json);
+
+                var ev = new EventTelemetry(e.GetType().FullName);
+                foreach (var prop in obj.Properties().Where(prop =>
+                    // Get only primitive values
+                    prop.Value.Type != JTokenType.Array &&
+                    prop.Value.Type != JTokenType.Object &&
+                    prop.Value.Type != JTokenType.Null))
+                {
+                    ev.Properties[prop.Name] = prop.Value.ToString();
+                }
+
+                if (e is IEventMetadata em)
+                {
+                    ev.Properties["EventId"] = em.EventId;
+                    ev.Properties[nameof(IEventMetadata.Subject)] = em.Subject;
+                    ev.Properties[nameof(IEventMetadata.Topic)] = em.Topic;
+                }
+
+                Thread.Sleep(50);
+
+                var eventTicks = e.EventTime.ToUniversalTime().Ticks / TimeSpan.TicksPerMillisecond * TimeSpan.TicksPerMillisecond;
+                var nowTicks = DateTime.UtcNow.Ticks / TimeSpan.TicksPerMillisecond * TimeSpan.TicksPerMillisecond;
+
+                ev.Metrics.Add("EventGridDelay", (nowTicks - eventTicks) / TimeSpan.TicksPerMillisecond);
+
+                client.TrackEvent(ev);
+            }
+
+            client.Flush();
+        }
+
         public async Task SendCustomEventGridEvent()
         {
             var env = new Environment();

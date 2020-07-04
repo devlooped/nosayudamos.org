@@ -25,7 +25,7 @@ namespace NosAyudamos.EventGrid
         }
 
         [FunctionName("store-event")]
-        public async Task SaveAsync([EventGridTrigger] EventGridEvent e)
+        public async Task RunAsync([EventGridTrigger] EventGridEvent e)
         {
             var type = Type.GetType(e.EventType);
             if (type != null && typeof(DomainEvent).IsAssignableFrom(type))

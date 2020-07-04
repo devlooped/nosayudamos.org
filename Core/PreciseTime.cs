@@ -12,7 +12,7 @@ namespace NosAyudamos
         static readonly long startTimestamp = Stopwatch.GetTimestamp();
         // We just preserve milliseconds precision from DateTimeOffset, which is precise enough for 
         // adding the timestamps on top.
-        static readonly long startTicks = (DateTimeOffset.UtcNow.Ticks / TimeSpan.TicksPerMillisecond * TimeSpan.TicksPerMillisecond);
+        static readonly long startTicks = DateTimeOffset.UtcNow.Ticks / TimeSpan.TicksPerMillisecond * TimeSpan.TicksPerMillisecond;
 
         /// <summary>
         /// Gets the elapsed time since the initial usage of <see cref="PreciseTime"/>.
