@@ -14,7 +14,7 @@ namespace NosAyudamos
 
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
-        public DateTime EventTime { get; set; } = PreciseTime.UtcNow.DateTime;
+        public DateTime EventTime { get; set; } = DateTime.UtcNow;
 
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]

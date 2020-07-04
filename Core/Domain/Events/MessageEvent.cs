@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NosAyudamos
 {
@@ -8,6 +10,7 @@ namespace NosAyudamos
 
         public string PhoneNumber { get; }
 
-        public DateTimeOffset When { get; set; } = PreciseTime.UtcNow;
+        [JsonConverter(typeof(IsoDateTimeConverter))]
+        public DateTime When { get; set; } = DateTime.UtcNow;
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace NosAyudamos
 {
@@ -19,8 +21,11 @@ namespace NosAyudamos
         public string FirstName { get; }
         public string LastName { get; }
         public string PhoneNumber { get; }
+        [JsonConverter(typeof(DateOnlyConverter))]
         public DateTime? DateOfBirth { get; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public Role Role { get; }
+        [JsonConverter(typeof(StringEnumConverter))]
         public Sex? Sex { get; }
     }
 }
