@@ -54,8 +54,8 @@ namespace NosAyudamos
             if (!env.IsDevelopment())
             {
                 //Add ApplicationInsights in production only
-                services.AddLogging(builder => builder.AddApplicationInsights(env.GetVariable("ApplicationInsightsKey")));
-                services.AddApplicationInsightsTelemetry(env.GetVariable("ApplicationInsightsKey"));
+                services.AddLogging(builder => builder.AddApplicationInsights(env.GetVariable("APPINSIGHTS_INSTRUMENTATIONKEY")));
+                services.AddApplicationInsightsTelemetry(env.GetVariable("APPINSIGHTS_INSTRUMENTATIONKEY"));
 
                 var liveMetricsKey = env.GetVariable("APPINSIGHTS_QUICKPULSEAUTHAPIKEY", default(string));
                 if (!string.IsNullOrEmpty(liveMetricsKey))
