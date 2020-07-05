@@ -62,12 +62,9 @@ namespace NosAyudamos
             client = new TelemetryClient(configuration);
         }
 
-        public void ContinouslyTelemetry()
+        public void CanSerializeDateTime()
         {
-            for (int i = 0; i < 5000; i++)
-            {
-                CanSendTelemetryFromSerializedEvents();
-            }
+            Console.WriteLine(new Serializer().Serialize(JToken.FromObject(DateTime.UtcNow)));
         }
 
         public void CanSendTelemetryFromSerializedEvents()
@@ -98,7 +95,7 @@ namespace NosAyudamos
                     prop.Value.Type != JTokenType.Object &&
                     prop.Value.Type != JTokenType.Null))
                 {
-                    ev.Properties[prop.Name] = prop.Value.ToString();
+                    ev.Properties[prop.Name] = serializer.Serialize(prop.Value);
                 }
 
                 if (e is IEventMetadata em)

@@ -17,11 +17,12 @@ namespace NosAyudamos.EventGrid
     class TelemetryHandler
     {
         readonly IEnvironment env;
+        readonly ISerializer serializer;
         readonly TelemetryClient client;
 
-        public TelemetryHandler(IEnvironment env, TelemetryClient client)
-            => (this.env, this.client)
-            = (env, client);
+        public TelemetryHandler(IEnvironment env, ISerializer serializer, TelemetryClient client)
+            => (this.env, this.serializer, this.client)
+            = (env, serializer, client);
 
         [FunctionName("insights")]
         public Task RunAsync([EventGridTrigger] EventGridEvent e)
@@ -41,12 +42,11 @@ namespace NosAyudamos.EventGrid
                 prop.Value.Type != JTokenType.Object &&
                 prop.Value.Type != JTokenType.Null))
             {
-                ev.Properties[prop.Name] = prop.Value.ToString();
+                ev.Properties[prop.Name] = serializer.Serialize(prop.Value);
             }
 
             ev.Properties["EventId"] = e.Id;
             ev.Properties[nameof(EventGridEvent.Subject)] = e.Subject;
-            ev.Properties[nameof(EventGridEvent.Topic)] = e.Topic;
 
             // Record the time it took from app-generated EventTime (when we 
             // pushed the event to the grid) to the current time, meassured 
