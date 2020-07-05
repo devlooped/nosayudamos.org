@@ -12,10 +12,10 @@ using Serilog.Sinks.Slack;
 using Polly;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
-using System.IO;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.VisualStudio.Threading;
 using Microsoft.Extensions.Logging;
+using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -50,6 +50,13 @@ namespace NosAyudamos
             var seqUrl = env.GetVariable("SeqUrl", default(string));
             if (!string.IsNullOrEmpty(seqUrl))
                 config.WriteTo.Seq(seqUrl);
+
+            var liveMetricsKey = env.GetVariable("APPINSIGHTS_QUICKPULSEAUTHAPIKEY", default(string));
+            if (!string.IsNullOrEmpty(liveMetricsKey))
+            {
+                services.ConfigureTelemetryModule<QuickPulseTelemetryModule>((module, o)
+                    => module.AuthenticationApiKey = liveMetricsKey);
+            }
 
             if (!env.IsDevelopment())
             {
