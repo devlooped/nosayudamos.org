@@ -34,7 +34,7 @@ namespace NosAyudamos
 
         public RequestRepository(ISerializer serializer, CloudStorageAccount storageAccount, string tableName = "Request")
             => (this.serializer, this.storageAccount, this.tableName)
-            = (serializer, storageAccount, tableName);
+            = (serializer, storageAccount, tableName ?? "Request");
 
         public async Task<Request?> GetAsync(string requestId, bool readOnly = true)
         {

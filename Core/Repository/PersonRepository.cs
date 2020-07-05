@@ -42,7 +42,7 @@ namespace NosAyudamos
 
         public PersonRepository(ISerializer serializer, CloudStorageAccount storageAccount, string tableName = "Person")
             => (this.serializer, this.storageAccount, this.tableName)
-            = (serializer, storageAccount, tableName);
+            = (serializer, storageAccount, tableName ?? "Person");
 
         public async Task<TPerson> PutAsync<TPerson>(TPerson person) where TPerson : Person
         {
