@@ -1,21 +1,25 @@
+using System;
 using System.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.CompilerServices;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.Threading;
+using Polly;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Slack;
-using Polly;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
-using Microsoft.Azure.Cosmos.Table;
-using Microsoft.VisualStudio.Threading;
-using Microsoft.Extensions.Logging;
-using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
 
 [assembly: WebJobsStartup(typeof(NosAyudamos.Startup))]
 
@@ -27,7 +31,16 @@ namespace NosAyudamos
         {
             // testable service registrations in the test-invoked method.
 #pragma warning disable CA2000 // Dispose objects before losing scope
-            Configure(builder.Services, new Environment());
+            var env = new Environment();
+            try
+            {
+                Configure(builder.Services, env);
+            }
+            catch (Exception e)
+            {
+                TraceException(e, env);
+                throw;
+            }
 #pragma warning restore CA2000 // Dispose objects before losing scope
         }
 
@@ -155,6 +168,24 @@ namespace NosAyudamos
 
             services.AddPolicyRegistry(registry);
             services.AddMemoryCache();
+        }
+
+        static void TraceException(Exception e, IEnvironment env)
+        {
+            Console.WriteLine(e.ToString());
+            var aiKey = env.GetVariable("APPINSIGHTS_INSTRUMENTATIONKEY", default(string));
+            if (string.IsNullOrEmpty(aiKey))
+                return;
+
+            using var config = new TelemetryConfiguration(aiKey);
+            var client = new TelemetryClient(config);
+            
+            client.TrackException(new ExceptionTelemetry(e)
+            {
+                SeverityLevel = SeverityLevel.Critical
+            });
+
+            client.Flush();
         }
     }
 }
