@@ -14,12 +14,12 @@ using Newtonsoft.Json.Linq;
 
 namespace NosAyudamos.EventGrid
 {
-    class InsightsHandler
+    class TelemetryHandler
     {
         readonly IEnvironment env;
         readonly TelemetryClient client;
 
-        public InsightsHandler(IEnvironment env, TelemetryClient client)
+        public TelemetryHandler(IEnvironment env, TelemetryClient client)
             => (this.env, this.client)
             = (env, client);
 

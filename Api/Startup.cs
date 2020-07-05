@@ -51,18 +51,18 @@ namespace NosAyudamos
             if (!string.IsNullOrEmpty(seqUrl))
                 config.WriteTo.Seq(seqUrl);
 
-            var liveMetricsKey = env.GetVariable("APPINSIGHTS_QUICKPULSEAUTHAPIKEY", default(string));
-            if (!string.IsNullOrEmpty(liveMetricsKey))
-            {
-                services.ConfigureTelemetryModule<QuickPulseTelemetryModule>((module, o)
-                    => module.AuthenticationApiKey = liveMetricsKey);
-            }
-
             if (!env.IsDevelopment())
             {
                 //Add ApplicationInsights in production only
                 services.AddLogging(builder => builder.AddApplicationInsights(env.GetVariable("ApplicationInsightsKey")));
                 services.AddApplicationInsightsTelemetry(env.GetVariable("ApplicationInsightsKey"));
+
+                var liveMetricsKey = env.GetVariable("APPINSIGHTS_QUICKPULSEAUTHAPIKEY", default(string));
+                if (!string.IsNullOrEmpty(liveMetricsKey))
+                {
+                    services.ConfigureTelemetryModule<QuickPulseTelemetryModule>((module, o)
+                        => module.AuthenticationApiKey = liveMetricsKey);
+                }
             }
             else
             {
