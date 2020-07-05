@@ -34,7 +34,7 @@ namespace NosAyudamos.EventGrid
             if (data == null)
                 return Task.CompletedTask;
 
-            var ev = new EventTelemetry(e.GetType().FullName);
+            var ev = new EventTelemetry(e.EventType);
 
             foreach (var prop in data.Properties().Where(prop =>
                 // Get only primitive values
