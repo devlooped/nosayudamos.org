@@ -14,16 +14,16 @@ using Newtonsoft.Json.Linq;
 
 namespace NosAyudamos.EventGrid
 {
-    class TelemetryHandler
+    class InsightsHandler
     {
         readonly IEnvironment env;
         readonly TelemetryClient client;
 
-        public TelemetryHandler(IEnvironment env, TelemetryClient client)
+        public InsightsHandler(IEnvironment env, TelemetryClient client)
             => (this.env, this.client)
             = (env, client);
 
-        [FunctionName("telemetry")]
+        [FunctionName("insights")]
         public Task RunAsync([EventGridTrigger] EventGridEvent e)
         {
             if (env.IsDevelopment() || !(e.Data is string json))
