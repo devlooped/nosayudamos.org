@@ -217,7 +217,7 @@ namespace NosAyudamos
                 new EventGridEvent
                 {
                     Id = now.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture),
-                    EventType = e.GetType().FullName,
+                    EventType = "System.Exception",
                     EventTime = now,
                     Data = new Serializer().Serialize(e),
                     DataVersion = typeof(Startup).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ??
