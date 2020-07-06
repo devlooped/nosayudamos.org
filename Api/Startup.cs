@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Composition;
 using System.Globalization;
 using System.Linq;
@@ -6,11 +7,14 @@ using System.Net.Http;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
 using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Azure.EventGrid;
+using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -95,7 +99,7 @@ namespace NosAyudamos
                          ShowDefaultAttachments = false,
                          ShowPropertyAttachments = false,
                          ShowExceptionAttachments = true,
-                     }, restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: @"`{Category}:{Level}` ```{@Message:j}```"));
+                     }, restrictedToMinimumLevel: LogEventLevel.Warning, outputTemplate: @"`{Category}:{Level}` ```{@Message:j}```"));
             }
 
             var logger = config.CreateLogger();
@@ -173,13 +177,19 @@ namespace NosAyudamos
         static void TraceException(Exception e, IEnvironment env)
         {
             Console.WriteLine(e.ToString());
+            SendTelemetry(e, env);
+            SendEvent(e, env);
+        }
+
+        static void SendTelemetry(Exception e, IEnvironment env)
+        {
             var aiKey = env.GetVariable("APPINSIGHTS_INSTRUMENTATIONKEY", default(string));
             if (string.IsNullOrEmpty(aiKey))
                 return;
 
             using var config = new TelemetryConfiguration(aiKey);
             var client = new TelemetryClient(config);
-            
+
             client.TrackException(new ExceptionTelemetry(e)
             {
                 SeverityLevel = SeverityLevel.Critical
@@ -187,5 +197,37 @@ namespace NosAyudamos
 
             client.Flush();
         }
+
+        static void SendEvent(Exception e, IEnvironment env)
+        {
+            var gridUrl = env.GetVariable("EventGridUrl", default(string));
+            var gridKey = env.GetVariable("EventGridAccessKey", default(string));
+            if (string.IsNullOrEmpty(gridUrl) ||
+                string.IsNullOrEmpty(gridKey))
+                return;
+
+            var credentials = new TopicCredentials(gridKey);
+            var domain = new Uri(gridUrl).Host;
+            using var client = new EventGridClient(credentials);
+
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
+            var now = DateTime.UtcNow;
+            client.PublishEventsAsync(domain, new List<EventGridEvent>
+            {
+                new EventGridEvent
+                {
+                    Id = now.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture),
+                    EventType = e.GetType().FullName,
+                    EventTime = now,
+                    Data = new Serializer().Serialize(e),
+                    DataVersion = typeof(Startup).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ??
+                        typeof(Startup).Assembly.GetName().Version?.ToString(),
+
+                    Subject = e.Message,
+                    Topic = "Runtime",
+                }
+            }).Wait();
+        }
+
     }
 }
