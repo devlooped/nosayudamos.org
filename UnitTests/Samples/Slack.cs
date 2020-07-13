@@ -16,7 +16,7 @@ namespace NosAyudamos
     public class SlackSamples
     {
         TestEnvironment environment;
-        PhoneSystem phoneSystem = new PhoneSystem(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber);
+        PhoneEntry phoneEntry = new PhoneEntry(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber);
 
         public SlackSamples()
         {
@@ -48,7 +48,7 @@ namespace NosAyudamos
                         }
                     },
                 },
-            }, phoneSystem);
+            }, phoneEntry);
 
             await SendMessageAsync(new SlackMessage
             {
@@ -69,7 +69,7 @@ namespace NosAyudamos
                         }
                     },
                 },
-            }, phoneSystem);
+            }, phoneEntry);
 
             await SendMessageAsync(new SlackMessage
             {
@@ -90,7 +90,7 @@ namespace NosAyudamos
                         }
                     },
                 },
-            }, phoneSystem);
+            }, phoneEntry);
         }
 
         public async Task SendApproved()
@@ -112,7 +112,7 @@ namespace NosAyudamos
                         }
                     },
                 },
-            }, phoneSystem);
+            }, phoneEntry);
         }
 
         public async Task SendUnknown()
@@ -166,7 +166,7 @@ namespace NosAyudamos
                         }
                     }
                 },
-            }, phoneSystem);
+            }, phoneEntry);
         }
 
         public async Task SendAddsAutomationActions()
@@ -180,11 +180,11 @@ namespace NosAyudamos
                 jtc.Factory);
 
             var people = new TestPersonRepository();
-            var phoneSystems = new TestEntityRepository<PhoneSystem>();
+            var phoneSystems = new TestEntityRepository<PhoneEntry>();
             var phoneThreads = new TestEntityRepository<PhoneThread>();
             var slackHandler = new SlackMessageSentHandler(environment, phoneThreads, http);
 
-            await phoneSystems.PutAsync(new PhoneSystem(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber)
+            await phoneSystems.PutAsync(new PhoneEntry(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber)
             {
                 AutomationPaused = true
             });
@@ -206,7 +206,7 @@ namespace NosAyudamos
             await handler.HandleAsync(new MessageReceived(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber, "Threaded, Resume only."));
             await slackHandler.HandleAsync(sent);
 
-            await phoneSystems.PutAsync(new PhoneSystem(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber)
+            await phoneSystems.PutAsync(new PhoneEntry(Constants.Donee.PhoneNumber, Constants.System.PhoneNumber)
             {
                 AutomationPaused = false
             });
@@ -215,7 +215,7 @@ namespace NosAyudamos
             await slackHandler.HandleAsync(sent);
         }
 
-        async Task SendMessageAsync(SlackMessage message, PhoneSystem phoneSystem)
+        async Task SendMessageAsync(SlackMessage message, PhoneEntry phoneSystem)
         {
             using var http = new HttpClient();
             using var jtc = new JoinableTaskContext();
@@ -226,7 +226,7 @@ namespace NosAyudamos
                 jtc.Factory);
 
             var people = new TestPersonRepository();
-            var phoneSystems = new TestEntityRepository<PhoneSystem>();
+            var phoneSystems = new TestEntityRepository<PhoneEntry>();
             var phoneThreads = new TestEntityRepository<PhoneThread>();
             var slackHandler = new SlackMessageSentHandler(environment, phoneThreads, http);
 

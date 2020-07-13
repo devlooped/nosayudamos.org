@@ -49,9 +49,9 @@ namespace NosAyudamos
 
     class AutomationEventsHandler : IEventHandler<AutomationPaused>, IEventHandler<AutomationResumed>
     {
-        readonly IEntityRepository<PhoneSystem> phoneDir;
+        readonly IEntityRepository<PhoneEntry> phoneDir;
 
-        public AutomationEventsHandler(IEntityRepository<PhoneSystem> phoneDir) => this.phoneDir = phoneDir;
+        public AutomationEventsHandler(IEntityRepository<PhoneEntry> phoneDir) => this.phoneDir = phoneDir;
 
         public async Task HandleAsync(AutomationResumed e)
         {
@@ -67,7 +67,7 @@ namespace NosAyudamos
         {
             var phone = await phoneDir.GetAsync(e.PhoneNumber);
             if (phone == null)
-                phone = new PhoneSystem(e.PhoneNumber, "");
+                phone = new PhoneEntry(e.PhoneNumber, "");
 
             if (phone.AutomationPaused != true)
             {

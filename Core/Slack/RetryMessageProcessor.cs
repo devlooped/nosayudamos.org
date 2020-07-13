@@ -6,9 +6,9 @@ namespace NosAyudamos.Slack
     class RetryMessageProcessor : ISlackPayloadProcessor
     {
         readonly IEventStreamAsync events;
-        readonly IEntityRepository<PhoneSystem> phoneDir;
+        readonly IEntityRepository<PhoneEntry> phoneDir;
 
-        public RetryMessageProcessor(IEventStreamAsync events, IEntityRepository<PhoneSystem> phoneDir)
+        public RetryMessageProcessor(IEventStreamAsync events, IEntityRepository<PhoneEntry> phoneDir)
             => (this.events, this.phoneDir)
             = (events, phoneDir);
 

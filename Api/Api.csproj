@@ -65,11 +65,8 @@
   <ItemGroup>
     <None Update="host.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="secrets.settings.json" CopyToOutputDirectory="PreserveNewest" />
     <UpToDateCheckInput Include="@(Content);@(None)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Entity\" />
   </ItemGroup>
 
   <ItemGroup>

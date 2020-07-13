@@ -53,7 +53,7 @@ namespace NosAyudamos
             private set
             {
                 requestId = value;
-                // When processing OnCreated(RequestCreated), we'll have already set 
+                // When processing OnCreated(RequestCreated), we'll have already set PersonId, so no need to re-parse it
                 if (string.IsNullOrEmpty(PersonId) || !requestId.StartsWith(PersonId, StringComparison.Ordinal))
                 {
                     // By setting this via the setter, we can avoid serializing the PersonId explicitly.

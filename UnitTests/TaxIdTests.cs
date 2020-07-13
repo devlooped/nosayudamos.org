@@ -25,7 +25,6 @@ namespace NosAyudamos
         [InlineData("22718904", "", "", Sex.Female, TaxCategory.A, TaxIdKind.CUIT, false)]
         [InlineData("20189078", "", "", Sex.Male, TaxCategory.NotApplicable, TaxIdKind.CUIT, false)]
         [InlineData("25188539", "", "", Sex.Male, TaxCategory.D, TaxIdKind.CUIT, null)]
-
         public async Task GetTaxStatus(
             string nationalId, string firstName, string lastName, Sex sex,
             TaxCategory? category, TaxIdKind? kind, bool? hasIncomeTax)

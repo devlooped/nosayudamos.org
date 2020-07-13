@@ -16,11 +16,11 @@ namespace NosAyudamos
         readonly Lazy<IMessaging> chatApi;
         readonly Lazy<IMessaging> log;
         readonly IEnvironment env;
-        readonly IEntityRepository<PhoneSystem> phoneDir;
+        readonly IEntityRepository<PhoneEntry> phoneDir;
 
         public Messaging(
             IReadOnlyPolicyRegistry<string> registry, IEnvironment env,
-            IEntityRepository<PhoneSystem> phoneDir, HttpClient http,
+            IEntityRepository<PhoneEntry> phoneDir, HttpClient http,
             ISerializer serializer, ILogger<Messaging> logger)
         {
             this.env = env;

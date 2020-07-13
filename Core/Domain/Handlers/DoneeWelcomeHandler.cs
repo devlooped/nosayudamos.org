@@ -6,10 +6,10 @@ namespace NosAyudamos.EventHandlers
     class DoneeWelcomeHandler : IEventHandler<TaxStatusValidated>, IEventHandler<TaxStatusApproved>
     {
         readonly IPersonRepository peopleRepo;
-        readonly IEntityRepository<PhoneSystem> phoneDir;
+        readonly IEntityRepository<PhoneEntry> phoneDir;
         readonly IEventStreamAsync events;
 
-        public DoneeWelcomeHandler(IPersonRepository peopleRepo, IEntityRepository<PhoneSystem> phoneDir, IEventStreamAsync events)
+        public DoneeWelcomeHandler(IPersonRepository peopleRepo, IEntityRepository<PhoneEntry> phoneDir, IEventStreamAsync events)
             => (this.peopleRepo, this.phoneDir, this.events)
             = (peopleRepo, phoneDir, events);
 

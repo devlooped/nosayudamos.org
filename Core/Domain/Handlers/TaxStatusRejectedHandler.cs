@@ -6,10 +6,10 @@ namespace NosAyudamos.EventHandlers
     class TaxStatusRejectedHandler : IEventHandler<TaxStatusRejected>
     {
         readonly IPersonRepository peopleRepo;
-        readonly IEntityRepository<PhoneSystem> phoneDir;
+        readonly IEntityRepository<PhoneEntry> phoneDir;
         readonly IEventStreamAsync events;
 
-        public TaxStatusRejectedHandler(IPersonRepository peopleRepo, IEntityRepository<PhoneSystem> phoneDir, IEventStreamAsync events)
+        public TaxStatusRejectedHandler(IPersonRepository peopleRepo, IEntityRepository<PhoneEntry> phoneDir, IEventStreamAsync events)
             => (this.peopleRepo, this.phoneDir, this.events)
             = (peopleRepo, phoneDir, events);
 

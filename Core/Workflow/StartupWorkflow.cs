@@ -21,6 +21,7 @@ namespace NosAyudamos
         readonly IMessaging messaging;
         readonly HttpClient http;
         readonly IBlobStorage blobStorage;
+        readonly IEntityRepository<PhoneEntry> phoneDir;
         readonly IPersonRepository peopleRepo;
         readonly ILogger<StartupWorkflow> logger;
 
@@ -33,16 +34,18 @@ namespace NosAyudamos
             IMessaging messaging,
             HttpClient http,
             IBlobStorage blobStorage,
+            IEntityRepository<PhoneEntry> phoneDir,
             IPersonRepository peopleRepo,
             ILogger<StartupWorkflow> logger)
-            => (this.env, this.events, this.idRecognizer, this.taxRecognizer, this.durableAction, this.messaging, this.http, this.blobStorage, this.peopleRepo, this.logger)
-            = (env, events, idRecognizer, taxRecognizer, durableAction, messaging, http, blobStorage, peopleRepo, logger);
+            => (this.env, this.events, this.idRecognizer, this.taxRecognizer, this.durableAction, this.messaging, this.http, this.blobStorage, this.phoneDir, this.peopleRepo, this.logger)
+            = (env, events, idRecognizer, taxRecognizer, durableAction, messaging, http, blobStorage, phoneDir, peopleRepo, logger);
 
-        public async Task RunAsync(MessageReceived message, TextAnalysis analysis, Person? person)
+        public async Task RunAsync(PhoneEntry phone, MessageReceived message, TextAnalysis analysis, Person? person)
         {
             // If we receive an image from an unregistered number, we assume 
             // it's someone trying to register by sending their ID as requested 
             // to become a donee.
+            // TODO: ignore moderated content
             if (Uri.TryCreate(message.Body, UriKind.Absolute, out var imageUri))
             {
                 await RegisterDoneeAsync(message, imageUri).ConfigureAwait(false);
@@ -51,11 +54,15 @@ namespace NosAyudamos
 
             if (analysis.Prediction.IsIntent(Intents.Utilities.Help, Intents.Help))
             {
+                phone.Role = Role.Donee;
+                await phoneDir.PutAsync(phone);
                 // User wants to be a donee, we need the ID
                 await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donee.SendIdentifier)).ConfigureAwait(false);
             }
             else if (analysis.Prediction.IsIntent(Intents.Donate))
             {
+                phone.Role = Role.Donor;
+                await phoneDir.PutAsync(phone);
                 await events.PushAsync(new MessageSent(message.PhoneNumber, Strings.UI.Donor.SendAmount)).ConfigureAwait(false);
             }
             else

@@ -4,6 +4,6 @@ namespace NosAyudamos
 {
     interface IWorkflow
     {
-        Task RunAsync(MessageReceived message, TextAnalysis analysis, Person? person);
+        Task RunAsync(PhoneEntry phone, MessageReceived message, TextAnalysis analysis, Person? person);
     }
 }

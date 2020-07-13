@@ -9,7 +9,7 @@ namespace NosAyudamos
 
         public DonorWorkflow(IEventStreamAsync events) => this.events = events;
 
-        public async Task RunAsync(MessageReceived message, TextAnalysis analysis, Person? person)
+        public async Task RunAsync(PhoneEntry phone, MessageReceived message, TextAnalysis analysis, Person? person)
         {
             if (person == null)
                 return;

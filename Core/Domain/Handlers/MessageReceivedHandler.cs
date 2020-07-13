@@ -15,7 +15,7 @@ namespace NosAyudamos
         readonly IPersonRepository peopleRepo;
         readonly ILanguageUnderstanding language;
         readonly ITextAnalyzer textAnalyzer;
-        readonly IEntityRepository<PhoneSystem> phoneDir;
+        readonly IEntityRepository<PhoneEntry> phoneDir;
         readonly IWorkflowSelector selector;
 
         public MessageReceivedHandler(
@@ -23,7 +23,7 @@ namespace NosAyudamos
             IPersonRepository peopleRepo,
             ILanguageUnderstanding language,
             ITextAnalyzer textAnalyzer,
-            IEntityRepository<PhoneSystem> phoneDir,
+            IEntityRepository<PhoneEntry> phoneDir,
             IWorkflowSelector selector)
             => (this.log, this.peopleRepo, this.language, this.textAnalyzer, this.phoneDir, this.selector)
             = (log, peopleRepo, language, textAnalyzer, phoneDir, selector);
@@ -32,21 +32,21 @@ namespace NosAyudamos
         {
             log.LogInformation("{@Message:j}", message);
 
-            var phoneSystem = await phoneDir.GetAsync(message.PhoneNumber).ConfigureAwait(false);
-            if (phoneSystem == null)
+            var phoneEntry = await phoneDir.GetAsync(message.PhoneNumber).ConfigureAwait(false);
+            if (phoneEntry == null)
             {
                 // Always update the map of user phone > system phone 
                 // So we can reliably reply to a user from their preferred system phone #.
-                await phoneDir.PutAsync(new PhoneSystem(message.PhoneNumber, message.SystemNumber)).ConfigureAwait(false);
+                phoneEntry = await phoneDir.PutAsync(new PhoneEntry(message.PhoneNumber, message.SystemNumber)).ConfigureAwait(false);
             }
-            else if (phoneSystem.SystemNumber != message.SystemNumber)
+            else if (phoneEntry.SystemNumber != message.SystemNumber)
             {
-                phoneSystem.SystemNumber = message.SystemNumber;
-                await phoneDir.PutAsync(phoneSystem);
+                phoneEntry.SystemNumber = message.SystemNumber;
+                phoneEntry = await phoneDir.PutAsync(phoneEntry);
             }
 
             // If automation has been paused for this user, don't perform any subsequent processing.
-            if (phoneSystem?.AutomationPaused == true)
+            if (phoneEntry!.AutomationPaused == true)
                 return;
 
             // Performs minimal discovery of existing person id (if any) and intents
@@ -56,7 +56,7 @@ namespace NosAyudamos
             var entities = await textAnalyzer.GetEntitiesAsync(message.Body);
             var keyPhrases = await textAnalyzer.GetKeyPhrasesAsync(message.Body);
 
-            await workflow.RunAsync(message, new TextAnalysis(prediction, entities.ToArray(), keyPhrases.ToArray()), person).ConfigureAwait(false);
+            await workflow.RunAsync(phoneEntry, message, new TextAnalysis(prediction, entities.ToArray(), keyPhrases.ToArray()), person).ConfigureAwait(false);
         }
     }
 }

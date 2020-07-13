@@ -14,11 +14,11 @@ namespace NosAyudamos.Slack
         readonly IEnvironment env;
         readonly IEventStreamAsync events;
         readonly IBlobStorage storage;
-        readonly IEntityRepository<PhoneSystem> phoneDir;
+        readonly IEntityRepository<PhoneEntry> phoneDir;
 
         public RegisterDoneeProcessor(
             IEnvironment env, IEventStreamAsync events,
-            IBlobStorage storage, IEntityRepository<PhoneSystem> phoneDir)
+            IBlobStorage storage, IEntityRepository<PhoneEntry> phoneDir)
             => (this.env, this.events, this.storage, this.phoneDir)
             = (env, events, storage, phoneDir);
 
