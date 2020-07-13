@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
+using Microsoft.Extensions.Primitives;
 
 namespace NosAyudamos.Http
 {
@@ -23,42 +24,23 @@ namespace NosAyudamos.Http
         public async Task<IActionResult> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
         {
-            using var reader = new StreamReader(req.Body);
-            var body = await reader.ReadToEndAsync();
+            // See https://www.mercadopago.com.ar/developers/es/guides/notifications/ipn
+            var id = req.Query["id"];
+            var topic = req.Query["topic"];
 
-            /*
+            // Quick path if the right values are already in the query string
+            if (id != StringValues.Empty && topic != StringValues.Empty)
             {
-              "resource": "https://api.mercadolibre.com/collections/notifications/ID",
-              "topic": "payment"
+                // By pushing to the event stream immediately and processing later, we get the 
+                // required quick response expected by MP after the notification, and we get the 
+                // resilient processing/storing like for all the other event processing we do.
+                if (topic == "payment")
+                    await events.PushAsync(new DonationReceived(id));
+                else if (topic == "subscription")
+                    await events.PushAsync(new SubscriptionReceived(id));
             }
-            */
 
-            var payload = JObject.Parse(body);
-
-            var resource = payload.Property("resource", StringComparison.Ordinal)?.Value?.ToString();
-            var topic = payload.Property("topic", StringComparison.Ordinal)?.Value?.ToString();
-
-            if (resource == null || topic == null)
-                return new BadRequestObjectResult("resource and topic are required");
-
-            if (!Uri.TryCreate(resource, UriKind.Absolute, out var uri))
-                return new BadRequestObjectResult("resource must be a valid URI");
-
-
-            var id = uri.GetComponents(UriComponents.Path, UriFormat.Unescaped).Split('/').LastOrDefault();
-
-            if (id == null)
-                return new BadRequestObjectResult("invalid resource URI");
-
-            // By pushing to the event stream immediately and processing later, we get the 
-            // required quick response expected by MP after the notification, and we get the 
-            // resilient processing/storing like for all the other event processing we do.
-            if (topic == "payment")
-                await events.PushAsync(new DonationReceived(id));
-            else if (topic == "subscription")
-                await events.PushAsync(new SubscriptionReceived(id));
-
-            return new OkObjectResult("");
+            return new OkResult();
         }
     }
 }
