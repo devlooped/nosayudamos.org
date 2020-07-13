@@ -51,7 +51,7 @@ namespace NosAyudamos
 
             // Performs minimal discovery of existing person id (if any) and intents
             var person = await peopleRepo.FindAsync(message.PhoneNumber).ConfigureAwait(false);
-            var workflow = selector.Select(person?.Role);
+            var workflow = selector.Select(person?.Role ?? phoneEntry!.Role);
             var prediction = await language.PredictAsync(message.Body);
             var entities = await textAnalyzer.GetEntitiesAsync(message.Body);
             var keyPhrases = await textAnalyzer.GetKeyPhrasesAsync(message.Body);
