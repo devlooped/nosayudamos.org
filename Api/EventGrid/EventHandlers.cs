@@ -6,6 +6,9 @@ using Microsoft.Azure.EventGrid.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.EventGrid;
 using System.Reflection;
+using Microsoft.ApplicationInsights;
+using System.Diagnostics;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace NosAyudamos.EventGrid
 {
@@ -13,10 +16,11 @@ namespace NosAyudamos.EventGrid
     {
         readonly ISerializer serializer;
         readonly IServiceProvider services;
+        readonly TelemetryClient telemetry;
 
-        public EventHandlers(ISerializer serializer, IServiceProvider services)
-            => (this.serializer, this.services)
-            = (serializer, services);
+        public EventHandlers(ISerializer serializer, IServiceProvider services, TelemetryClient telemetry)
+            => (this.serializer, this.services, this.telemetry)
+            = (serializer, services, telemetry);
 
         [FunctionName("automation-paused")]
         public Task AutomationPausedAsync([EventGridTrigger] EventGridEvent e) => HandleAsync(e.GetData<AutomationPaused>(serializer));
@@ -95,7 +99,8 @@ namespace NosAyudamos.EventGrid
             var handlers = (IEnumerable<IEventHandler<TEvent>>)services.GetService(typeof(IEnumerable<IEventHandler<TEvent>>));
             foreach (var handler in handlers.OrderBy(h => h.GetType().GetCustomAttribute<OrderAttribute>()?.Order ?? 0))
             {
-                await handler.HandleAsync(e);
+                using (var operation = telemetry.StartOperation<RequestTelemetry>(handler.GetType().FullName))
+                    await handler.HandleAsync(e);
             }
         }
     }
