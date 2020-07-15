@@ -1,0 +1,15 @@
+{
+  "collector": {
+    "email": "foo@bar.com",
+    "identification": {
+      "number": "22222222",
+    }
+  },
+  "payer": {
+    "shipping_modes": [
+      "custom",
+      "not_specified",
+      "me2"
+    ]
+  }
+}
