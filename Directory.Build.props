@@ -7,6 +7,8 @@
   <PropertyGroup>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     <LangVersion>Preview</LangVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
     <InformationalVersion Condition="'$(TF_BUILD)' == 'true'">$(BUILD_BUILDNUMBER)-$(BUILD_BUILDID).$(BUILD_SOURCEBRANCHNAME).$(BUILD_SOURCEVERSION.Substring(0, 9))</InformationalVersion>
   </PropertyGroup>
 
