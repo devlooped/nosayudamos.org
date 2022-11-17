@@ -40,7 +40,7 @@
     <PackageReference Include="StreamStone" Version="2.3.0" />
     <PackageReference Include="Humanizer.Core.es" Version="2.8.11" />
     <PackageReference Include="Merq.Core" Version="1.2.*" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.*" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Polly" Version="7.2.0" />
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
